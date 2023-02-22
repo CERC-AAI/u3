@@ -1,0 +1,13 @@
+*
+!*/
+
+# track this file
+!.gitignore
+!unity.sln
+!Assembly-CSharp.csproj
+!Assembly-CSharp-Editor.csproj
+
+# whitelist
+!Assets/**
+!ProjectSettings/**
+!Packages/**
