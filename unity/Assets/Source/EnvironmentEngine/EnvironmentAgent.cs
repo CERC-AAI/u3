@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
 
 public class EnvironmentAgent : Agent
 {
@@ -34,18 +35,33 @@ public class EnvironmentAgent : Agent
         mBrain.Initialize();
     }
 
-    public override void OnActionReceived(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers actions)
     {
         CheckBrain();
+
+        float[] vectorAction = new float[actions.DiscreteActions.Length];
+        for (int i = 0; i < vectorAction.Length; i++)
+        {
+            vectorAction[i] = actions.DiscreteActions[i];
+        }
 
         mBrain.OnEnvironmentActionReceived(vectorAction);
     }
 
-    public override void Heuristic(float[] actionsOut)
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
         CheckBrain();
 
-        mBrain.Heuristic(actionsOut);
+        float[] vectorAction = new float[actionsOut.DiscreteActions.Length];
+
+        mBrain.Heuristic(vectorAction);
+
+        ActionSegment<int> actions = actionsOut.DiscreteActions;
+
+        for (int i = 0; i < vectorAction.Length; i++)
+        {
+            actions[i] = (int)vectorAction[0];
+        }
     }
 
     public override void OnEpisodeBegin()

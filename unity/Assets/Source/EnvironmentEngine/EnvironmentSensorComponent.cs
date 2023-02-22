@@ -10,14 +10,13 @@ public class EnvironmentSensorComponent : SensorComponent
 {
     EnvironmentBrain mSensor;
 
-    public override ISensor CreateSensor()
+    public override ISensor[] CreateSensors()
     {
         mSensor = GetComponent<EnvironmentBrain>();
-        return mSensor;
-    }
 
-    public override int[] GetObservationShape()
-    {
-        return mSensor.GetObservationShape();
+        EnvironmentBrain[] sensors = new EnvironmentBrain[1];
+        sensors[0] = mSensor;
+
+        return sensors;
     }
 }

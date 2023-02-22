@@ -417,9 +417,9 @@ public class GridEnvironment : BaseEnvironment
         }
     }
 
-    public override int[] GetObservationShape()
+    public override ObservationSpec GetObservationSpec()
     {
-        return mObservationSize;
+        return ObservationSpec.Visual(mObservationSize[0], mObservationSize[1], mObservationSize[2]);
     }
 
     public override int Write(ObservationWriter writer)

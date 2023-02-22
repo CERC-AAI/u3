@@ -62,7 +62,7 @@ public abstract class EnvironmentBrain : Brain, ISensor
         {
             mSideChannel = new EnvironmentSideChannel(this);
 
-            Unity.MLAgents.SideChannels.SideChannelsManager.RegisterSideChannel(mSideChannel);
+            Unity.MLAgents.SideChannels.SideChannelManager.RegisterSideChannel(mSideChannel);
         }
     }
     public void OnDestroy()
@@ -70,7 +70,7 @@ public abstract class EnvironmentBrain : Brain, ISensor
         // De-register the Debug.Log callback
         if (Academy.IsInitialized)
         {
-            Unity.MLAgents.SideChannels.SideChannelsManager.UnregisterSideChannel(mSideChannel);
+            Unity.MLAgents.SideChannels.SideChannelManager.UnregisterSideChannel(mSideChannel);
         }
     }
 
@@ -510,16 +510,28 @@ public abstract class EnvironmentBrain : Brain, ISensor
         return "EnvironmentSensor";
     }
 
-    public virtual int[] GetObservationShape()
+    public virtual ObservationSpec GetObservationSpec()
     {
         if (!mSizeWarning)
         {
             mSizeWarning = true;
 
-            Debug.LogError("You must specify the observation size in your environment!");
+            Debug.LogError("You must specify the observation specification in your environment!");
         }
 
-        return new int[1];
+        return ObservationSpec.Vector(1);
+    }
+
+    public virtual CompressionSpec GetCompressionSpec()
+    {
+        if (!mSizeWarning)
+        {
+            mSizeWarning = true;
+
+            Debug.LogError("You must specify the compresion specification in your environment!");
+        }
+
+        return CompressionSpec.Default();
     }
 
     public virtual byte[] GetCompressedObservation()

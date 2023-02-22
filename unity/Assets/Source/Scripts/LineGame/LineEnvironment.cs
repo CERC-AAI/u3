@@ -386,9 +386,9 @@ public class LineEnvironment : BaseEnvironment
     {
     }
 
-    public override int[] GetObservationShape()
+    public override ObservationSpec GetObservationSpec()
     {
-        return new int[1] { 1 };
+        return ObservationSpec.Vector(1);
     }
 
     public override int Write(ObservationWriter writer)
