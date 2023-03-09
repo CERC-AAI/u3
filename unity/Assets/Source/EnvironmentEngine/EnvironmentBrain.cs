@@ -6,7 +6,7 @@ using Unity.MLAgents;
 using UnityEngine.Networking;
 using Unity.MLAgents.Sensors;
 
-[RequireComponent(typeof(EnvironmentEngine))]
+/*[RequireComponent(typeof(EnvironmentEngine))]
 [RequireComponent(typeof(EnvironmentAgent))]
 [RequireComponent(typeof(EnvironmentSensorComponent))]
 public abstract class EnvironmentBrain : Brain, ISensor
@@ -19,8 +19,7 @@ public abstract class EnvironmentBrain : Brain, ISensor
     public bool forceSaveData = false;
 
     protected JSONObject mGameEvents = new JSONObject();
-    bool mLevelIsFresh = false;
-    bool mIsLevelReset = true;
+    bool mIsEpisodeReset = true;
     protected bool mStatic = false;
     protected int mSeedValue = -1;
     protected bool mIsTraining = false;
@@ -38,14 +37,16 @@ public abstract class EnvironmentBrain : Brain, ISensor
     protected EnvironmentSideChannel mSideChannel;
 
 
-    override protected void Init()
+    override protected void Initialize()
     {
         Academy.Instance.AutomaticSteppingEnabled = false;
+
+        mResetParams = Academy.Instance.EnvironmentParameters;
 
         CheckAgent();
         CheckSideChannel();
 
-        base.Init();
+        base.Initialize();
     }
 
     public void CheckAgent()
@@ -80,7 +81,7 @@ public abstract class EnvironmentBrain : Brain, ISensor
         {
             mQueueRestart = false;
 
-            LoadLevel();
+            LoadEpisode();
         }
 
         if (isEndOfTurn)
@@ -97,11 +98,6 @@ public abstract class EnvironmentBrain : Brain, ISensor
         }
 
         base.OnUpdate(isEndOfTurn);
-    }
-
-    public virtual void Initialize()
-    {
-        mResetParams = Academy.Instance.EnvironmentParameters;
     }
 
     public virtual void CheckEnvironmentElement(string elementName, string elementData = "")
@@ -162,8 +158,6 @@ public abstract class EnvironmentBrain : Brain, ISensor
 
     public virtual void OnTurnEnd()
     {
-        mLevelIsFresh = false;
-
         mEngine.IncrementTime();
     }
 
@@ -215,7 +209,7 @@ public abstract class EnvironmentBrain : Brain, ISensor
         AddGameEvent("Timed Out", "");
         SendData();
 
-        ResetLevel();
+        ResetEpisode();
     }
 
     public virtual void OnInstantiate(EnvironmentObject newObject)
@@ -228,14 +222,9 @@ public abstract class EnvironmentBrain : Brain, ISensor
 
     }
 
-   /* public virtual void OnObjectStopped(EnvironmentObject movedObject)
-    {
-
-    }*/
-
     public void GameOver()
     {
-        if (!mIsLevelReset)
+        if (!mIsEpisodeReset)
         {
             OnGameOver();
         }
@@ -246,9 +235,9 @@ public abstract class EnvironmentBrain : Brain, ISensor
         EndEpisode();
     }
 
-    virtual protected void ResetLevel()
+    virtual protected void ResetEpisode()
     {
-        mIsLevelReset = true;
+        mIsEpisodeReset = true;
 
         RestartEnvironment();
     }
@@ -267,11 +256,10 @@ public abstract class EnvironmentBrain : Brain, ISensor
     {
     }
 
-    virtual public void LoadLevel()
+    virtual public void LoadEpisode()
     {
         mIsRunning = true;
-        mIsLevelReset = false;
-        mLevelIsFresh = true;
+        mIsEpisodeReset = false;
         mTotalLoads++;
 
         if (mTotalLoads % 100 == 0)
@@ -346,29 +334,6 @@ public abstract class EnvironmentBrain : Brain, ISensor
                 Debug.Log("Complete: " + www.downloadHandler.text);
             }
         }
-    }
-
-    override protected void BuildRunStateJSON(JSONObject root)
-    {
-        //root["paralyzed"] = new JSONObject(mIsParalyzed);
-        //root["static"] = new JSONObject(mStatic);
-
-        base.BuildRunStateJSON(root);
-    }
-
-    override protected void LoadRunStateJSON(JSONObject root)
-    {
-        /*if (root.keys.Contains("paralyzed"))
-        {
-            mIsParalyzed = root["paralyzed"].b;
-        }
-
-        if (root.keys.Contains("static"))
-        {
-            mIsParalyzed = root["static"].b;
-        }*/
-
-        base.BuildRunStateJSON(root);
     }
 
     public void AddGameCustom(string eventName, string eventValue)
@@ -568,7 +533,7 @@ public abstract class EnvironmentBrain : Brain, ISensor
     {
         Debug.Log("Set seed:" + seedValue);
 
-        UnityEngine.Random.InitState(seedValue);
+        UnityEngine.Random.InitState(seedValue); //FIX ME
         mSeedValue = seedValue;
     }
 
@@ -659,4 +624,4 @@ public abstract class EnvironmentBrain : Brain, ISensor
 
         JavascriptInterface.SendEventToJavascript("Message", jsonString);
     }
-}
+}*/

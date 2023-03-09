@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class KeyGame : GridEnvironment
+/*public class KeyGame : GridEnvironment
 {
     public GameObject wallPrefab;
     public GameObject doorPrefab;
@@ -18,16 +18,16 @@ public class KeyGame : GridEnvironment
     List<Door> mDoors = new List<Door>();
     Dictionary<string, string> mTurnInfo = new Dictionary<string, string>();
 
-    protected override void Init()
+    protected override void Initialize()
     {
         mPlayerHP = player.GetComponent<HealthBar>();
 
-        base.Init();
+        base.Initialize();
     }
 
-    public override void LoadLevel()
+    public override void LoadEpisode()
     {
-        base.LoadLevel();
+        base.LoadEpisode();
 
 
     }
@@ -148,9 +148,9 @@ public class KeyGame : GridEnvironment
         mPlayerHP.addHP(999999999.0f);
     }
 
-    protected override void ResetLevel()
+    protected override void ResetEpisode()
     {
-        base.ResetLevel();
+        base.ResetEpisode();
 
         mDoors.Clear();
         mPlayerHP.addHP(999999999.0f);
@@ -202,4 +202,4 @@ public class KeyGame : GridEnvironment
     }
 
     
-}
+}*/

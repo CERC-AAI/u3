@@ -11,11 +11,11 @@ public class Button : EnvironmentComponent
     int mOrder;
     ButtonGame mButtonList;
 
-    protected override void Init()
+    public override void OnRunStarted()
     {
         mPressed = false;
 
-        base.Init();
+        base.OnRunStarted();
     }
 
     public bool isPressed()
@@ -23,9 +23,9 @@ public class Button : EnvironmentComponent
         return mPressed;
     }
 
-    public override void OnEndTurnCollision(EnvironmentObject otherObject)
+    public override void OnEndStepCollision(EnvironmentObject otherObject)
     {
-        if (otherObject.tag == "Player" && mButtonList)
+        /*if (otherObject.tag == "Player" && mButtonList)
         {
             if (mButtonList.CanPressButton(mOrder))
             {
@@ -50,9 +50,9 @@ public class Button : EnvironmentComponent
 
                 mParentObject.Remove();
             }
-        }
+        }*/
 
-        base.OnEndTurnCollision(otherObject);
+        base.OnEndStepCollision(otherObject);
     }
 
     public void SetOrder(ButtonGame buttonList, int order)
@@ -67,7 +67,7 @@ public class Button : EnvironmentComponent
         return mOrder;
     }
 
-    protected override void BuildRunStateJSON(JSONObject root)
+    /*protected override void BuildRunStateJSON(JSONObject root)
     {
         Vector2Int position;
         mButtonList.GetGridPosition(transform.position, out position);
@@ -91,7 +91,7 @@ public class Button : EnvironmentComponent
         }
 
         base.LoadRunStateJSON(root);
-    }
+    }*/
 
     public override void OnPostLoadState()
     {
@@ -101,7 +101,7 @@ public class Button : EnvironmentComponent
         }
         else if (!isPressed() && !gameObject.activeSelf)
         {
-            mParentObject.RefreshObject();
+            mParentObject.WakeUp();
         }
 
         base.OnPostLoadState();

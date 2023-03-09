@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents;
 
-public class FrogGame : EnvironmentBrain
+/*public class FrogGame : EnvironmentBrain
 {
     public enum Actions
     {
@@ -48,4 +48,4 @@ public class FrogGame : EnvironmentBrain
             actionsOut[0] = (int)Actions.DOWN;
         }
     }
-}
+}*/

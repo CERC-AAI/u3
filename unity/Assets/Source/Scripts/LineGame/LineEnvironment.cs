@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using Unity.MLAgents.Sensors;
 using System.Text.RegularExpressions;
 
-public class LineEnvironment : BaseEnvironment
+/*public class LineEnvironment : BaseEnvironment
 {
     //float[] mDelays = { 1.0f, 4.0f, 8.0f };
     float[] mDelays = { 0.0f, 3.0f };
@@ -66,9 +66,9 @@ public class LineEnvironment : BaseEnvironment
     List<int> mDelayIndices = new List<int>();
     int mCurrentDelay = 0;
 
-    override protected void Init()
+    override protected void Initialize()
     {
-        base.Init();
+        base.Initialize();
 
         mIsLine = cueCardPrefab.slider != null || cueCardPrefab.lineSlider != null;
 
@@ -88,19 +88,11 @@ public class LineEnvironment : BaseEnvironment
         //Cursor.visible = false;
     }
 
-    /*public void LateUpdate()
-    {
-        cursor.position = Input.mousePosition;
-        cursor.transform.SetAsLastSibling();
-
-        base.Update();
-    }*/
-
     public override void Update()
     {
         if (mShouldStart)
         {
-            LoadLevel();
+            LoadEpisode();
 
             mShouldStart = false;
         }
@@ -108,9 +100,9 @@ public class LineEnvironment : BaseEnvironment
         base.Update();
     }
 
-    public override void LoadLevel()
+    public override void LoadEpisode()
     {
-        base.LoadLevel();
+        base.LoadEpisode();
 
         if (mRoundTimer > 0)
         {
@@ -170,7 +162,7 @@ public class LineEnvironment : BaseEnvironment
         {
             if (thisLevel == mLevelInstance)
             {
-                int displayIndex = UnityEngine.Random.Range(0, mDisplayTimes.Length);
+                int displayIndex = GetEngine().GetRandomRange(0, mDisplayTimes.Length);
 
                 mDisplayTime = mDisplayTimes[displayIndex];
 
@@ -185,7 +177,7 @@ public class LineEnvironment : BaseEnvironment
                     }
                     else
                     {
-                        delayIndex = UnityEngine.Random.Range(0, mDelays.Length);
+                        delayIndex = GetEngine().GetRandomRange(0, mDelays.Length);
                     }
 
                     mDelayTime = mDelays[delayIndex];
@@ -245,7 +237,7 @@ public class LineEnvironment : BaseEnvironment
 
         if (mRandomOffset)
         {
-            mOffset = UnityEngine.Random.Range(-200, 200);
+            mOffset = GetEngine().GetRandomRange(-200, 200);
         }
         else
         {
@@ -277,11 +269,8 @@ public class LineEnvironment : BaseEnvironment
 
     public void TrialInitialize(bool isNewBlock)
     {
-        /*float mean = UnityEngine.Random.Range(0, 4) * 0.25f + 0.125f;
-        //mCurrentValue = (float)NextGaussianDouble(mRandom) * std + mean;
-        mCurrentValue = UnityEngine.Random.value;*/
         //mCurrentValue = mMeans[UnityEngine.Random.Range(0, mMeans.Length)];
-        mCurrentValue = mStartValue + UnityEngine.Random.value * (mEndValue - mStartValue);
+        mCurrentValue = mStartValue + GetEngine().GetRandomFloat() * (mEndValue - mStartValue);
         if (mCurrentValue < 0)
         {
             mCurrentValue += 1;
@@ -545,4 +534,4 @@ public class LineEnvironment : BaseEnvironment
 
         }
     }
-}
+}*/

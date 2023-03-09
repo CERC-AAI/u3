@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using Unity.MLAgents.Sensors;
 using System.Text.RegularExpressions;
 
-public class BaseEnvironment : EnvironmentBrain
+/*public class BaseEnvironment : EnvironmentBrain
 {
     public string[] parameters;
 
@@ -15,9 +15,14 @@ public class BaseEnvironment : EnvironmentBrain
 
     int mTurnNumber = 0;
 
-    override protected void Init()
+    override protected void Initialize()
     {
-        base.Init();
+        base.Initialize();
+
+        for (int i = 0; i < mLoadedObjects.Count; i++)
+        {
+            mLoadedObjects[i].CheckInitialized();
+        }
 
         if (IsTesting())
         {
@@ -44,16 +49,13 @@ public class BaseEnvironment : EnvironmentBrain
         return newObject;
     }
 
-    public override void LoadLevel()
+    public override void LoadEpisode()
     {
-        AddGameEvent("LoadLevel", "DefaultLevel");
+        AddGameEvent("LoadEpisode", "DefaultEnvironment");
 
-        for (int i = 0; i < mLoadedObjects.Count; i++)
-        {
-            mLoadedObjects[i].OnLevelLoaded();
-        }
+        base.LoadEpisode();
 
-        base.LoadLevel();
+        GetComponent<EnvironmentEngine>().EpisodeStarted();
     }
 
     public override void LoadEnvironmentElement(string elementName, string elementData = "")
@@ -126,9 +128,9 @@ public class BaseEnvironment : EnvironmentBrain
         base.OnGameOver();
     }
 
-    protected override void ResetLevel()
+    protected override void ResetEpisode()
     {
-        base.ResetLevel();
+        base.ResetEpisode();
 
         for (int i = 0; i < mLoadedObjects.Count; i++)
         {
@@ -170,4 +172,4 @@ public class BaseEnvironment : EnvironmentBrain
             mGameEvents["Turns"].Add(new JSONObject(turnInfo));
         }
     }
-}
+}*/

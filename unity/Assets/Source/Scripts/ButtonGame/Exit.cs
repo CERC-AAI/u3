@@ -5,14 +5,14 @@ using UnityEngine;
 public class Exit : EnvironmentComponent
 {
 
-    public override void OnEndTurnCollision(EnvironmentObject otherObject)
+    public override void OnEndStepCollision(EnvironmentObject otherObject)
     {
         if (otherObject.tag == "Player")
         {
-            mEngine.Victory();
+            //mEngine.Victory();
         }
 
-        base.OnEndTurnCollision(otherObject);
+        base.OnEndStepCollision(otherObject);
     }
 
 }

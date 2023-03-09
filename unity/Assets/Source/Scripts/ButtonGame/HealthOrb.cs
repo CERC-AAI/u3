@@ -6,11 +6,11 @@ public class HealthOrb : EnvironmentComponent
 {
     public int amount = 5;
 
-    public override void OnEndTurnCollision(EnvironmentObject otherObject)
+    public override void OnEndStepCollision(EnvironmentObject otherObject)
     {
         Debug.Log("Hit health orb");
 
-        if (otherObject.tag == "Player")
+        /*if (otherObject.tag == "Player")
         {
             HealthBar healthBar = otherObject.GetComponentInChildren<HealthBar>();
 
@@ -23,9 +23,9 @@ public class HealthOrb : EnvironmentComponent
             }
 
             mParentObject.Remove();
-        }
+        }*/
 
-        base.OnEndTurnCollision(otherObject);
+        base.OnEndStepCollision(otherObject);
     }
 
 }

@@ -4,60 +4,111 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
 
+public enum CallbackScope
+{
+    ENVIRONMENT = 1,
+    SELF = 2
+}
+
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+public class Callback : Attribute
+{
+    public Type callbackType;
+    public CallbackScope callbackScope;
+
+    public Callback(Type callbackType, CallbackScope scope = CallbackScope.SELF)
+    {
+        this.callbackType = callbackType;
+        this.callbackScope = scope;
+    }
+}
+
+[AttributeUsage(AttributeTargets.Property)]
+public class NotSaved : Attribute
+{
+
+}
+
+[AttributeUsage(AttributeTargets.Property)]
+public class DefaultValue : Attribute
+{
+    public string defaultValue = null;
+
+    public DefaultValue(string defaultValue)
+    {
+        this.defaultValue = defaultValue;
+    }
+}
+
+public delegate void EnvironmentCallback();
+public delegate void EnvironmentCallback<T>(T value = default(T));
+
 //base class for environment objects
 public class EnvironmentComponent : MonoBehaviour 
 {
     // Public members
 
     // Private members
-    int mComponentID;
     protected EnvironmentEngine mEngine;
     protected EnvironmentObject mParentObject;
     List<PropertyInfo> mSaveProperties = new List<PropertyInfo>();
+    List<object> mDefaultValues = new List<object>();
     protected bool mPropertiesInitialized = false;
-    protected bool mIsInitialized = false;
+    protected bool mInitialized = false;
+
+    List<Delegate> mCallbackDelegates = new List<Delegate>();
+    List<Delegate> mCallbackReferences = new List<Delegate>();
+    List<Type> mCallbackTypes = new List<Type>();
+    bool mCallbacksInitialized = false;
+
+    Dictionary<Type, object> mCachedComponents = new Dictionary<Type, object>();
+
+
+    //Dictionary<EnvironmentCallback, EnvironmentCallback> mRegisteredCallbacks = new Dictionary<EnvironmentCallback, EnvironmentCallback>();
+
 
     // Start is called before the first frame update
-    private void Start()
+    protected virtual void Start()
     {
         if (Application.isPlaying)
         {
-            CheckInit();
+            CheckInitialized();
         }
     }
 
-    virtual public void OnCreated()
+    public void CheckInitialized(bool force = false)
     {
-        mIsInitialized = false;
-        mIsInitialized = false;
+        if (!mInitialized || force)
+        {
+            Initialize();
+        }
     }
 
-    virtual protected void Init() 
+    virtual protected void Initialize() 
     {
         CheckAll();
-    }
 
-    public void CheckInit()
-    {
-        if (!mIsInitialized)
+        if (mInitialized)
         {
-            mIsInitialized = true;
-
-            Init();
+            Debug.LogError("Object (" + name + ") initialized twice.");
         }
-    }
 
-    private void Update()
-    {
-        CheckEngine();
-        CheckObject();
+        mInitialized = true;
+
+        DoRegisterCallbacks();
     }
 
     public void CheckAll()
     {
         CheckEngine();
         CheckObject();
-        CheckProperties();
+        CheckCallbacks();
+        //CheckProperties();
+
+        if (mParentObject == null && GetComponent<EnvironmentEngine>() == null)
+        {
+            Debug.LogError(name + "(" + GetType().ToString() + ") Each EnvironmentComponent must be attached to a GameObject with an EnvironmentObject, or a EnvironmentEngine derived class.");
+        }
     }
 
     private void OnDestroy()
@@ -66,6 +117,18 @@ public class EnvironmentComponent : MonoBehaviour
         {
             mEngine.RemoveObject((EnvironmentObject)this);
         }
+        if (mEngine && this is EnvironmentAgent)
+        {
+            mEngine.RemoveAgent((EnvironmentAgent)this);
+        }
+
+        for (int i = 0; i < mCallbackReferences.Count; i++)
+        {
+            mCallbackReferences[i] = Delegate.Remove(mCallbackReferences[i], mCallbackDelegates[i]);
+        }
+        mCallbackReferences.Clear();
+        mCallbackDelegates.Clear();
+        mCallbackTypes.Clear();
     }
 
     private void CheckEngine()
@@ -77,6 +140,10 @@ public class EnvironmentComponent : MonoBehaviour
             {
                 mEngine.AddObject((EnvironmentObject)this);
             }
+            if (mEngine && mEngine != this && this is EnvironmentAgent)
+            {
+                mEngine.AddAgent((EnvironmentAgent)this);
+            }
         }
     }
 
@@ -86,7 +153,7 @@ public class EnvironmentComponent : MonoBehaviour
         {
             mParentObject = GetComponent<EnvironmentObject>();
 
-            EnvironmentComponent[] allComponents = GetComponents<EnvironmentComponent>();
+            /*EnvironmentComponent[] allComponents = GetComponents<EnvironmentComponent>();
             for (int i = 0; i < allComponents.Length; i++)
             {
                 if (allComponents[i] == this)
@@ -94,8 +161,137 @@ public class EnvironmentComponent : MonoBehaviour
                     mComponentID = i;
                     break;
                 }
+            }*/
+        }
+    }
+
+    protected virtual void DoRegisterCallbacks()
+    {
+
+    }
+
+    private void CheckCallbacks()
+    {
+        if (!mCallbacksInitialized)
+        {
+            mCallbacksInitialized = true;
+
+            List<string> addedMethods = new List<string>();
+
+            Type currentType = GetType();
+            do
+            {
+                MethodInfo[] methodInfos = currentType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+                foreach (MethodInfo methodInfo in methodInfos)
+                {
+                    Callback callbackInfo = methodInfo.GetCustomAttribute<Callback>();
+                    if (callbackInfo != null && !addedMethods.Contains(methodInfo.Name))
+                    {
+                        addedMethods.Add(methodInfo.Name);
+
+                        switch (callbackInfo.callbackScope)
+                        {
+                            case CallbackScope.ENVIRONMENT:
+                                CheckRegisterCallback(mEngine, callbackInfo.callbackType, methodInfo);
+                                break;
+
+                            case CallbackScope.SELF:
+                                CheckRegisterCallback(mParentObject, callbackInfo.callbackType, methodInfo);
+                                break;
+                        }
+                    }
+                }
+
+                currentType = currentType.BaseType;
+            }
+            while (currentType == typeof(EnvironmentComponent) || currentType.IsSubclassOf(typeof(EnvironmentComponent)));
+        }
+    }
+
+    private void CheckRegisterCallback(EnvironmentComponent thisObject, Type componentType, MethodInfo callbackMethod)
+    {
+        EnvironmentComponent registerComponent = (EnvironmentComponent)thisObject.GetComponent(componentType);
+
+        if (registerComponent)
+        {
+            FieldInfo callbackInfo = registerComponent.GetType().GetField(callbackMethod.Name + "Callbacks", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (callbackInfo != null)
+            {
+                Delegate callback = (Delegate)callbackInfo.GetValue(registerComponent);
+                Delegate newCallback = Delegate.CreateDelegate(callbackInfo.FieldType, this, callbackMethod);
+                if (callback != null)
+                {
+                    callback = Delegate.Combine(callback, newCallback);
+                }
+                else
+                {
+                    callback = newCallback;
+                }
+                callbackInfo.SetValue(registerComponent, callback);
+
+                Debug.Log("Added object " + name + "(" + registerComponent.GetType().Name + ") to callback of object " + thisObject.name + "(" + GetType().Name + ") for callback " + callbackMethod.Name);
+            }
+            else
+            {
+                Debug.LogError("No callback named '" + callbackMethod.Name + "Callbacks' found in object " + thisObject.name + " (" + registerComponent.GetType().Name + ").");
             }
         }
+    }
+
+    new public Component GetComponent(Type type)
+    {
+        if (!mCachedComponents.ContainsKey(type))
+        {
+            Component tempObject = base.GetComponent(type);
+
+            mCachedComponents[type] = tempObject;
+        }
+
+        return (Component)mCachedComponents[type];
+    }
+
+    new public T GetComponent<T>()
+    {
+        if (!mCachedComponents.ContainsKey(typeof(T)))
+        {
+            T tempObject = base.GetComponent<T>();
+
+            mCachedComponents[typeof(T)] = tempObject;
+        }
+
+        return (T)mCachedComponents[typeof(T)];
+    }
+
+    public void RegisterCallback(ref EnvironmentCallback callback, EnvironmentCallback functionToRegister)
+    {
+        mCallbackReferences.Add(functionToRegister);
+        mCallbackDelegates.Add(callback);
+        mCallbackTypes.Add(typeof(EnvironmentCallback));
+
+        callback += functionToRegister;
+
+        //Debug.Log("Added delegate " + functionToRegister.Target.ToString() + " to callback of object " + callback.GetInvocationList()[0].Target.ToString() + " for callback " + callback.Method.Name);
+    }
+
+    public void RegisterCallback<T>(ref EnvironmentCallback<T> callback, EnvironmentCallback<T> functionToRegister)
+    {
+        mCallbackReferences.Add(functionToRegister);
+        mCallbackDelegates.Add(callback);
+        mCallbackTypes.Add(typeof(EnvironmentCallback<T>));
+
+        callback += functionToRegister;
+    }
+
+
+    public virtual void ResetDefaultProperties()
+    {
+        mPropertiesInitialized = false;
+
+        CheckProperties();
+
+        //Debug.Log(GetType().Name + ": ResetDefaultProperties");
     }
 
     private void CheckProperties()
@@ -104,64 +300,79 @@ public class EnvironmentComponent : MonoBehaviour
         {
             mPropertiesInitialized = true;
 
-            PropertyInfo[] propertyInfos = GetType().GetProperties();
+            mSaveProperties.Clear();
+            mDefaultValues.Clear();
 
-            foreach (PropertyInfo propertyInfo in propertyInfos)
+            Type currentType = GetType();
+            do
             {
-                if (propertyInfo.DeclaringType.IsSubclassOf(typeof(EnvironmentComponent)))
+                PropertyInfo[] propertyInfos = currentType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+                foreach (PropertyInfo propertyInfo in propertyInfos)
                 {
-                    mSaveProperties.Add(propertyInfo);
+                    if (propertyInfo.GetCustomAttribute<NotSaved>() == null && propertyInfo.SetMethod != null && propertyInfo.GetMethod != null)
+                    {
+                        mSaveProperties.Add(propertyInfo);
+                        mDefaultValues.Add(propertyInfo.GetValue(this));
+                    }
                 }
-            }
+
+                currentType = currentType.BaseType;
+            } 
+            while (currentType == typeof(EnvironmentComponent) || currentType.IsSubclassOf(typeof(EnvironmentComponent)));
         }
     }
 
-    virtual public void OnUpdate(bool isEndOfTurn)
+    virtual public void DoAction()
     {
     }
 
-    virtual public void OnFixedUpdate(bool isEndOfTurn)
+    virtual public void OnRunStarted()
     {
     }
 
-    virtual public bool OnActionRecieved(float[] vectorAction)
+    virtual public void OnRunEnded()
     {
-        return false;
     }
 
-    virtual public void OnLevelLoaded()
+    virtual public void OnPreStep()
     {
-
     }
 
-    //pipe out the state of the game
-    virtual public void GetState(Dictionary<String, Byte[]> saveDictionary)
+    virtual public void OnStep()
     {
-        OnPreGetState();
-
-        foreach (PropertyInfo propertyInfo in mSaveProperties)
-        {
-            saveDictionary[mParentObject.GetObjectID() + "/" + mComponentID + "/" + propertyInfo.Name] = BinarizeData.ToByteArray(propertyInfo.GetValue(this), 9999);
-        }
     }
 
-    virtual public void LoadState(Dictionary<String, Byte[]> saveDictionary)
+    virtual public void OnCreated()
     {
-        foreach (PropertyInfo propertyInfo in mSaveProperties)
-        {
-            string keyName = mParentObject.GetObjectID() + "/" + mComponentID + "/" + propertyInfo.Name;
+    }
 
-            if (saveDictionary.ContainsKey(keyName))
-            {
-                object tempObject = null;
-                int size;
+    virtual public void OnUpdate(float deltaTime)
+    {
+    }
 
-                BinarizeData.FromByteArray(propertyInfo.PropertyType, saveDictionary[keyName], 0, out size, ref tempObject);
-                propertyInfo.SetValue(this, tempObject);
-            }
-        }
+    virtual public void OnLateUpdate(float deltaTime)
+    {
+    }
 
-        OnPostLoadState();
+    virtual public void OnFixedUpdate(float fixedDeltaTime)
+    {
+    }
+
+    virtual public void OnLateFixedUpdate(float fixedDeltaTime)
+    {
+    }
+
+    public EnvironmentObject GetParentObject()
+    {
+        return mParentObject;
+    }
+
+    public int GetObjectID()
+    {
+        CheckObject();
+
+        return mParentObject.GetObjectID();
     }
 
     virtual public JSONObject SaveToJSON()
@@ -169,10 +380,39 @@ public class EnvironmentComponent : MonoBehaviour
         OnPreGetState();
 
         JSONObject fullComponent = new JSONObject();
-
+        
+        int i = 0;
         foreach (PropertyInfo propertyInfo in mSaveProperties)
         {
-            Common.saveJSONValue(fullComponent, propertyInfo.Name, propertyInfo.GetValue(this), propertyInfo.PropertyType);
+            if (name == "Player")
+            {
+                int  test = 1;
+            }
+
+            string defaultValue = null;
+            if (propertyInfo.GetCustomAttribute<DefaultValue>() != null)
+            {
+                defaultValue = propertyInfo.GetCustomAttribute<DefaultValue>().defaultValue;
+            }
+
+            if (mDefaultValues[i] != null)
+            {
+                JSONObject componentJSON = new JSONObject();
+                Common.saveJSONValue(componentJSON, propertyInfo.Name, propertyInfo.GetValue(this), propertyInfo.PropertyType, defaultValue, GetType().ToString());
+
+                JSONObject defaultJSON = new JSONObject();
+                Common.saveJSONValue(defaultJSON, propertyInfo.Name, mDefaultValues[i], propertyInfo.PropertyType, defaultValue, GetType().ToString());
+
+                if (componentJSON.ToString() != defaultJSON.ToString())
+                {
+                    Common.saveJSONValue(fullComponent, propertyInfo.Name, propertyInfo.GetValue(this), propertyInfo.PropertyType, defaultValue, GetType().ToString());
+                }
+            }
+            else
+            {
+                Common.saveJSONValue(fullComponent, propertyInfo.Name, propertyInfo.GetValue(this), propertyInfo.PropertyType, defaultValue, GetType().ToString());
+            }
+            i++;
         }
 
         return fullComponent;
@@ -180,8 +420,6 @@ public class EnvironmentComponent : MonoBehaviour
 
     virtual public void LoadFromJSON(JSONObject tempObject)
     {
-        CheckProperties();
-
         foreach (PropertyInfo propertyInfo in mSaveProperties)
         {
             object tempValue = Common.getJSONValue(tempObject, propertyInfo.Name, propertyInfo.PropertyType);
@@ -200,55 +438,46 @@ public class EnvironmentComponent : MonoBehaviour
     {
     }
 
-    virtual public void OnCollision(EnvironmentObject otherObject)
+    virtual public void OnRemoved()
     {
+
     }
 
-    virtual public void OnEndTurnCollision(EnvironmentObject otherObject)
-    {
-    }
-
-    public void Remove()
+    virtual public void Remove()
     {
         mParentObject.Remove();
     }
 
+    public EnvironmentEngine GetEngine()
+    {
+        return mEngine;
+    }
+
+
+    //Move me to other classes
+
     public void Move(Vector3 newPosition)
     {
-        mEngine.OnObjectMoved(mParentObject, mParentObject.GetPosition(), mEngine.GetEnvironmentPosition(newPosition));
+        //mEngine.OnObjectMoved(mParentObject, mParentObject.GetPosition(), mEngine.GetEnvironmentPosition(newPosition));
 
         transform.position = newPosition;
     }
 
-    public JSONObject BuildRunStateToJSON()
-    {
-        OnPreGetState();
-
-        JSONObject fullComponent = new JSONObject();
-        BuildRunStateJSON(fullComponent);
-
-        return fullComponent;
-    }
-
-    public void LoadRunStateFromJSON(JSONObject tempObject)
-    {
-        JSONObject lowerJSON = new JSONObject();
-
-        foreach (string key in tempObject.keys)
-        {
-            lowerJSON[key.ToLower()] = tempObject[key];
-        }
-
-        LoadRunStateJSON(tempObject);
-
-        OnPostLoadState();
-    }
-
-    virtual protected void BuildRunStateJSON(JSONObject root)
+    virtual public void OnCollision(EnvironmentObject otherObject)
     {
     }
 
-    virtual protected void LoadRunStateJSON(JSONObject root)
+    virtual public void OnPostCollision(EnvironmentObject otherObject)
     {
+    }
+
+    virtual public void OnEndStepCollision(EnvironmentObject otherObject)
+    {
+    }
+
+    public virtual void WakeUp()
+    {
+        mInitialized = false;
+        Initialize();
     }
 }

@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcf7219bab7fe46a1ad266029b2fee19, type: 3}
+  m_Name: Readme
+  m_EditorClassIdentifier: 
+  icon: {fileID: 2800000, guid: 44a17a5b205fcd349a24700e6f5615bd, type: 3}
+  title: Etra's Starter Assets
+  sections:
+  - heading: <b>Etra's Games For Non-Gamers:</b>
+    text: 
+    linkText: Youtube Channel
+    url: https://www.youtube.com/@GamesForNon-Gamers
+  - heading: 
+    text: 
+    linkText: Patreon
+    url: https://www.patreon.com/GamesForNongamers
+  - heading: 
+    text: 
+    linkText: Discord
+    url: https://discord.gg/DTRXMBYmQq
+  - heading: <b>VIDEO TUTORIALS:</b>
+    text: 
+    linkText: 'Etra''s Starter Assets: Overview'
+    url: https://youtu.be/5Yb4oaFpZ04
+  - heading: 
+    text: 
+    linkText: 'Etra''s Starter Assets: Modding'
+    url: https://youtu.be/q26z6KW1geI
+  - heading: About Etra's Starter Assets
+    text: 'Etra''s Starter Assets is an expanded combination of the Unity First Person
+      and Third Person Starter Assets. A new Character Creator, Ability System, and
+      Item System allows you to quickly build expandable character controllers. '
+    linkText: 
+    url: 
+  - heading: Getting Started
+    text: 'To create a First or Third Person Etra Character Controller go to : Window>Etra''sStarterAssets>EtraCharacterCreator.
+      Select which abilities and items your charcter should have then press "CREATE"
+      to add your new character creator to your currently open scene.'
+    linkText: 
+    url: 
+  - heading: 
+    text: 'To learn more about the <b>Character Creator</b>, the <b>ABILITY System</b>,
+      the <b>ITEM System</b>, and more check out the <b>Video Tutorials</b> above. '
+    linkText: 
+    url: 
+  - heading: Dependencies
+    text: "The Etra\u2019s Starter Assets package requires the Cinemachine and TextMeshPro
+      packages to work.  It is highly recommended that you download the Input System
+      package. Partial support for Unity\u2019s default input system is included
+      in the StarterAssetsInputs.cs script. "
+    linkText: 
+    url: 
+  - heading: Render Pipelines
+    text: Currently, Etra's Starter Asset's support the Unity Standard and Universal
+      Render Pipeline.
+    linkText: 
+    url: 
+  - heading: Documentation
+    text: See the full documentation (1-UserAssets/Etra'sStarterAssets_Documentation.pdf)
+      for more information on how to set up Etra's Starter Assets in a new Scene,
+      use the Character Creator, ABILITY System, or Item System.
+    linkText: 
+    url: 
+  loadedLayout: 1

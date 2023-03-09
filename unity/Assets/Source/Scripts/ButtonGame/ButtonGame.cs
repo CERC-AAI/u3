@@ -13,6 +13,29 @@ public class ButtonGame : GridEnvironment
     
     float mHealthLoss = 0.2f;
 
+    public override void InitializeEnvironment(JSONObject loadParams)
+    {
+        base.InitializeEnvironment(loadParams);
+
+        //All arenas have walls
+        for (int y = 0; y < GetArenaHeight(); y++)
+        {
+            for (int x = 0; x < GetArenaWidth(); x++)
+            {
+                if (x == 0 || y == 0 || x == GetArenaWidth() - 1 || y == GetArenaHeight() - 1)
+                {
+                    /*if (!GetGridObject(new Vector2Int(x, y)))
+                    {
+                        LoadObject(wallPrefab, new Vector3(x, y, 0));
+                    }*/
+
+                    CreateEnvironmentObject(wallPrefab, new Vector3(x, y, 0));
+                }
+            }
+        }
+    }
+
+    /*
     HealthBar mPlayerHP;
     
     List<Button> mButtons = new List<Button>();
@@ -25,19 +48,17 @@ public class ButtonGame : GridEnvironment
 
     int mSpawnButtons;
 
-    protected override void Init()
+    protected override void Initialize()
     {
         mPlayerHP = player.GetComponent<HealthBar>();
         mSpawnButtons = totalButtons;
 
-        base.Init();
-
-        LoadLevel();
+        base.Initialize();
     }
 
-    public override void LoadLevel()
+    public override void InitializeEnvironment()
     {
-        base.LoadLevel();
+        base.InitializeEnvironment();
     }
 
     protected override int[] GetObjectType(EnvironmentObject checkObject)
@@ -102,11 +123,11 @@ public class ButtonGame : GridEnvironment
         {
             if (mSeedValue >= 0)
             {
-                UnityEngine.Random.InitState(mSeedValue);
+                GetEngine().SetSeed(mSeedValue);
             }
             else
             {
-                UnityEngine.Random.InitState(1);
+                GetEngine().RandomizeSeed();
             }
         }
 
@@ -134,6 +155,9 @@ public class ButtonGame : GridEnvironment
 
     public override void LoadEnvironmentElement(string elementName, string elementData = "")
     {
+
+        Debug.Log("LoadEnvironmentElement");
+
         switch (elementName.ToLower())
         {
             case "button1":
@@ -219,9 +243,9 @@ public class ButtonGame : GridEnvironment
         base.OnGameOver();
     }
 
-    protected override void ResetLevel()
+    protected override void ResetEpisode()
     {
-        base.ResetLevel();
+        base.ResetEpisode();
 
         mButtons.Clear();
         mPlayerHP.addHP(999999999.0f);
@@ -409,7 +433,7 @@ public class ButtonGame : GridEnvironment
         }
     }
 
-    override protected void BuildRunStateJSON(JSONObject root)
+    /*override protected void BuildRunStateJSON(JSONObject root)
     {
         for (int i = 0; i < mButtons.Count; i++)
         {
@@ -440,5 +464,5 @@ public class ButtonGame : GridEnvironment
         }
 
         base.LoadRunStateJSON(root);
-    }
+    }*/
 }

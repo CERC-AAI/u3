@@ -8,7 +8,7 @@ public class LoadBar : MonoBehaviour
 
     float maxSize;
 
-    public void Start()
+    public void Awake()
     {
         maxSize = loadBar.transform.localScale.x;
     }

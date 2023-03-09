@@ -10,151 +10,92 @@ using UnityEditor;
 //base class for game objects
 // Defines postion in game world, collision code, etc
 [ExecuteInEditMode]
-public class EnvironmentObject : EnvironmentComponent
+public class EnvironmentObject : EnvironmentComponentHolder
 {
     // Public members
 
     public Vector3 Position
     {
-        get { return GetPosition(); }
-        set { SetPosition(value); }
+        get { return transform.localPosition; }
+        set { transform.localPosition = mEngine.ApplyEnvironmentPosition(value);  }
     }
+
     public Vector3 Rotation
     {
-        get { return transform.rotation.eulerAngles; }
-        set
+        get { return transform.localPosition; }
+        set 
         {
-            Quaternion rotation = Quaternion.Euler(value);
-            transform.rotation = rotation;
+            Quaternion currentRotation = transform.localRotation;
+            Vector3 eulerAngles = currentRotation.eulerAngles;
+
+            eulerAngles = mEngine.ApplyEnvironmentRotation(value);
+
+            currentRotation.eulerAngles = eulerAngles;
+            transform.localRotation = currentRotation;
         }
     }
+
     public string Name
     {
         get { return name; }
         set { name = value; }
     }
 
-    // Private mebers
-    Collider[] mColliders;
-    Collider2D[] mColliders2D;
-    Rigidbody mRigidbody;
-    Rigidbody2D mRigidbody2D;
-    bool mIs2D;
+    // Private members
     int mObjectID;
     [HideInInspector]
     public string mPrefabPath;
-    EnvironmentComponent[] mComponents;
-    Brain mBrain;
-    List<EnvironmentObject> mTurnCollisions = new List<EnvironmentObject>();
-    GameObject mBaseObject;
 
-    static Dictionary<GameObject, List<EnvironmentObject>> mUnusedObjects = new Dictionary<GameObject, List<EnvironmentObject>>();
+    List<EnvironmentObject> mStepCollisions = new List<EnvironmentObject>();
+    List<EnvironmentObject> mFixedUpdateCollisions = new List<EnvironmentObject>();
+    //GameObject mBaseObject;
 
-    
-    override protected void Init()
+    Collider2D[] mColliders2D;
+    Collider[] mColliders;
+
+    override protected void Initialize()
     {
-        mColliders = GetComponentsInChildren<Collider>();
         mColliders2D = GetComponentsInChildren<Collider2D>();
-        mRigidbody = GetComponent<Rigidbody>();
-        mRigidbody2D = GetComponent<Rigidbody2D>();
-
-        if (mRigidbody && !mRigidbody2D)
-        {
-            mIs2D = false;
-        }
-        else if (!mRigidbody && mRigidbody2D)
-        {
-            mIs2D = true;
-        }
+        mColliders = GetComponentsInChildren<Collider>();
 
         CheckComponents();
+
+        base.Initialize();
+    }
+
+    public override void OnRunStarted()
+    {
+        base.OnRunStarted();
+
+        ResetDefaultProperties();
+    }
+
+    public override void ResetDefaultProperties()
+    {
+        base.ResetDefaultProperties();
+
         for (int i = 0; i < mComponents.Length; i++)
         {
-            mComponents[i].CheckInit();
-        }
-
-        base.Init();
-    }
-
-    void CheckComponents()
-    {
-        if (mComponents == null)
-        {
-            mComponents = GetComponents<EnvironmentComponent>();
+            if (mComponents[i] != this)
+            {
+                mComponents[i].ResetDefaultProperties();
+            }
         }
     }
 
-    void CheckBrain()
+    override public void Remove()
     {
-        if (mBrain == null)
-        {
-            mBrain = GetComponent<Brain>();
-        }
-    }
+        base.Remove();
 
-    public void Remove()
-    {
-        OnRemoved();
-
-        if (mUnusedObjects.ContainsKey(mBaseObject) && !mUnusedObjects[mBaseObject].Contains(this))
-        {
-            mUnusedObjects[mBaseObject].Add(this);
-        }
         transform.parent = mEngine.recycleBin;
         gameObject.SetActive(false);
     }
 
-    virtual public void OnRemoved()
-    {
-
-    }
-
-    virtual public void OnCreated()
-    {
-        mColliders = null;
-        mColliders2D = null;
-        mRigidbody = null;
-        mRigidbody2D = null;
-        mComponents = null;
-
-        mPropertiesInitialized = false;
-        mIsInitialized = false;
-
-        CheckComponents();
-        for (int i = 0; i < mComponents.Length; i++)
-        {
-            mComponents[i].OnCreated();
-        }
-    }
-
-    static public EnvironmentObject GetNewObject(GameObject baseObject)
-    {
-        if (!mUnusedObjects.ContainsKey(baseObject))
-        {
-            mUnusedObjects.Add(baseObject, new List<EnvironmentObject>());
-        }
-
-        EnvironmentObject newObject = null;
-        if (mUnusedObjects[baseObject].Count >  0)
-        {
-            newObject = mUnusedObjects[baseObject][0];
-            mUnusedObjects[baseObject].RemoveAt(0);
-        }
-        else
-        {
-            newObject = ((GameObject)GameObject.Instantiate(baseObject)).GetComponent<EnvironmentObject>();
-        }
-
-        newObject.RefreshObject();
-        newObject.mBaseObject = baseObject;
-
-        return newObject;
-    }
-
-    public void RefreshObject()
+    public override void WakeUp()
     {
         gameObject.SetActive(true);
-        OnCreated();
+
+        base.WakeUp();
     }
 
     private void Update()
@@ -176,53 +117,53 @@ public class EnvironmentObject : EnvironmentComponent
 #endif
     }
 
-    public void OnObjectUpdate(bool isEndOfTurn)
+    sealed override public void OnObjectUpdate(float deltaTime)
     {
-        for (int i = 0; i < mComponents.Length; i++)
-        {
-            mComponents[i].OnUpdate(isEndOfTurn);
-        }
+        base.OnObjectUpdate(deltaTime);
     }
 
-    public void OnObjectFixedUpdate(bool isEndOfTurn)
+    sealed override public void OnObjectFixedUpdate(float fixedDeltaTime)
     {
-        for (int i = 0; i < mComponents.Length; i++)
-        {
-            mComponents[i].OnFixedUpdate(isEndOfTurn);
-        }
-
-        if (isEndOfTurn)
-        {
-            for (int i = 0; i < mTurnCollisions.Count; i++)
-            {
-                OnEndTurnCollision(mTurnCollisions[i]);
-            }
-            mTurnCollisions.Clear();
-        }
-
-        if ((!mRigidbody || mRigidbody.isKinematic || !mRigidbody.useGravity) && (!mRigidbody2D || mRigidbody2D.bodyType == RigidbodyType2D.Kinematic || mRigidbody2D.gravityScale == 0))
-        {
-            SetPosition(mEngine.GetDiscretePosition(GetPosition(), isEndOfTurn));
-
-            transform.rotation = Quaternion.identity;
-        }
-
+        base.OnObjectFixedUpdate(fixedDeltaTime);
     }
 
-    public bool OnObjectActionRecieved(float[] vectorAction)
+    sealed override public void OnObjectLateFixedUpdate(float fixedDeltaTime)
     {
-        bool shouldEndTurn = false;
+        base.OnObjectLateFixedUpdate(fixedDeltaTime);
+    }
 
-        for (int i = 0; i < mComponents.Length; i++)
+    public override void OnStep()
+    {
+        for (int i = 0; i < mStepCollisions.Count; i++)
         {
-            if (mComponents[i].OnActionRecieved(vectorAction))
+            for (int j = 0; j < mComponents.Length; j++)
             {
-                shouldEndTurn = true;
+                mComponents[j].OnEndStepCollision(mStepCollisions[i]);
             }
         }
+        mStepCollisions.Clear();
 
-        return shouldEndTurn;
+        base.OnStep();
     }
+
+    public override void OnLateFixedUpdate(float fixedDeltaTime)
+    {
+        base.OnLateFixedUpdate(fixedDeltaTime);
+
+        for (int i = 0; i < mFixedUpdateCollisions.Count; i++)
+        {
+            for (int j = 0; j < mComponents.Length; j++)
+            {
+                mComponents[j].OnPostCollision(mFixedUpdateCollisions[i]);
+            }
+        }
+        mFixedUpdateCollisions.Clear();
+    }
+
+    /*sealed override public bool OnObjectActionRecieved(float[] vectorAction)
+    {
+        return base.OnObjectActionRecieved(vectorAction);
+    }*/
 
     void OnTriggerEnter(Collider other)
     {
@@ -278,43 +219,9 @@ public class EnvironmentObject : EnvironmentComponent
         }
     }
 
-
-    public void SetPosition(Vector3 newEnvironmentPosition)
-    {
-        Vector3 worldPosition = mEngine.GetGlobalPosition(newEnvironmentPosition);
-        transform.position = worldPosition;
-    }
-
-    public void SetPosition(Vector2 newEnvironmentPosition)
-    {
-        SetPosition(new Vector3(newEnvironmentPosition.x, newEnvironmentPosition.y, 0));
-    }
-
-    public void AddPosition(Vector3 offset)
-    {
-        Vector3 environmentPosition = GetPosition() + offset;
-        SetPosition(environmentPosition);
-    }
-
-    public void AddPosition(Vector2 offset)
-    {
-        AddPosition(new Vector3(offset.x, offset.y, 0));
-    }
-
-    public Vector3 GetPosition()
-    {
-        return mEngine.GetEnvironmentPosition(transform.position);
-    }
-
     // For effects that occur during collision, physics should be handled by Unity
     override public void OnCollision(EnvironmentObject otherObject)
     {
-        CheckBrain();
-        if (mBrain)
-        {
-            mBrain.OnCollision(otherObject);
-        }
-
         for (int i = 0; i < mComponents.Length; i++)
         {
             if (mComponents[i] != this)
@@ -323,28 +230,29 @@ public class EnvironmentObject : EnvironmentComponent
             }
         }
 
-        mTurnCollisions.Add(otherObject);
+        if (!mStepCollisions.Contains(otherObject))
+        {
+            mStepCollisions.Add(otherObject);
+        }
+        if (!mFixedUpdateCollisions.Contains(otherObject))
+        {
+            mFixedUpdateCollisions.Add(otherObject);
+        }
 
         base.OnCollision(otherObject);
     }
 
-    override public void OnEndTurnCollision(EnvironmentObject otherObject)
+    override public void OnEndStepCollision(EnvironmentObject otherObject)
     {
-        CheckBrain();
-        if (mBrain)
-        {
-            mBrain.OnEndTurnCollision(otherObject);
-        }
-
         for (int i = 0; i < mComponents.Length; i++)
         {
             if (mComponents[i] != this)
             {
-                mComponents[i].OnEndTurnCollision(otherObject);
+                mComponents[i].OnEndStepCollision(otherObject);
             }
         }
 
-        base.OnEndTurnCollision(otherObject);
+        base.OnEndStepCollision(otherObject);
     }
 
     public void SetObjectID(int id)
@@ -361,26 +269,32 @@ public class EnvironmentObject : EnvironmentComponent
     {
         JSONObject fullObject = new JSONObject();
 
+        fullObject.AddField("name", name);
+
         if (mPrefabPath == null || mPrefabPath == "")
         {
             Debug.LogError("Could not find a prefab associated with object: " + name);
-
-            return fullObject;
+        }
+        else
+        {
+            string relativePrefabPath = mPrefabPath.Substring(mPrefabPath.LastIndexOf("Resources/") + 10);
+            relativePrefabPath = relativePrefabPath.Substring(0, relativePrefabPath.LastIndexOf(".prefab"));
+            fullObject.AddField("prefabPath", relativePrefabPath);
         }
 
-
-        JSONObject[] allObjects = new JSONObject[mComponents.Length];
+        JSONObject allObjects = new JSONObject();
         for (int i = 0; i < mComponents.Length; i++)
         {
             JSONObject tempObject = mComponents[i].SaveToJSON();
-
-            allObjects[i] = tempObject;
+            if (tempObject.Count > 0)
+            {
+                allObjects.AddField(mComponents[i].GetType().Name, tempObject);
+            }
         }
-
-        string relativePrefabPath = mPrefabPath.Substring(mPrefabPath.LastIndexOf("Resources/") + 10);
-        relativePrefabPath = relativePrefabPath.Substring(0, relativePrefabPath.LastIndexOf(".prefab"));
-        fullObject.AddField("prefabPath", relativePrefabPath);
-        fullObject.AddField("components", new JSONObject(allObjects));
+        if (allObjects.Count > 0)
+        {
+            fullObject.AddField("components", allObjects);
+        }
 
         return fullObject;
     }

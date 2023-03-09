@@ -86,7 +86,7 @@ public class InstructionCard : EnvironmentComponent
     {
         yield return new WaitForSeconds(3.0f);
 
-        mEngine.SendEvent("Stage2", this);
+        mEngine.AddGameEvent("Stage2");
     }
 
     public void setStage3(bool isLine, string overrideText = "")
@@ -130,11 +130,11 @@ public class InstructionCard : EnvironmentComponent
 
         if (mInstructionStage == 1)
         {
-            mEngine.SendEvent("Stage1", this);
+            mEngine.AddGameEvent("Stage1");
         }
         else if (mInstructionStage == 0)
         {
-            mEngine.SendEvent("Start", this);
+            mEngine.AddGameEvent("Start");
             RemoveCard();
         }
     }

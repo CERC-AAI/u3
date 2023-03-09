@@ -6,7 +6,7 @@ using Unity.MLAgents;
 using UnityEngine.Networking;
 using Unity.MLAgents.Sensors;
 
-public class EnvironmentSensorComponent : SensorComponent
+/*public class EnvironmentSensorComponent : SensorComponent
 {
     EnvironmentBrain mSensor;
 
@@ -19,4 +19,4 @@ public class EnvironmentSensorComponent : SensorComponent
 
         return sensors;
     }
-}
+}*/

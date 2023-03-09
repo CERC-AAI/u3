@@ -5,60 +5,111 @@ using UnityEngine;
 
 public class HealthBar : EnvironmentComponent
 {
+    public float HP
+    {
+        get { return currentHP; }
+        set
+        {
+            float originalHP = HP;
+
+            currentHP = value;
+            currentHP = Mathf.Clamp(currentHP, 0, maxHP);
+
+            if (mHealthBar)
+            {
+                mHealthBar.SetPercent(currentHP / maxHP);
+            }
+
+            if (originalHP > 0 && HP <= 0)
+            {
+                if (OnDiedCallbacks != null)
+                {
+                    OnDiedCallbacks();
+                }
+                //SendMessage("OnDied");
+            }
+        }
+    }
+
+    public float MaxHP
+    {
+        get { return maxHP; }
+        set
+        {
+            maxHP = value;
+            HP = currentHP;
+
+            if (mHealthBar)
+            {
+                mHealthBar.SetPercent(currentHP / maxHP);
+            }
+        }
+    }
+
+    public float HealthDrainRate
+    {
+        get { return healthDrainRate; }
+        set { healthDrainRate = value; }
+    }
+
+    public EnvironmentCallback OnDiedCallbacks;
+
+    [Tooltip("Maximum health the object can have.")]
     public float maxHP = 20;
+    [Tooltip("Current health of the agent. Calls 'OnDiedCallbacks' and send OnDied message to components when health reaches 0.")]
     public float currentHP = 20;
+    [Tooltip("Drain rate is per second, or per turn if in a GridEnvironment.")]
+    public float healthDrainRate = 0.2f;
 
     LoadBar mHealthBar;
+    bool mIsPerTurn = false;
 
-    protected override void Init()
+    protected override void Initialize()
     {
+        base.Initialize();
+
+        if (mEngine is GridEnvironment)
+        {
+            mIsPerTurn = true;
+        }
+
         mHealthBar = GetComponentInChildren<LoadBar>();
-
-        base.Init();
     }
 
-    public void addHP(float amount)
+    protected override void DoRegisterCallbacks()
     {
-        currentHP = Math.Min(maxHP, currentHP + amount);
-
-        if (mHealthBar)
+        if (mEngine is GridEnvironment)
         {
-            mHealthBar.SetPercent(currentHP / maxHP);
+            RegisterCallback(ref ((GridEnvironment)mEngine).OnEndTurnCallbacks, OnEndTurn);
         }
+
+        base.DoRegisterCallbacks();
     }
 
-
-    public void subHP(float amount)
+    virtual public void OnEndTurn()
     {
-        currentHP = Math.Max(0, currentHP - amount);
-
-        if (mHealthBar)
-        {
-            mHealthBar.SetPercent(currentHP / maxHP);
-        }
+        HP -= HealthDrainRate;
     }
 
-    public void setHP(float amount)
+
+    public override void OnRunStarted()
     {
-        currentHP = amount;
+        base.OnRunStarted();
 
-        if (mHealthBar)
-        {
-            mHealthBar.SetPercent(currentHP / maxHP);
-        }
+        HP = MaxHP;
     }
 
-    public void setMaxHP(float amount)
+    public override void OnFixedUpdate(float fixedDeltaTime)
     {
-        maxHP = amount;
-
-        if (mHealthBar)
+        if (!mIsPerTurn)
         {
-            mHealthBar.SetPercent(currentHP / maxHP);
-        }
+            HP -= HealthDrainRate * fixedDeltaTime;
+        }        
+
+        base.OnFixedUpdate(fixedDeltaTime);
     }
 
-    protected override void BuildRunStateJSON(JSONObject root)
+    /*protected override void BuildRunStateJSON(JSONObject root)
     {
         root["hp"] = new JSONObject(currentHP);
         root["maxhp"] = new JSONObject(maxHP);
@@ -83,5 +134,5 @@ public class HealthBar : EnvironmentComponent
         }
 
         base.LoadRunStateJSON(root);
-    }
+    }*/
 }

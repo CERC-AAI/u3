@@ -23,9 +23,9 @@ public class Key : LinkComponent
         return mIsTaken;
     }
 
-    public override void OnEndTurnCollision(EnvironmentObject otherObject)
+    public override void OnEndStepCollision(EnvironmentObject otherObject)
     {
-        if (otherObject.tag == "Player")
+        /*if (otherObject.tag == "Player")
         {
             if (!mIsTaken)
             {
@@ -36,8 +36,8 @@ public class Key : LinkComponent
 
                 gameObject.SetActive(false);
             }
-        }
+        }*/
 
-        base.OnEndTurnCollision(otherObject);
+        base.OnEndStepCollision(otherObject);
     }
 }

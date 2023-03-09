@@ -5,39 +5,42 @@ using UnityEngine;
 
 
 // Defines ability of object to move about the world
-[RequireComponent(typeof(EnvironmentObject))]
 public class Movement : EnvironmentComponent
 {
     // Public members
     public Vector3 Velocity
     {
         get { return GetVelocity(); }
-        set { SetVelocity(value); }
+        set { SetVelocity(mEngine.ApplyEnvironmentVelocity(value)); }
     }
 
     public Vector3 AngularVelocity
     {
         get { return GetAngularVelocity(); }
-        set { SetAngularVelocity(value); }
+        set { SetAngularVelocity(mEngine.ApplyEnvironmentAngularVelocity(value)); }
     }
 
+    public EnvironmentCallback<Vector3> OnVelocityChangedCallbacks;
 
     // Private members
     Rigidbody mRigidbody;
     Rigidbody2D mRigidbody2D;
-    GraphicsObject mGraphicsObject;
+    //GraphicsObject mGraphicsObject;
 
     Vector3 mVelocity;
     Vector3 mAngularVelocity;
 
-    override protected void Init()
+    Vector3 mPreviousVelocity;
+
+    override protected void Initialize()
     {
         mRigidbody = GetComponent<Rigidbody>();
         mRigidbody2D = GetComponent<Rigidbody2D>();
-        mGraphicsObject = GetComponent<GraphicsObject>();
+        //mGraphicsObject = GetComponent<GraphicsObject>();
 
         mVelocity = Vector3.zero;
         mAngularVelocity = Vector3.zero;
+        mPreviousVelocity = Vector3.zero;
 
         if (mRigidbody)
         {
@@ -48,21 +51,21 @@ public class Movement : EnvironmentComponent
             mRigidbody2D.velocity = Vector2.zero;
         }
 
-        base.Init();
+        base.Initialize();
     }
 
-    public override void OnFixedUpdate(bool isEndOfTurn)
+    public override void OnFixedUpdate(float fixedDeltaTime)
     {
         if (mRigidbody && mRigidbody.isKinematic)
         {
-            mParentObject.AddPosition(mEngine.GetDiscreteVelocity(mVelocity) * Time.fixedDeltaTime);
+            mParentObject.Position += mVelocity * fixedDeltaTime;
         }
         else if (mRigidbody2D && mRigidbody2D.bodyType == RigidbodyType2D.Kinematic)
         {
-            mParentObject.AddPosition(mEngine.GetDiscreteVelocity(mVelocity) * Time.fixedDeltaTime);
+            mParentObject.Position += mVelocity * fixedDeltaTime;
         }
 
-        base.OnFixedUpdate(isEndOfTurn);
+        base.OnFixedUpdate(fixedDeltaTime);
     }
 
     public void SetVelocity(Vector3 targetVelocity)
@@ -75,24 +78,21 @@ public class Movement : EnvironmentComponent
         {
             mRigidbody2D.velocity = targetVelocity;
         }
-        else
+
+        if (targetVelocity != mVelocity)
         {
+            if (OnVelocityChangedCallbacks != null)
+            {
+                OnVelocityChangedCallbacks(targetVelocity);
+            }
+
             mVelocity = targetVelocity;
         }
 
-        /*if (targetVelocity == Vector3.zero)
-        {
-            mEngine.OnObjectStopped(mParentObject);
-        }
-        else
-        {
-            mEngine.OnObjectMoved(mParentObject);
-        }*/
-
-        if (mGraphicsObject)
+        /*if (mGraphicsObject)
         {
             mGraphicsObject.SetFacing(targetVelocity);
-        }
+        }*/
     }
 
     public Vector3 GetVelocity()
@@ -145,15 +145,11 @@ public class Movement : EnvironmentComponent
 
     public void MoveTowards(Vector3 targetPosition)
     {
-        SetVelocity(targetPosition - mParentObject.GetPosition());
+        SetVelocity(targetPosition - mParentObject.Position);
     }
 
     public void MoveTo(Vector3 targetPosition)
     {
-        //mEngine.OnObjectMoved(mParentObject);
-
-        mParentObject.SetPosition(targetPosition);
-
-        //mEngine.OnObjectStopped(mParentObject);
+        mParentObject.Position = targetPosition;
     }
 }

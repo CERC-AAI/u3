@@ -5,72 +5,68 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 
-public class EnvironmentAgent : Agent
+[RequireComponent(typeof(U3Agent))]
+public class EnvironmentAgent : EnvironmentComponent
 {
-    EnvironmentBrain mBrain;
+    U3Agent mAgentScript;
 
-    private void Init()
+    protected override void Initialize()
     {
-        CheckBrain();
+        mAgentScript = GetComponent<U3Agent>();
+
+        base.Initialize();
     }
 
-    private void Update()
+    protected override void DoRegisterCallbacks()
     {
-        CheckBrain();
-    }
-
-    void CheckBrain()
-    {
-        if (mBrain == null)
+        HealthBar healthBar = GetComponent<HealthBar>();
+        if (healthBar)
         {
-            mBrain = GetComponent<EnvironmentBrain>();
-            mBrain.CheckAgent();
-        }
-    }
-
-    public override void Initialize()
-    {
-        CheckBrain();
-
-        mBrain.Initialize();
-    }
-
-    public override void OnActionReceived(ActionBuffers actions)
-    {
-        CheckBrain();
-
-        float[] vectorAction = new float[actions.DiscreteActions.Length];
-        for (int i = 0; i < vectorAction.Length; i++)
-        {
-            vectorAction[i] = actions.DiscreteActions[i];
+            RegisterCallback(ref healthBar.OnDiedCallbacks, OnDied);
         }
 
-        mBrain.OnEnvironmentActionReceived(vectorAction);
+        base.DoRegisterCallbacks();
     }
 
-    public override void Heuristic(in ActionBuffers actionsOut)
+    //[Callback(typeof(HealthBar), CallbackScope.SELF)]
+    virtual protected void OnDied()
     {
-        CheckBrain();
-
-        float[] vectorAction = new float[actionsOut.DiscreteActions.Length];
-
-        mBrain.Heuristic(vectorAction);
-
-        ActionSegment<int> actions = actionsOut.DiscreteActions;
-
-        for (int i = 0; i < vectorAction.Length; i++)
-        {
-            actions[i] = (int)vectorAction[0];
-        }
+        DoEndEpisode();        
     }
 
-    public override void OnEpisodeBegin()
+    public void RequestDecision()
     {
-        CheckBrain();
+        CollectObservations();
 
-        if (mBrain.isRunning())
-        {
-            mBrain.OnEpisodeBegin();
-        }
+        mAgentScript.RequestDecision();
     }
+
+    void CollectObservations()
+    {
+    }
+
+    virtual public bool ShouldRequestDecision(long fixedUdpateNumber)
+    {
+        return true;// fixedUdpateNumber % 10 == 0;
+    }
+
+    virtual public bool ShouldBlockDecision(ActionBuffers actions)
+    {
+        return false;// fixedUdpateNumber % 10 == 0;
+    }
+
+    virtual public void OnActionReceived(ActionBuffers actions)
+    {
+    }
+
+    virtual public void Heuristic(in ActionBuffers actionsOut)
+    {
+        Debug.Log("Heuristic");
+    }
+
+    virtual public void DoEndEpisode()
+    {
+        mEngine.AgentEndedEpisode(this);
+    }
+
 }

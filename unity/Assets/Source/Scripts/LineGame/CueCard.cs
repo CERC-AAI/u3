@@ -140,12 +140,12 @@ public class CueCard : EnvironmentComponent
             mResponse = lineSlider.GetValue();
         }
 
-        mEngine.SendEvent("Response", this);
+        mEngine.AddGameEvent("Response", new JSONObject(mResponse));
     }
 
     public void OnClickMissed()
     {
-        mEngine.SendEvent("Missed", this);
+        mEngine.AddGameEvent("Missed", null);
     }
 
     public float getResponse()

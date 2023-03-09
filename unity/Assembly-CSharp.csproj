@@ -47,7 +47,7 @@
   <PropertyGroup>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <UnityProjectGenerator>Package</UnityProjectGenerator>
-    <UnityProjectGeneratorVersion>2.0.16</UnityProjectGeneratorVersion>
+    <UnityProjectGeneratorVersion>2.0.17</UnityProjectGeneratorVersion>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2021.3.11f1</UnityVersion>
@@ -56,49 +56,139 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\Framework\LeanTween.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\Framework\LTDescr.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\EtraCharacterMainController.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\Framework\LeanTweenExt.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\MovingPlatform\Scripts\MovingPlatformAttach.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\General_Abilities\ABILITY_Jump.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\InputSystem\StarterAssetsInputs.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\Framework\LTSeq.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentBrain.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Exit.cs" />
+    <Compile Include="Assets\Source\Scripts\GridWorld\GridEnvironment.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\LineSlider.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\ButtonGame.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\CameraScripts\CameraShake.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\FPS_ExclusiveAbilities\ABILITY_FPS_Crouch.cs" />
     <Compile Include="Assets\Libraries\JSONLoader.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\SciFiDoor\SciFiDoor.cs" />
+    <Compile Include="Assets\Source\Scripts\GridWorld\SpriteGraphicsObject.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\Interactionizer\ObjectInteraction.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\LineEnvironment.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentSensor.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\LinkComponent.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\GridPlayer.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\Movement.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\FPSUsableItems\Items\USABLEITEM_FPS_Flashlight.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\GunScripts\BulletProjectile.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\OvalSlider.cs" />
     <Compile Include="Assets\Libraries\JSON\JSONObject.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\GraphicsObject.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\HealthOrb.cs" />
     <Compile Include="Assets\Libraries\JSON\VectorTemplates.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\TPS_ExclusiveAbilities\ABILITY_TPS_Aim.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\FPSUsableItems\Items\USABLEITEM_FPS_Physics_Grabber.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\General_Abilities\ABILITY_CharacterMovement.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\EtraAbilityBaseClass.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\Spawn.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\GridEnvironment.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\FPS_Item_Cam_Checks.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\Interactionizer\PlaySoundOnce.cs" />
+    <Compile Include="Assets\Source\Scripts\GridWorld\GridObject.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\CameraScripts\EtraCharacterAssetCamera.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\Framework\LTDescrOptional.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\Treadmill\Treadmill_Interactable.cs" />
     <Compile Include="Assets\Source\Scripts\LoadBar.cs" />
+    <Compile Include="Assets\Source\Scripts\GridWorld\GridPlayer.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentEngine.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\KeyGame.cs" />
+    <Compile Include="Assets\Source\Other\U3Agent.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\General_Abilities\ABILITY_Sprint.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\EtrasResourceGrabbingFunctions.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\VoxelAnimator.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\WeightedButton\Interactable_WeightedButton.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\FrogGame.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\InstructionCard.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\ParticleSystemMultiPlayer.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentAgent.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Door.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\CameraScripts\CinemachineShake.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentTask.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentComponent.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\General_Abilities\ABILITY_CameraMovement.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\Framework\LeanAudio.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\FPSUsableItems\EtraFPSUsableItemBaseClass.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\CueCard.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\SyncVariable.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\NoInput.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\FPSUsableItems\Items\USABLEITEM_FPS_Sword.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentManager.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\StarterAssets-FPC\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\HealthBar.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\FPSUsableItems\EtraFPSUsableItemManager.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\Interactionizer\ABILITY_ActivateInteract.cs" />
     <Compile Include="Assets\Source\Other\Common.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\EtraAbilityManager.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\MovingPlatform\Scripts\MovingPlatformMove.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\ModelOptionsList.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\Scripts\Interactionizer\Slideshow.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\Framework\LeanSmooth.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\General_Abilities\ABILITY_Dash.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Key.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\BaseEnvironment.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\Framework\LeanTest.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentSensorComponent.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\FPSUsableItems\FPSUsableItemSwayAndBobAnimations.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\FPSUsableItems\Items\USABLEITEM_FPS_Blaster.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\JavascriptInterface.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\General_Abilities\ABILITY_GrabInteract.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Button.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentSideChannel.cs" />
+    <Compile Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\CharacterAsset\Scripts\Abilities\General_Abilities\ABILITY_RigidbodyPush.cs" />
     <Compile Include="Assets\Source\Other\BinarizeData.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\Pushable.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentComponentHolder.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\Brain.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentObject.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\Treadmill\KrisLicense.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\SciFiDoor\AsourLicense.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\Libraries\JSON\readme.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\Libraries\HDF.PInvoke.1.8.21.1\lib\HDF.PInvoke.XML" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\ReadMe.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\GoogleFonts\OFL.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\LeanTween\License.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\Models\AsourModels\Exit Icon License.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\StarterAssets-FPC\StarterAssets\Environment\Shaders\Built-in_RP\Triplanar.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\Models\CodyModels\CodyLicense.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\StandingButton\AsourLicense.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Libraries\HDF.PInvoke.1.8.21.1\lib\HDF.PInvoke.dll" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\StarterAssets-FPC\StarterAssets\Environment\Shaders\Built-in_RP\ArmatureShader.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\ThirdPartyNotices.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\StarterAssets-FPC\StarterAssets\license.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\StarterAssets-TPC\StarterAssets\license.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\1-UserAssets\InteractableObjects\WeightedButton\KrisLicense.txt" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\Etra&apos;sStarterAssets\2-Source\ThirdParty\TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -344,47 +434,38 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.11f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
+    <Reference Include="System.IO.Abstractions">
+      <HintPath>Library\PackageCache\com.unity.ml-agents@2.0.1\Plugins\System.IO.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Unsafe">
+      <HintPath>Library\PackageCache\com.unity.burst@1.7.3\Unity.Burst.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Cecil.Mdb">
+      <HintPath>Library\PackageCache\com.unity.burst@1.7.3\Unity.Burst.CodeGen\Unity.Burst.Cecil.Mdb.dll</HintPath>
+    </Reference>
     <Reference Include="Google.Protobuf">
       <HintPath>Library\PackageCache\com.unity.barracuda@2.0.0\Barracuda\Runtime\Plugins\ProtoBuffer\Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Pdb">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.Pdb.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.burst@1.7.3\Unity.Burst.CodeGen\Unity.Burst.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Cecil">
+      <HintPath>Library\PackageCache\com.unity.burst@1.7.3\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Cecil.Rocks">
+      <HintPath>Library\PackageCache\com.unity.burst@1.7.3\Unity.Burst.CodeGen\Unity.Burst.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Abstractions.TestingHelpers">
-      <HintPath>Library\PackageCache\com.unity.ml-agents@2.0.0\Plugins\System.IO.Abstractions.TestingHelpers.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.ml-agents@2.0.1\Plugins\System.IO.Abstractions.TestingHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Interactive.Async">
+      <HintPath>Library\PackageCache\com.unity.ml-agents@2.0.1\Plugins\ProtoBuffer\System.Interactive.Async.dll</HintPath>
+    </Reference>
+    <Reference Include="Grpc.Core">
+      <HintPath>Library\PackageCache\com.unity.ml-agents@2.0.1\Plugins\ProtoBuffer\Grpc.Core.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.0.2\Runtime\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.Abstractions">
-      <HintPath>Library\PackageCache\com.unity.ml-agents@2.0.0\Plugins\System.IO.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>Library\PackageCache\com.unity.analytics@3.6.12\AnalyticsStandardEvents\Unity.Analytics.StandardEvents.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Analytics.Editor">
-      <HintPath>Library\PackageCache\com.unity.analytics@3.6.12\Unity.Analytics.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Unsafe">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Cecil.Mdb">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Cecil">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Cecil.Rocks">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.Rocks.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>Library\PackageCache\com.unity.analytics@3.6.12\Unity.Analytics.Tracker.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Interactive.Async">
-      <HintPath>Library\PackageCache\com.unity.ml-agents@2.0.0\Plugins\ProtoBuffer\System.Interactive.Async.dll</HintPath>
-    </Reference>
-    <Reference Include="Grpc.Core">
-      <HintPath>Library\PackageCache\com.unity.ml-agents@2.0.0\Plugins\ProtoBuffer\Grpc.Core.dll</HintPath>
     </Reference>
     <Reference Include="HDF.PInvoke">
       <HintPath>Assets\Libraries\HDF.PInvoke.1.8.21.1\lib\HDF.PInvoke.dll</HintPath>
@@ -761,23 +842,17 @@
     <Reference Include="Unity.Barracuda.iOSBLAS">
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.iOSBLAS.dll</HintPath>
     </Reference>
-    <Reference Include="Purchasing.Common">
-      <HintPath>Library\ScriptAssemblies\Purchasing.Common.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Purchasing">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.Purchasing.dll</HintPath>
+    <Reference Include="Unity.2D.PixelPerfect">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.PixelPerfect.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
+    <Reference Include="Unity.RenderPipelines.Universal.Shaders">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Purchasing.SecurityStub">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.Purchasing.SecurityStub.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Advertisements">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.Advertisements.dll</HintPath>
+    <Reference Include="Unity.Searcher.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
@@ -785,35 +860,35 @@
     <Reference Include="Unity.InputSystem">
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Rider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Analytics">
-      <HintPath>Library\ScriptAssemblies\Analytics.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>Library\ScriptAssemblies\UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.EditorCoroutines.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.ML-Agents.CommunicatorObjects">
       <HintPath>Library\ScriptAssemblies\Unity.ML-Agents.CommunicatorObjects.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>Library\ScriptAssemblies\Unity.Analytics.DataPrivacy.dll</HintPath>
+    <Reference Include="Unity.ShaderGraph.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Purchasing.Codeless">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.Purchasing.Codeless.dll</HintPath>
+    <Reference Include="Cinemachine">
+      <HintPath>Library\ScriptAssemblies\Cinemachine.dll</HintPath>
+    </Reference>
+    <Reference Include="com.unity.cinemachine.editor">
+      <HintPath>Library\ScriptAssemblies\com.unity.cinemachine.editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Toolchain.Win-x86_64-Linux-x86_64">
+      <HintPath>Library\ScriptAssemblies\Unity.Toolchain.Win-x86_64-Linux-x86_64.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Mathematics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Monetization">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.Monetization.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Barracuda.MacBLAS">
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.MacBLAS.dll</HintPath>
@@ -824,11 +899,14 @@
     <Reference Include="Unity.Barracuda.BurstBLAS">
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.BurstBLAS.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.MemoryProfiler">
-      <HintPath>Library\ScriptAssemblies\Unity.MemoryProfiler.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.2D.Tilemap.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.2D.Tilemap.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="PPv2URPConverters">
+      <HintPath>Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
@@ -836,26 +914,20 @@
     <Reference Include="Unity.Barracuda">
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Analytics.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Services.Analytics.Editor.dll</HintPath>
+    <Reference Include="Unity.Sysroot.Linux_x86_64">
+      <HintPath>Library\ScriptAssemblies\Unity.Sysroot.Linux_x86_64.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Burst.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.MemoryProfiler.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.MemoryProfiler.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Services.Analytics">
-      <HintPath>Library\ScriptAssemblies\Unity.Services.Analytics.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PlasticSCM.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
@@ -872,8 +944,8 @@
     <Reference Include="Unity.Burst">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Purchasing.SecurityCore">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.Purchasing.SecurityCore.dll</HintPath>
+    <Reference Include="Unity.RenderPipelines.Universal.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.XR.LegacyInputHelpers">
       <HintPath>Library\ScriptAssemblies\UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
@@ -881,29 +953,32 @@
     <Reference Include="Unity.Services.Core.Environments">
       <HintPath>Library\ScriptAssemblies\Unity.Services.Core.Environments.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.2D.PixelPerfect.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.PixelPerfect.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Purchasing.Stores">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.Purchasing.Stores.dll</HintPath>
+    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.XR.LegacyInputHelpers">
       <HintPath>Library\ScriptAssemblies\UnityEditor.XR.LegacyInputHelpers.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor.Purchasing">
-      <HintPath>Library\ScriptAssemblies\UnityEditor.Purchasing.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor.SpatialTracking">
       <HintPath>Library\ScriptAssemblies\UnityEditor.SpatialTracking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Advertisements.Editor">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.Advertisements.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Barracuda.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.ML-Agents.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.ML-Agents.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.SysrootPackage.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.SysrootPackage.Editor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

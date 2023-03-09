@@ -8,7 +8,7 @@ public class Door : LinkComponent
 
     bool mLocked = true;
 
-    public override void OnFixedUpdate(bool isEndOfTurn)
+    public override void OnFixedUpdate(float fixedDeltaTime)
     {
         if (mLocked && thisKey && thisKey.isPickedUp())
         {
@@ -18,7 +18,7 @@ public class Door : LinkComponent
             mParentObject.MakeCollidersTriggers();
         }
 
-        base.OnFixedUpdate(isEndOfTurn);
+        base.OnFixedUpdate(fixedDeltaTime);
     }
 
     public bool isLocked()
@@ -36,7 +36,7 @@ public class Door : LinkComponent
         }
     }
 
-    public override void OnEndTurnCollision(EnvironmentObject otherObject)
+    public override void OnEndStepCollision(EnvironmentObject otherObject)
     {
         if (true || !mLocked)
         {
@@ -44,10 +44,10 @@ public class Door : LinkComponent
             {
                 gameObject.SetActive(false);
 
-                mEngine.AddGameEvent("Door", mLoadID.ToString());
+                mEngine.AddGameEvent("Door", new JSONObject(mLoadID.ToString()));
             }
         }
 
-        base.OnEndTurnCollision(otherObject);
+        base.OnEndStepCollision(otherObject);
     }
 }
