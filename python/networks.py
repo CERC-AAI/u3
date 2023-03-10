@@ -20,6 +20,7 @@ from seed_rl.common import utils
 import tensorflow as tf
 from absl import flags
 from absl import logging
+import numpy as np
 
 AgentOutput = collections.namedtuple('AgentOutput', 'action q_values')
 AgentState = collections.namedtuple(
@@ -127,7 +128,7 @@ class DuelingLSTMDQNNet(tf.Module):
     one_hot_prev_action = tf.one_hot(prev_action, self._num_actions)
     # [batch_size, torso_output_size]
     return tf.concat(
-        [conv_out, tf.expand_dims(env_output.reward, -1), one_hot_prev_action],
+        [conv_out, one_hot_prev_action],
         axis=1)
 
   def _head(self, core_output):
@@ -142,7 +143,7 @@ class DuelingLSTMDQNNet(tf.Module):
     q_values = value + advantage
 
     action = tf.cast(tf.argmax(q_values, axis=1), tf.int32)
-    return AgentOutput(action, q_values)
+    return AgentOutput(action, q_values), value, advantage
 
   def __call__(self, input_, agent_state, unroll=False):
     """Applies a network mapping observations to actions.
@@ -170,12 +171,16 @@ class DuelingLSTMDQNNet(tf.Module):
       input_ = tf.nest.map_structure(lambda t: tf.expand_dims(t, 0),
                                      input_)
     prev_actions, env_outputs = input_
-    outputs, agent_state = self._unroll(prev_actions, env_outputs, agent_state)
+    rawOutputs, agent_state, inputs, values, advantage = self._unroll(prev_actions, env_outputs, agent_state)
     if not unroll:
       # Remove time dimension.
-      outputs = tf.nest.map_structure(lambda t: tf.squeeze(t, 0), outputs)
-
-    return outputs, agent_state
+      outputs = tf.nest.map_structure(lambda t: tf.squeeze(t, 0), rawOutputs)
+    else:
+      outputs = rawOutputs
+	  
+    info = dict(frameInputs = inputs, frameValue = values, frameAdvantage = advantage, frameOutputs = rawOutputs)
+	
+    return outputs, agent_state, info
 
   def _unroll(self, prev_actions, env_outputs, agent_state):
     # [time, batch_size, <field shape>]
@@ -193,5 +198,6 @@ class DuelingLSTMDQNNet(tf.Module):
         initial_agent_state.core_state,
         self._core)
 
-    agent_output = utils.batch_apply(self._head, (core_outputs,))
-    return agent_output, AgentState(core_state)
+    agent_output, values, advantage = utils.batch_apply(self._head, (core_outputs,))
+	
+    return agent_output, AgentState(core_state), torso_outputs, values, advantage

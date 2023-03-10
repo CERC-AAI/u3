@@ -53,19 +53,19 @@ public class EnvironmentComponentHolder : EnvironmentComponent
         }
     }
 
-    virtual public void PreStep()
+    virtual public void StepStarted()
     {
         for (int i = 0; i < mComponents.Length; i++)
         {
-            mComponents[i].OnPreStep();
+            mComponents[i].OnStepStarted();
         }
     }
 
-    virtual public void Step()
+    virtual public void StepEnded()
     {
         for (int i = 0; i < mComponents.Length; i++)
         {
-            mComponents[i].OnStep();
+            mComponents[i].OnStepEnded();
         }
     }
 

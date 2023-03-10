@@ -23,10 +23,16 @@ from gym import wrappers
 from gym_unity.envs import UnityToGymWrapper
 from seed_rl.unity import unity_preprocessing
 from pathlib import Path
+import uuid
+
 
 import subprocess
 from typing import Dict, List, Optional, Any, Tuple
-from mlagents_envs.side_channel.side_channel import SideChannel, IncomingMessage
+from mlagents_envs.side_channel.side_channel import (
+    SideChannel,
+    IncomingMessage,
+    OutgoingMessage,
+)
 import mlagents_envs
 from mlagents_envs.logging_util import get_logger
 from mlagents_envs.exception import (
@@ -35,6 +41,7 @@ from mlagents_envs.exception import (
 	UnityTimeOutException,
 	UnityCommunicatorStoppedException,
 )
+from mlagents_envs.base_env import BaseEnv
 
 logger = get_logger(__name__)
 
@@ -47,7 +54,34 @@ flags.DEFINE_integer('max_random_noops', 30,
 										 'Maximal number of random no-ops at the beginning of each '
 										 'episode.')
 
+# Create the StringLogChannel class
+class EnvironmentSideChannel(SideChannel):
+
+    def __init__(self) -> None:
+        super().__init__(uuid.UUID("621f0a70-4f87-11ea-a6bf-784f4387d1f7"))
+
+    def on_message_received(self, msg: IncomingMessage) -> None:
+        """
+        Note: We must implement this method of the SideChannel interface to
+        receive messages from Unity
+        """
+        # We simply read a string from the message and print it.
+        message = str(msg.get_raw_bytes()[4:], 'utf_8')
+        self.environment.lastEnvironment = message
+        #print('Unity output: {}'.format(message[0:100]))
+
+    def send_string(self, data: str) -> None:
+        # Add the string to an OutgoingMessage
+        msg = OutgoingMessage()
+        msg.write_string(data)
+        # We call this method to queue the data we want to send
+        super().queue_message_to_send(msg)
+		
+    def set_environment(self, environment):		
+        self.environment = environment
+		
 class UnityDockerEnvironment(UnityEnvironment):
+	
 	def __init__(
 		self,
 		file_name: Optional[str] = None,
@@ -95,6 +129,67 @@ class UnityDockerEnvironment(UnityEnvironment):
 					f'"chmod -R 755 {launch_string}"'
 				) from perm
 
+class UnityEnvironmentWrapper(UnityToGymWrapper):
+	
+	def __init__(
+        self,
+        unity_env: BaseEnv,
+		sideChannel: EnvironmentSideChannel,
+        uint8_visual: bool = False,
+        flatten_branched: bool = False,
+        allow_multiple_obs: bool = False,
+    ):
+		self.sideChannel = sideChannel
+		self.sideChannel.set_environment(self)
+		self.lastEnvironment = ""
+		super(UnityEnvironmentWrapper, self).__init__(unity_env=unity_env, uint8_visual=uint8_visual, flatten_branched=flatten_branched, allow_multiple_obs=allow_multiple_obs)
+		
+	def seed(self, seed: Any = None) -> None:
+		"""Sets the seed for this env's random number generator(s).
+        Currently not implemented.
+        """
+		self.sideChannel.send_string('seed{}'.format(seed))
+		return
+	
+	def setTraining(self, isTraining: bool) -> None:
+		"""Sets the seed for this env's random number generator(s).
+        Currently not implemented.
+        """
+		if isTraining:
+			self.sideChannel.send_string('training1')
+		else:
+			self.sideChannel.send_string('training0')
+			
+		return
+	
+	def setStatic(self, isStatic: bool) -> None:
+		"""Sets the seed for this env's random number generator(s).
+        Currently not implemented.
+        """
+		if isStatic:
+			self.sideChannel.send_string('static1')
+		else:
+			self.sideChannel.send_string('static0')
+			
+		return
+	
+	def setElement(self, elementName: str, elementData: str) -> None:
+		"""Sets the seed for this env's random number generator(s).
+        Currently not implemented.
+        """
+		self.sideChannel.send_string('element{}|{}'.format(elementName, elementData))
+			
+		return
+	
+	def clearElements(self) -> None:
+		"""Sets the seed for this env's random number generator(s).
+        Currently not implemented.
+        """
+		self.sideChannel.send_string('reset')
+			
+		return
+	
+	
 def create_environment(task):	
 	logging.info('Creating environment: %s', FLAGS.game)
 
@@ -106,10 +201,10 @@ def create_environment(task):
 	import os
 	modeOffset = FLAGS.run_mode == 'actor'
 	path = Path(__file__).parent.absolute()
-	unity_env = UnityDockerEnvironment('{}/envs/{}/{}'.format(path, FLAGS.game,FLAGS.game), base_port=5005+task+int(modeOffset))
-	env = UnityToGymWrapper(unity_env, flatten_branched = True, uint8_visual=True)
+	environmentChannel = EnvironmentSideChannel()
+	unity_env = UnityDockerEnvironment('{}/envs/{}/{}'.format(path, FLAGS.game,FLAGS.game), base_port=5005+task+int(modeOffset), side_channels=[environmentChannel])
+	env = UnityEnvironmentWrapper(unity_env, environmentChannel, flatten_branched = True, uint8_visual=True)
 	env.seed(task)
 
 
-	return unity_preprocessing.UnityPreprocessing(
-			env, max_random_noops=FLAGS.max_random_noops)
+	return env

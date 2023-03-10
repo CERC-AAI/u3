@@ -24,6 +24,15 @@ public class GridPlayer : EnvironmentAgent
         set { tilesPerSecondSpeed = value; }
     }
 
+    public override void AppendActionLists(List<ActionInfo> actions)
+    {
+        ActionInfo basicMovement = new ActionInfo(DoMovement, (int)GridEnvironment.Actions.NOOP);
+
+        actions.Add(basicMovement);
+
+        base.AppendActionLists(actions);
+    }
+
     override protected void Initialize()
     {
         mMovement = GetComponent<Movement>();
@@ -82,19 +91,15 @@ public class GridPlayer : EnvironmentAgent
         mMovement.Velocity = Vector2.zero;
     }
 
-    override public void OnActionReceived(ActionBuffers actions)
+    void DoMovement(int actionValue)
     {
-        base.OnActionReceived(actions);
-
         float speed = tilesPerSecondSpeed;
         if (mGridEngine)
         {
             speed = tilesPerSecondSpeed * mGridEngine.gridSize / mGridEngine.GetTurnTime();
         }
 
-        var action = Mathf.FloorToInt(actions.DiscreteActions[0]);
-
-        switch ((GridEnvironment.Actions)action)
+        switch ((GridEnvironment.Actions)actionValue)
         {
             case GridEnvironment.Actions.NOOP:
                 mMovement.Velocity = Vector2.zero * speed;
@@ -120,6 +125,13 @@ public class GridPlayer : EnvironmentAgent
                 throw new ArgumentException("Invalid action value");
         }
     }
+
+    /*override public void OnActionReceived(ActionBuffers actions)
+    {
+        base.OnActionReceived(actions);
+
+        
+    }*/
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {

@@ -854,7 +854,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
       propertyPath: m_BehaviorName
-      value: My Behavior2
+      value: My Behavior
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 309630483, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
       propertyPath: mPrefabPath
@@ -2759,6 +2775,30 @@ PrefabInstance:
     - target: {fileID: 170875322, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
       propertyPath: healthDrainRate
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[1]
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[1]
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 309630483, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
       propertyPath: mPrefabPath
@@ -14169,9 +14209,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   recycleBin: {fileID: 1165078678}
-  fixedUpdatesPerSecond: 1
+  fixedUpdatesPerSecond: 10
   isTraining: 0
-  fixedUpdatesPerTurn: 1
+  fixedUpdatesPerTurn: 10
   levelImage: {fileID: 0}
   player: {fileID: 309630484}
   arenaX: 10

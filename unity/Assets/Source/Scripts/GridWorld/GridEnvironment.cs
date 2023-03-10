@@ -230,14 +230,14 @@ public class GridEnvironment : EnvironmentEngine
         base.OnInstantiate(newObject);
     }*/
 
-    public override void OnPreStep()
+    public override void OnStepStarted()
     {
-        if (mFixedTime > 0 && OnEndTurnCallbacks != null)
+        if (mFixedTime > 0 && IsEndOfTurn() && OnEndTurnCallbacks != null)
         {
             OnEndTurnCallbacks();
         }
 
-        base.OnPreStep();
+        base.OnStepStarted();
     }
 
     public override void OnFixedUpdate(float fixedDeltaTime)

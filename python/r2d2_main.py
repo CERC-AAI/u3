@@ -34,7 +34,7 @@ tf.compat.v1.keras.backend.set_session(sess)
 FLAGS = flags.FLAGS
 
 # Optimizer settings.
-flags.DEFINE_float('learning_rate', 0.00048, 'Learning rate.')
+flags.DEFINE_float('learning_rate', 1e-5, 'Learning rate.')
 flags.DEFINE_float('adam_epsilon', 1e-3, 'Adam epsilon.')
 
 

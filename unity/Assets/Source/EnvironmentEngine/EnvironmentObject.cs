@@ -132,7 +132,7 @@ public class EnvironmentObject : EnvironmentComponentHolder
         base.OnObjectLateFixedUpdate(fixedDeltaTime);
     }
 
-    public override void OnStep()
+    public override void OnStepEnded()
     {
         for (int i = 0; i < mStepCollisions.Count; i++)
         {
@@ -143,7 +143,7 @@ public class EnvironmentObject : EnvironmentComponentHolder
         }
         mStepCollisions.Clear();
 
-        base.OnStep();
+        base.OnStepEnded();
     }
 
     public override void OnLateFixedUpdate(float fixedDeltaTime)

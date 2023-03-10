@@ -56,7 +56,7 @@ public class HealthBar : EnvironmentComponent
 
     [Tooltip("Maximum health the object can have.")]
     public float maxHP = 20;
-    [Tooltip("Current health of the agent. Calls 'OnDiedCallbacks' and send OnDied message to components when health reaches 0.")]
+    [Tooltip("Current health of the agent. Calls 'OnDiedCallbacks' to components when health reaches 0.")]
     public float currentHP = 20;
     [Tooltip("Drain rate is per second, or per turn if in a GridEnvironment.")]
     public float healthDrainRate = 0.2f;

@@ -125,7 +125,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     {
         if (mFixedTime != mLastRequestTime)
         {
-            PreStep();
+            StepStarted();
 
             mLastRequestTime = mFixedTime;
         }
@@ -215,7 +215,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             if (mBlockingAgents.Count == 0)
             {
                 //No agents require decisions, continue the simulation
-                Step();
+                StepEnded();
             }
             else
             {
@@ -225,25 +225,25 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         }
     }
 
-    override public void Step()
+    override public void StepEnded()
     {
         mIsWaitingForActions = false;
 
-        base.Step();
+        base.StepEnded();
         for (int i = 0; i < mEnvironmentObjects.Count; i++)
         {
-            mEnvironmentObjects[i].Step();
+            mEnvironmentObjects[i].StepEnded();
         }
     }
 
-    override public void PreStep()
+    override public void StepStarted()
     {
         mIsWaitingForActions = false;
 
-        base.PreStep();
+        base.StepStarted();
         for (int i = 0; i < mEnvironmentObjects.Count; i++)
         {
-            mEnvironmentObjects[i].PreStep();
+            mEnvironmentObjects[i].StepStarted();
         }
     }
 
@@ -449,7 +449,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             if (hadDecisions && mDecisionRequests.Count == 0)
             {
                 //No agents require decisions, continue the simulation
-                Step();
+                StepEnded();
             }
         }
 
@@ -469,6 +469,11 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         if (!mInactiveAgents.Contains(agent))
         {
             mInactiveAgents.Add(agent);
+        }
+
+        if (mDecisionRequests.Contains(agent))
+        {
+            mDecisionRequests.Remove(agent);
         }
 
         //No more active agents, restart run.

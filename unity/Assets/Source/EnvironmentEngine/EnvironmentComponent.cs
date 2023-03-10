@@ -165,6 +165,11 @@ public class EnvironmentComponent : MonoBehaviour
         }
     }
 
+    public virtual void AppendActionLists(List<ActionInfo> discreteActions)
+    {
+
+    }
+
     protected virtual void DoRegisterCallbacks()
     {
 
@@ -323,10 +328,6 @@ public class EnvironmentComponent : MonoBehaviour
         }
     }
 
-    virtual public void DoAction()
-    {
-    }
-
     virtual public void OnRunStarted()
     {
     }
@@ -335,11 +336,11 @@ public class EnvironmentComponent : MonoBehaviour
     {
     }
 
-    virtual public void OnPreStep()
+    virtual public void OnStepEnded()
     {
     }
 
-    virtual public void OnStep()
+    virtual public void OnStepStarted()
     {
     }
 
@@ -451,16 +452,6 @@ public class EnvironmentComponent : MonoBehaviour
     public EnvironmentEngine GetEngine()
     {
         return mEngine;
-    }
-
-
-    //Move me to other classes
-
-    public void Move(Vector3 newPosition)
-    {
-        //mEngine.OnObjectMoved(mParentObject, mParentObject.GetPosition(), mEngine.GetEnvironmentPosition(newPosition));
-
-        transform.position = newPosition;
     }
 
     virtual public void OnCollision(EnvironmentObject otherObject)
