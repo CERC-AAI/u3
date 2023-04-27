@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Key : LinkComponent
+public class Key : EnvironmentComponent
 {
     bool mIsTaken = false;
 

@@ -13,7 +13,7 @@ public class GridEnvironment : EnvironmentEngine
 
     public Texture2D levelImage;
     //public Texture2D gameState;
-    public GridPlayer player;
+    public Player3D player;
     //public Vector2Int mCurrentPosition;
     //public int viewDistance = 5;
     public int arenaX = -1;

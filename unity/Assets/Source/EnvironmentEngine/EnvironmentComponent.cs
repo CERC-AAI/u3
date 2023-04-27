@@ -23,6 +23,17 @@ public class Callback : Attribute
     }
 }
 
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+public class Action : Attribute
+{
+    public int actionCount = 1;
+
+    public Action(int actionCount = 1)
+    {
+        this.actionCount = actionCount;
+    }
+}
+
 [AttributeUsage(AttributeTargets.Property)]
 public class NotSaved : Attribute
 {
@@ -165,9 +176,50 @@ public class EnvironmentComponent : MonoBehaviour
         }
     }
 
-    public virtual void AppendActionLists(List<ActionInfo> discreteActions)
+    public virtual void AppendActionLists(List<ActionInfo> actionsList)
     {
+        Type currentType = GetType();
+        do
+        {
+            MethodInfo[] methodInfos = currentType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
+            foreach (MethodInfo methodInfo in methodInfos)
+            {
+                Action actionInfo = methodInfo.GetCustomAttribute<Action>();
+                if (actionInfo != null)
+                {
+                    Delegate newCallback = null;
+
+                    ParameterInfo[] paramInfos = methodInfo.GetParameters();
+
+                    if (paramInfos.Length != 1)
+                    {
+                        Debug.Log("Cannot add Action" + name + "(" + methodInfo.Name + "). Function must have a single int or float parameter.");
+
+                        return;
+                    }
+
+                    ActionInfo actionObject = null;
+                    if (paramInfos[0].ParameterType == typeof(int))
+                    {
+                        newCallback = Delegate.CreateDelegate(typeof(ActionInfo.DiscreteAction), this, methodInfo);
+
+                        actionObject = new ActionInfo((ActionInfo.DiscreteAction)newCallback, actionInfo.actionCount);
+                    }
+                    else
+                    {
+                        newCallback = Delegate.CreateDelegate(typeof(ActionInfo.ContinuousAction), this, methodInfo);
+
+                        actionObject = new ActionInfo((ActionInfo.ContinuousAction)newCallback);
+                    }
+
+                    actionsList.Add(actionObject);
+                }
+            }
+
+            currentType = currentType.BaseType;
+        }
+        while (currentType == typeof(EnvironmentComponent) || currentType.IsSubclassOf(typeof(EnvironmentComponent)));
     }
 
     protected virtual void DoRegisterCallbacks()
@@ -334,6 +386,16 @@ public class EnvironmentComponent : MonoBehaviour
 
     virtual public void OnRunEnded()
     {
+    }
+
+    virtual public void OnEpisodeStarted()
+    {
+
+    }
+
+    virtual public void OnEpisodeEnded()
+    {
+
     }
 
     virtual public void OnStepEnded()

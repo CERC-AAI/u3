@@ -5,16 +5,70 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 
-public class EnvironmentTask : EnvironmentComponent
+public class EnvironmentTask : EnvironmentComponentHolder
 {
-    virtual public void OnEpisodeStarted()
-    {
+    public bool startEpisodeOnRun = true;
 
+
+    EnvironmentAgent mAgent;
+
+    float mTotalReward = 0;
+
+    protected override void Initialize()
+    {
+        mAgent = GetComponent<EnvironmentAgent>();
+
+        base.Initialize();
     }
 
-    virtual public void OnEpisodeEnded()
+    public override void OnRunStarted()
     {
+        base.OnRunStarted();
 
+        if (startEpisodeOnRun)
+        {
+            StartEpisode();
+        }
     }
 
+    public override void OnRunEnded()
+    {
+        base.OnRunEnded();
+
+        EndEpisode();
+    }
+
+    virtual protected void StartEpisode()
+    {
+        mEngine.OnTaskEpisodeStarted(this);
+
+        mTotalReward = 0;
+
+        for (int i = 0; i < mComponents.Length; i++)
+        {
+            mComponents[i].OnEpisodeStarted();
+        }
+    }
+
+    virtual protected void EndEpisode()
+    {
+        for (int i = 0; i < mComponents.Length; i++)
+        {
+            mComponents[i].OnEpisodeEnded();
+        }
+
+        mAgent.DoEndEpisode();
+    }
+
+    public void AddReward(float reward)
+    {
+        mTotalReward += reward;
+        mAgent.OnAddedReward(reward);
+    }
+
+    public void SetReward(float reward)
+    {
+        mTotalReward = reward;
+        mAgent.OnSetReward(reward);
+    }
 }

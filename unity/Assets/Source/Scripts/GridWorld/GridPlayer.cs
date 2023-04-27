@@ -24,14 +24,14 @@ public class GridPlayer : EnvironmentAgent
         set { tilesPerSecondSpeed = value; }
     }
 
-    public override void AppendActionLists(List<ActionInfo> actions)
+    /*public override void AppendActionLists(List<ActionInfo> actionsList)
     {
         ActionInfo basicMovement = new ActionInfo(DoMovement, (int)GridEnvironment.Actions.NOOP);
 
-        actions.Add(basicMovement);
+        actionsList.Add(basicMovement);
 
-        base.AppendActionLists(actions);
-    }
+        base.AppendActionLists(actionsList);
+    }*/
 
     override protected void Initialize()
     {
@@ -52,16 +52,6 @@ public class GridPlayer : EnvironmentAgent
         mMovement.SetVelocity(Vector3.zero);
 
         base.OnRunStarted();
-    }
-
-    public override void OnFixedUpdate(float fixedDeltaTime)
-    {
-        if (mHealthBar && mHealthBar.currentHP <= 0)
-        {
-            //mEngine.Defeat();
-        }
-
-        base.OnFixedUpdate(fixedDeltaTime);
     }
 
     public override bool ShouldRequestDecision(long fixedUdpateNumber)
@@ -91,6 +81,7 @@ public class GridPlayer : EnvironmentAgent
         mMovement.Velocity = Vector2.zero;
     }
 
+    [Action((int)GridEnvironment.Actions.NOOP)]
     void DoMovement(int actionValue)
     {
         float speed = tilesPerSecondSpeed;

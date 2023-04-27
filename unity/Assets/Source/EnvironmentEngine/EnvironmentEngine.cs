@@ -385,6 +385,11 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         base.OnObjectLateFixedUpdate(fixedDeltaTime);
     }
 
+    virtual public void OnTaskEpisodeStarted(EnvironmentTask task)
+    {
+
+    }
+
     /*public virtual void OnEnvironmentActionRecieved(float[] vectorAction, bool shouldMove)
     {
         bool shouldEndTurn = false;

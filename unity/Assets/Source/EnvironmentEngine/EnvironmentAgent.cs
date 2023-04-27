@@ -179,8 +179,16 @@ public class EnvironmentAgent : EnvironmentComponent
         Debug.Log("Heuristic");
     }
 
-    virtual public void DoEndEpisode()
+    virtual public void DoEndEpisode(bool timedOut = false)
     {
+        if (timedOut)
+        {
+            mAgentScript.EpisodeInterrupted();
+        }
+        else
+        {
+            mAgentScript.EndEpisode();
+        }
         mEngine.AgentEndedEpisode(this);
     }
 
@@ -188,4 +196,16 @@ public class EnvironmentAgent : EnvironmentComponent
     {
         DoEndEpisode();
     }
+
+    virtual public void OnAddedReward(float reward)
+    {
+        mAgentScript.AddReward(reward);
+    }
+
+    virtual public void OnSetReward(float reward)
+    {
+        mAgentScript.AddReward(reward);
+    }
+
+
 }

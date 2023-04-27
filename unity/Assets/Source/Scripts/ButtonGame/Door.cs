@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Door : LinkComponent
+public class Door : EnvironmentComponent
 {
     public Key thisKey;
 
@@ -28,12 +28,12 @@ public class Door : LinkComponent
 
     public void FindKey()
     {
-        GetLinkedObjects();
+        /*GetLinkedObjects();
 
         if (mLinkedObjects.Count > 0 && mLinkedObjects[0] is Key)
         {
             thisKey = (Key)mLinkedObjects[0];
-        }
+        }*/
     }
 
     public override void OnEndStepCollision(EnvironmentObject otherObject)
@@ -44,7 +44,7 @@ public class Door : LinkComponent
             {
                 gameObject.SetActive(false);
 
-                mEngine.AddGameEvent("Door", new JSONObject(mLoadID.ToString()));
+                //mEngine.AddGameEvent("Door", new JSONObject(mLoadID.ToString()));
             }
         }
 
