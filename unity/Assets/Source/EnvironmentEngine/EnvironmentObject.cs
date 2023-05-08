@@ -160,11 +160,6 @@ public class EnvironmentObject : EnvironmentComponentHolder
         mFixedUpdateCollisions.Clear();
     }
 
-    /*sealed override public bool OnObjectActionRecieved(float[] vectorAction)
-    {
-        return base.OnObjectActionRecieved(vectorAction);
-    }*/
-
     void OnTriggerEnter(Collider other)
     {
         if (Application.isPlaying)
