@@ -5,6 +5,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
+using Unity.MLAgents.Sensors;
 
 public class ActionInfo
 {
@@ -207,5 +208,8 @@ public class EnvironmentAgent : EnvironmentComponent
         mAgentScript.AddReward(reward);
     }
 
-
+    public void AddSensor(ISensor sensor)
+    {
+        mAgentScript.AddSensor(sensor);
+    }
 }

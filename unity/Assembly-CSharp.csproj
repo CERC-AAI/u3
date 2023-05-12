@@ -88,11 +88,14 @@
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\10- Multiple movement states setup\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\HealthOrb.cs" />
     <Compile Include="Assets\Libraries\JSON\VectorTemplates.cs" />
+    <Compile Include="Assets\FreeSelectionOutline\Scripts\DebugFunction.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\Utilities\MobileDisableAutoSwitchControls.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\4- Landing and leaving ground\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\ICharacterController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PlayableMover.cs" />
+    <Compile Include="Assets\FreeSelectionOutline\Scripts\SelectionOutlineController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\ExampleMovingPlatform.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\GravityGun.cs" />
     <Compile Include="Assets\Source\Other\Spawn.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\KinematicCharacterSystem.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\GridObject.cs" />
@@ -148,6 +151,7 @@
     <Compile Include="Assets\Source\Other\MakeCube.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\1- Player Camera Character Setup\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Key.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\HighlightNearestObject.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PlanetManager.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\12- NoClip state\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\2- Basic Movement and Gravity\Scripts\MyPlayer.cs" />
@@ -164,13 +168,9 @@
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\4- Landing and leaving ground\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\b- Double Jumping\MyCharacterController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PrefabLauncher.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\TargettingCursor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\7- Orienting towards arbitrary up direction\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentObject.cs" />
-    <Compile Include="Assets\Source\Scripts\XLand\GravityGun.cs" />
-    <Compile Include="Assets\Source\Scripts\XLand\HighlightNearestObject.cs" />
-    <Compile Include="Assets\FreeSelectionOutline\Scripts\SelectionOutlineController.cs" />
-    <Compile Include="Assets\FreeSelectionOutline\Scripts\DebugFunction.cs" />
-    <Compile Include="Assets\Source\Scripts\XLand\TargettingCursor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Libraries\JSON\readme.txt" />

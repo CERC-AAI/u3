@@ -49,7 +49,7 @@ public class SelectionOutlineController : MonoBehaviour
     [Range(0, 1)]
     public float OutlineHardness = 0.85f;
 
-    void OnEnale()
+    void OnEnable()
     {
 
         Inital();
