@@ -18,6 +18,10 @@ public class GridPlayer : EnvironmentAgent
     Movement mMovement;
     HealthBar mHealthBar;
 
+    [Action((int)GridEnvironment.Actions.NOOP)]
+    public ActionInfo.DiscreteAction doMovement;
+
+
     public float MaxSpeed
     {
         get { return tilesPerSecondSpeed; }
@@ -81,7 +85,6 @@ public class GridPlayer : EnvironmentAgent
         mMovement.Velocity = Vector2.zero;
     }
 
-    [Action((int)GridEnvironment.Actions.NOOP)]
     void DoMovement(int actionValue)
     {
         float speed = tilesPerSecondSpeed;

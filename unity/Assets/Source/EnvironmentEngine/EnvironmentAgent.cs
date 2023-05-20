@@ -35,6 +35,23 @@ public class ActionInfo
         mActionCount = 1;
         mActionCallback = callback;
     }
+
+    public void DoAction(int actionValueDiscrete = 0, float actionValueContinuous = 0f)
+    {
+        switch (mType)
+        {
+            case TYPE.DISCRETE:
+                ((DiscreteAction)mActionCallback)?.Invoke(actionValueDiscrete);
+                break;
+            case TYPE.CONTINUOUS:
+                ((ContinuousAction)mActionCallback)?.Invoke(actionValueContinuous);
+                break;
+            default:
+                Debug.LogError("Invalid action type.");
+                break;
+        }
+    }
+
 }
 
 [RequireComponent(typeof(U3Agent))]
@@ -131,7 +148,7 @@ public class EnvironmentAgent : EnvironmentComponent
     //[Callback(typeof(HealthBar), CallbackScope.SELF)]
     virtual protected void OnDied()
     {
-        DoEndEpisode();        
+        DoEndEpisode();
     }
 
     public void RequestDecision()
@@ -161,7 +178,7 @@ public class EnvironmentAgent : EnvironmentComponent
         {
             if (actions.ContinuousActions.Length > i)
             {
-                ((ActionInfo.ContinuousAction)mContinuousActions[i].mActionCallback)(actions.ContinuousActions[i]);
+                mContinuousActions[i].DoAction(0, actions.ContinuousActions[i]);
             }
         }
 
@@ -169,7 +186,7 @@ public class EnvironmentAgent : EnvironmentComponent
         {
             if (actions.DiscreteActions.Length > i)
             {
-                ((ActionInfo.DiscreteAction)mDiscreteActions[i].mActionCallback)(actions.DiscreteActions[i]);
+                mDiscreteActions[i].DoAction(actions.DiscreteActions[i], 0f);
             }
         }
 
