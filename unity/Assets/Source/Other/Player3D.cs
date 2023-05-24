@@ -16,7 +16,7 @@ public class Player3D : EnvironmentAgent
     HealthBar mHealthBar;
 
     [Action((int)GridEnvironment.Actions.NOOP)]
-    public ActionInfo.DiscreteAction doMovement;
+    public int doMovement;
 
     override protected void Initialize()
     {
@@ -25,7 +25,6 @@ public class Player3D : EnvironmentAgent
 
         base.Initialize();
 
-        doMovement = new ActionInfo.DiscreteAction(DoMovement);
     }
 
     public override void OnRunStarted()
@@ -53,11 +52,16 @@ public class Player3D : EnvironmentAgent
         mMovement.Velocity = Vector2.zero;
     }
 
-    void DoMovement(int actionValue)
+    void Update()
+    {
+        DoMovement();
+    }
+
+    void DoMovement()
     {
         float speed = tilesPerSecondSpeed;
 
-        switch ((GridEnvironment.Actions)actionValue)
+        switch ((GridEnvironment.Actions)doMovement)
         {
             case GridEnvironment.Actions.NOOP:
                 mMovement.Velocity = Vector2.zero * speed;
