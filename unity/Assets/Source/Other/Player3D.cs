@@ -54,7 +54,13 @@ public class Player3D : EnvironmentAgent
 
     void Update()
     {
+        ReadAction();
         DoMovement();
+    }
+
+    void ReadAction()
+    {
+        doMovement = mDiscreteActions[0].mActionDiscrete;
     }
 
     void DoMovement()

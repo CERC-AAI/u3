@@ -59,8 +59,8 @@ public class EnvironmentAgent : EnvironmentComponent
     U3Agent mAgentScript;
     BehaviorParameters mBehaviorParameters;
 
-    List<ActionInfo> mDiscreteActions = new List<ActionInfo>();
-    List<ActionInfo> mContinuousActions = new List<ActionInfo>();
+    public List<ActionInfo> mDiscreteActions = new List<ActionInfo>();
+    public List<ActionInfo> mContinuousActions = new List<ActionInfo>();
 
     protected override void Initialize()
     {
@@ -172,19 +172,20 @@ public class EnvironmentAgent : EnvironmentComponent
 
     virtual public void OnActionReceived(ActionBuffers actions)
     {
-        for (int i = 0; i < mContinuousActions.Count; i++)
-        {
-            if (actions.ContinuousActions.Length > i)
-            {
-                mContinuousActions[i].DoAction(0, actions.ContinuousActions[i]);
-            }
-        }
-
         for (int i = 0; i < mDiscreteActions.Count; i++)
         {
             if (actions.DiscreteActions.Length > i)
             {
                 mDiscreteActions[i].DoAction(actions.DiscreteActions[i]);
+            }
+        }
+
+        for (int i = 0; i < mContinuousActions.Count; i++)
+        {
+            if (actions.ContinuousActions.Length > i)
+            {
+                mContinuousActions[i].DoAction(0, actions.ContinuousActions[i]);
+
             }
         }
 
