@@ -15,25 +15,23 @@ public class ActionInfo
         CONTINUOUS
     }
 
-    public delegate void DiscreteAction(int actionValue);
-    public delegate void ContinuousAction(float actionValue);
-
-    public Delegate mActionCallback;
+    public int mActionDiscrete = 0;
+    public float mActionContinuous = 0f;
     public int mActionCount = 1;
     public TYPE mType;
 
-    public ActionInfo(DiscreteAction callback, int actionCount)
+    public ActionInfo(int actionDiscrete, int actionCount)
     {
         mType = TYPE.DISCRETE;
         mActionCount = actionCount;
-        mActionCallback = callback;
+        mActionDiscrete = actionDiscrete;
     }
 
-    public ActionInfo(ContinuousAction callback)
+    public ActionInfo(float actionContinuous)
     {
         mType = TYPE.CONTINUOUS;
         mActionCount = 1;
-        mActionCallback = callback;
+        mActionContinuous = actionContinuous;
     }
 
     public void DoAction(int actionValueDiscrete = 0, float actionValueContinuous = 0f)
@@ -41,10 +39,10 @@ public class ActionInfo
         switch (mType)
         {
             case TYPE.DISCRETE:
-                ((DiscreteAction)mActionCallback)?.Invoke(actionValueDiscrete);
+                mActionDiscrete = actionValueDiscrete;
                 break;
             case TYPE.CONTINUOUS:
-                ((ContinuousAction)mActionCallback)?.Invoke(actionValueContinuous);
+                mActionContinuous = actionValueContinuous;
                 break;
             default:
                 Debug.LogError("Invalid action type.");
@@ -186,7 +184,7 @@ public class EnvironmentAgent : EnvironmentComponent
         {
             if (actions.DiscreteActions.Length > i)
             {
-                mDiscreteActions[i].DoAction(actions.DiscreteActions[i], 0f);
+                mDiscreteActions[i].DoAction(actions.DiscreteActions[i]);
             }
         }
 
