@@ -188,23 +188,20 @@ public class EnvironmentComponent : MonoBehaviour
                 Action actionAttribute = fieldInfo.GetCustomAttribute<Action>();
                 if (actionAttribute != null)
                 {
-                    Delegate callbackDelegate = (Delegate)fieldInfo.GetValue(this);
+                    object fieldValue = fieldInfo.GetValue(this);
 
-                    if (callbackDelegate is ActionInfo.DiscreteAction)
+                    if (fieldValue is int)
                     {
-                        ActionInfo.DiscreteAction discreteCallback = (ActionInfo.DiscreteAction)callbackDelegate;
-                        actionsList.Add(new ActionInfo(discreteCallback, actionAttribute.actionCount));
+                        actionsList.Add(new ActionInfo((int)fieldValue, actionAttribute.actionCount));
                     }
-                    else if (callbackDelegate is ActionInfo.ContinuousAction)
+                    else if (fieldValue is float)
                     {
-                        ActionInfo.ContinuousAction continuousCallback = (ActionInfo.ContinuousAction)callbackDelegate;
-                        actionsList.Add(new ActionInfo(continuousCallback));
+                        actionsList.Add(new ActionInfo((float)fieldValue));
                     }
                     else
                     {
-                        Debug.Log("Cannot add Action" + name + "(" + fieldInfo.Name + "). Field must be of type ActionInfo.DiscreteAction or ActionInfo.ContinuousAction.");
+                        Debug.Log("Cannot add Action" + name + "(" + fieldInfo.Name + "). Field must be of type int or float.");
                     }
-
                 }
             }
 
