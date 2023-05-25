@@ -250,7 +250,20 @@ public class EnvironmentComponent : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError("Could not initalize ActionInfo for type: " + fieldInfo.FieldType + ".");
+                        string typeName = fieldInfo.FieldType.Name;
+
+                        if (typeName.Length > 1)
+                        {
+                            typeName = char.ToUpper(typeName[0]) + typeName.Substring(1);
+                        }
+                        else
+                        {
+                            typeName = typeName.ToUpper();
+                        }
+
+                        typeName += "ActionInfo";
+
+                        Debug.LogError("Could not initalize ActionInfo for type: " + fieldInfo.FieldType + ". Please add it to ActionInfo.mActionInfoMap, or make sure the class is named: " + typeName);
                     }
                 }
             }
