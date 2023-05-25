@@ -16,11 +16,6 @@ public class IntActionInfo : ActionInfo
         mFieldInfo.SetValue(mParent, values[0]);
     }
 
-    override public void encodeDiscreteActions(List<int> values)
-    {
-        values[0] = (int)mFieldInfo.GetValue(mParent);
-    }
-
     override public int getIntegerCount()
     {
         return 1;
@@ -49,20 +44,6 @@ public class BooleanActionInfo : ActionInfo
         }
     }
 
-    override public void encodeDiscreteActions(List<int> values)
-    {
-        bool value = (bool)mFieldInfo.GetValue(mParent);
-
-        if (value)
-        {
-            values[0] = 1;
-        }
-        else
-        {
-            values[0] = 0;
-        }
-    }
-
     override public int getIntegerCount()
     {
         return 1;
@@ -82,23 +63,6 @@ public class EnumActionInfo : ActionInfo
         mFieldInfo.SetValue(mParent, mFieldInfo.FieldType.GetEnumValues().GetValue(values[0]));
     }
 
-    override public void encodeDiscreteActions(List<int> values)
-    {
-        int enumValue = (int)mFieldInfo.GetValue(mParent);
-
-        int i = 0;
-        foreach (int value in mFieldInfo.FieldType.GetEnumValues())
-        {
-            if (value == enumValue)
-            {
-                values[0] = i;
-                return;
-            }
-
-            i++;
-        }         
-    }
-
     override public int getIntegerCount()
     {
         return 1;
@@ -110,14 +74,6 @@ public class Vector2IntActionInfo : ActionInfo
     override public void setDiscreteActions(List<int> values)
     {
         mFieldInfo.SetValue(mParent, new Vector2Int(values[0], values[1]));
-    }
-
-    override public void encodeDiscreteActions(List<int> values)
-    {
-        Vector2Int value = (Vector2Int)mFieldInfo.GetValue(mParent);
-
-        values[0] = value.x;
-        values[1] = value.y;
     }
 
     override public int getIntegerCount()
@@ -132,16 +88,6 @@ public class Vector3IntActionInfo : ActionInfo
     {
         mFieldInfo.SetValue(mParent, new Vector3Int(values[0], values[1], values[2]));
     }
-
-    override public void encodeDiscreteActions(List<int> values)
-    {
-        Vector3Int value = (Vector3Int)mFieldInfo.GetValue(mParent);
-
-        values[0] = value.x;
-        values[1] = value.y;
-        values[2] = value.z;
-    }
-
     override public int getIntegerCount()
     {
         return 3;
@@ -153,11 +99,6 @@ public class FloatActionInfo : ActionInfo
     override public void setContinuousActions(List<float> values)
     {
         mFieldInfo.SetValue(mParent, values[0]);
-    }
-
-    override public void encodeContinuousActions(List<float> values)
-    {
-        values[0] = (float)mFieldInfo.GetValue(mParent);
     }
 
     override public int getFloatCount()
@@ -173,14 +114,6 @@ public class Vector2ActionInfo : ActionInfo
         mFieldInfo.SetValue(mParent, new Vector2(values[0], values[1]));
     }
 
-    override public void encodeContinuousActions(List<float> values)
-    {
-        Vector2 value = (Vector2)mFieldInfo.GetValue(mParent);
-
-        values[0] = value.x;
-        values[1] = value.y;
-    }
-
     override public int getFloatCount()
     {
         return 2;
@@ -192,15 +125,6 @@ public class Vector3ActionInfo : ActionInfo
     override public void setContinuousActions(List<float> values)
     {
         mFieldInfo.SetValue(mParent, new Vector3(values[0], values[1], values[2]));
-    }
-
-    override public void encodeContinuousActions(List<float> values)
-    {
-        Vector3 value = (Vector3)mFieldInfo.GetValue(mParent);
-
-        values[0] = value.x;
-        values[1] = value.y;
-        values[2] = value.z;
     }
 
     override public int getFloatCount()
@@ -218,8 +142,6 @@ public class ActionInfo
         [typeof(int)] = typeof(IntActionInfo),
         [typeof(float)] = typeof(FloatActionInfo),
     };
-
-    public delegate void Heuristic();
 
     protected FieldInfo mFieldInfo;
     protected object mParent;
@@ -396,7 +318,7 @@ public class EnvironmentAgent : EnvironmentComponent
         return false;// fixedUdpateNumber % 10 == 0;
     }
 
-    virtual public void OnActionReceived(ActionBuffers actions)
+    public void OnActionReceived(ActionBuffers actions)
     {
         List<int> currentDiscreteBuffer = new List<int>();
         List<float> currentContinuousBuffer = new List<float>();
@@ -433,7 +355,7 @@ public class EnvironmentAgent : EnvironmentComponent
 
     virtual public void Heuristic(in ActionBuffers actionsOut)
     {
-        ActionSegment<int> discreteActions = actionsOut.DiscreteActions;
+        /*ActionSegment<int> discreteActions = actionsOut.DiscreteActions;
         ActionSegment<float> continuousActions = actionsOut.ContinuousActions;
 
         List<int> currentDiscreteBuffer = new List<int>();
@@ -476,7 +398,7 @@ public class EnvironmentAgent : EnvironmentComponent
 
             discreteOffset += mActions[i].getIntegerCount();
             continuousOffset += mActions[i].getFloatCount();
-        }
+        }*/
     }
 
     virtual public void DoEndEpisode(bool timedOut = false)

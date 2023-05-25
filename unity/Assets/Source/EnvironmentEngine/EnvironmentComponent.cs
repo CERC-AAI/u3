@@ -28,15 +28,9 @@ public class Action : Attribute
 {
     public float minValue = -ActionInfo.DEFAULT_VALUE_RANGE;
     public float maxValue = ActionInfo.DEFAULT_VALUE_RANGE;
-    public ActionInfo.Heuristic heuristic;
 
     public Action()
     {
-    }
-
-    public Action(ActionInfo.Heuristic heuristic)
-    {
-        this.heuristic = heuristic;
     }
 
     public Action(float minValue = float.MinValue, float maxValue = float.MinValue)
@@ -45,24 +39,10 @@ public class Action : Attribute
         this.maxValue = maxValue;
     }
 
-    public Action(ActionInfo.Heuristic heuristic, float minValue = float.MinValue, float maxValue = float.MinValue)
-    {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        this.heuristic = heuristic;
-    }
-
     public Action(int minValue = int.MinValue, int maxValue = int.MinValue)
     {
         this.minValue = minValue;
         this.maxValue = maxValue;
-    }
-
-    public Action(ActionInfo.Heuristic heuristic, int minValue = int.MinValue, int maxValue = int.MinValue)
-    {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        this.heuristic = heuristic;
     }
 }
 

@@ -12,6 +12,7 @@ using Unity.MLAgents.Sensors;
 public class U3Agent : Agent
 {
     EnvironmentAgent mAgent;
+    bool mUsingHeuristics = false;
 
     public void Start()
     {
@@ -22,13 +23,19 @@ public class U3Agent : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        mAgent.OnActionReceived(actions);
+        if (!mUsingHeuristics)
+        {
+            mAgent.OnActionReceived(actions);
+        }
         mAgent.GetEngine().OnAgentActionReceived(mAgent, mAgent.ShouldBlockDecision(actions));
+
+        mUsingHeuristics = false;
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         mAgent.Heuristic(in actionsOut);
+        mUsingHeuristics = true;
     }
 
     private void Update()
