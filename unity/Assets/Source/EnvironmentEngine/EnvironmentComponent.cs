@@ -23,7 +23,7 @@ public class Callback : Attribute
     }
 }
 
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
 public class Action : Attribute
 {
     public int actionCount = 1;
@@ -55,7 +55,7 @@ public delegate void EnvironmentCallback();
 public delegate void EnvironmentCallback<T>(T value = default(T));
 
 //base class for environment objects
-public class EnvironmentComponent : MonoBehaviour 
+public class EnvironmentComponent : MonoBehaviour
 {
     // Public members
 
@@ -95,7 +95,7 @@ public class EnvironmentComponent : MonoBehaviour
         }
     }
 
-    virtual protected void Initialize() 
+    virtual protected void Initialize()
     {
         CheckAll();
 
@@ -181,39 +181,27 @@ public class EnvironmentComponent : MonoBehaviour
         Type currentType = GetType();
         do
         {
-            MethodInfo[] methodInfos = currentType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            FieldInfo[] fieldInfos = currentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-            foreach (MethodInfo methodInfo in methodInfos)
+            foreach (FieldInfo fieldInfo in fieldInfos)
             {
-                Action actionInfo = methodInfo.GetCustomAttribute<Action>();
-                if (actionInfo != null)
+                Action actionAttribute = fieldInfo.GetCustomAttribute<Action>();
+                if (actionAttribute != null)
                 {
-                    Delegate newCallback = null;
+                    object fieldValue = fieldInfo.GetValue(this);
 
-                    ParameterInfo[] paramInfos = methodInfo.GetParameters();
-
-                    if (paramInfos.Length != 1)
+                    if (fieldValue is int)
                     {
-                        Debug.Log("Cannot add Action" + name + "(" + methodInfo.Name + "). Function must have a single int or float parameter.");
-
-                        return;
+                        actionsList.Add(new ActionInfo((int)fieldValue, actionAttribute.actionCount));
                     }
-
-                    ActionInfo actionObject = null;
-                    if (paramInfos[0].ParameterType == typeof(int))
+                    else if (fieldValue is float)
                     {
-                        newCallback = Delegate.CreateDelegate(typeof(ActionInfo.DiscreteAction), this, methodInfo);
-
-                        actionObject = new ActionInfo((ActionInfo.DiscreteAction)newCallback, actionInfo.actionCount);
+                        actionsList.Add(new ActionInfo((float)fieldValue));
                     }
                     else
                     {
-                        newCallback = Delegate.CreateDelegate(typeof(ActionInfo.ContinuousAction), this, methodInfo);
-
-                        actionObject = new ActionInfo((ActionInfo.ContinuousAction)newCallback);
+                        Debug.Log("Cannot add Action" + name + "(" + fieldInfo.Name + "). Field must be of type int or float.");
                     }
-
-                    actionsList.Add(actionObject);
                 }
             }
 
@@ -375,7 +363,7 @@ public class EnvironmentComponent : MonoBehaviour
                 }
 
                 currentType = currentType.BaseType;
-            } 
+            }
             while (currentType == typeof(EnvironmentComponent) || currentType.IsSubclassOf(typeof(EnvironmentComponent)));
         }
     }
@@ -443,13 +431,13 @@ public class EnvironmentComponent : MonoBehaviour
         OnPreGetState();
 
         JSONObject fullComponent = new JSONObject();
-        
+
         int i = 0;
         foreach (PropertyInfo propertyInfo in mSaveProperties)
         {
             if (name == "Player")
             {
-                int  test = 1;
+                int test = 1;
             }
 
             string defaultValue = null;

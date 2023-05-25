@@ -18,6 +18,10 @@ public class GridPlayer : EnvironmentAgent
     Movement mMovement;
     HealthBar mHealthBar;
 
+    [Action((int)GridEnvironment.Actions.NOOP)]
+    public int doMovement;
+
+
     public float MaxSpeed
     {
         get { return tilesPerSecondSpeed; }
@@ -81,8 +85,18 @@ public class GridPlayer : EnvironmentAgent
         mMovement.Velocity = Vector2.zero;
     }
 
-    [Action((int)GridEnvironment.Actions.NOOP)]
-    void DoMovement(int actionValue)
+    void Update()
+    {
+        ReadAction();
+        DoMovement();
+    }
+
+    void ReadAction()
+    {
+        doMovement = mDiscreteActions[0].mActionDiscrete;
+    }
+
+    void DoMovement()
     {
         float speed = tilesPerSecondSpeed;
         if (mGridEngine)
@@ -90,7 +104,7 @@ public class GridPlayer : EnvironmentAgent
             speed = tilesPerSecondSpeed * mGridEngine.gridSize / mGridEngine.GetTurnTime();
         }
 
-        switch ((GridEnvironment.Actions)actionValue)
+        switch ((GridEnvironment.Actions)doMovement)
         {
             case GridEnvironment.Actions.NOOP:
                 mMovement.Velocity = Vector2.zero * speed;

@@ -15,26 +15,41 @@ public class ActionInfo
         CONTINUOUS
     }
 
-    public delegate void DiscreteAction(int actionValue);
-    public delegate void ContinuousAction(float actionValue);
-
-    public Delegate mActionCallback;
+    public int mActionDiscrete = 0;
+    public float mActionContinuous = 0f;
     public int mActionCount = 1;
     public TYPE mType;
 
-    public ActionInfo(DiscreteAction callback, int actionCount)
+    public ActionInfo(int actionDiscrete, int actionCount)
     {
         mType = TYPE.DISCRETE;
         mActionCount = actionCount;
-        mActionCallback = callback;
+        mActionDiscrete = actionDiscrete;
     }
 
-    public ActionInfo(ContinuousAction callback)
+    public ActionInfo(float actionContinuous)
     {
         mType = TYPE.CONTINUOUS;
         mActionCount = 1;
-        mActionCallback = callback;
+        mActionContinuous = actionContinuous;
     }
+
+    public void DoAction(int actionValueDiscrete = 0, float actionValueContinuous = 0f)
+    {
+        switch (mType)
+        {
+            case TYPE.DISCRETE:
+                mActionDiscrete = actionValueDiscrete;
+                break;
+            case TYPE.CONTINUOUS:
+                mActionContinuous = actionValueContinuous;
+                break;
+            default:
+                Debug.LogError("Invalid action type.");
+                break;
+        }
+    }
+
 }
 
 [RequireComponent(typeof(U3Agent))]
@@ -44,8 +59,8 @@ public class EnvironmentAgent : EnvironmentComponent
     U3Agent mAgentScript;
     BehaviorParameters mBehaviorParameters;
 
-    List<ActionInfo> mDiscreteActions = new List<ActionInfo>();
-    List<ActionInfo> mContinuousActions = new List<ActionInfo>();
+    public List<ActionInfo> mDiscreteActions = new List<ActionInfo>();
+    public List<ActionInfo> mContinuousActions = new List<ActionInfo>();
 
     protected override void Initialize()
     {
@@ -131,7 +146,7 @@ public class EnvironmentAgent : EnvironmentComponent
     //[Callback(typeof(HealthBar), CallbackScope.SELF)]
     virtual protected void OnDied()
     {
-        DoEndEpisode();        
+        DoEndEpisode();
     }
 
     public void RequestDecision()
@@ -157,19 +172,20 @@ public class EnvironmentAgent : EnvironmentComponent
 
     virtual public void OnActionReceived(ActionBuffers actions)
     {
-        for (int i = 0; i < mContinuousActions.Count; i++)
-        {
-            if (actions.ContinuousActions.Length > i)
-            {
-                ((ActionInfo.ContinuousAction)mContinuousActions[i].mActionCallback)(actions.ContinuousActions[i]);
-            }
-        }
-
         for (int i = 0; i < mDiscreteActions.Count; i++)
         {
             if (actions.DiscreteActions.Length > i)
             {
-                ((ActionInfo.DiscreteAction)mDiscreteActions[i].mActionCallback)(actions.DiscreteActions[i]);
+                mDiscreteActions[i].DoAction(actions.DiscreteActions[i]);
+            }
+        }
+
+        for (int i = 0; i < mContinuousActions.Count; i++)
+        {
+            if (actions.ContinuousActions.Length > i)
+            {
+                mContinuousActions[i].DoAction(0, actions.ContinuousActions[i]);
+
             }
         }
 
