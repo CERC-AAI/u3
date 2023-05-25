@@ -11,7 +11,7 @@ using System.Reflection;
 public class IntActionInfo : ActionInfo
 {
 
-    override public void setDiscreteActions(List<int> values)
+    override public void setActions(List<int> values)
     {
         mFieldInfo.SetValue(mParent, values[0]);
     }
@@ -32,7 +32,7 @@ public class BooleanActionInfo : ActionInfo
         base.init();
     }
 
-    override public void setDiscreteActions(List<int> values)
+    override public void setActions(List<int> values)
     {
         if (values[0] == 1)
         {
@@ -58,7 +58,7 @@ public class EnumActionInfo : ActionInfo
         mMaxValue = mFieldInfo.FieldType.GetEnumValues().Length;
     }
 
-    override public void setDiscreteActions(List<int> values)
+    override public void setActions(List<int> values)
     {
         mFieldInfo.SetValue(mParent, mFieldInfo.FieldType.GetEnumValues().GetValue(values[0]));
     }
@@ -71,7 +71,7 @@ public class EnumActionInfo : ActionInfo
 
 public class Vector2IntActionInfo : ActionInfo
 {
-    override public void setDiscreteActions(List<int> values)
+    override public void setActions(List<int> values)
     {
         mFieldInfo.SetValue(mParent, new Vector2Int(values[0], values[1]));
     }
@@ -84,7 +84,7 @@ public class Vector2IntActionInfo : ActionInfo
 
 public class Vector3IntActionInfo : ActionInfo
 {
-    override public void setDiscreteActions(List<int> values)
+    override public void setActions(List<int> values)
     {
         mFieldInfo.SetValue(mParent, new Vector3Int(values[0], values[1], values[2]));
     }
@@ -96,7 +96,7 @@ public class Vector3IntActionInfo : ActionInfo
 
 public class FloatActionInfo : ActionInfo
 {
-    override public void setContinuousActions(List<float> values)
+    override public void setActions(List<float> values)
     {
         mFieldInfo.SetValue(mParent, values[0]);
     }
@@ -109,7 +109,7 @@ public class FloatActionInfo : ActionInfo
 
 public class Vector2ActionInfo : ActionInfo
 {
-    override public void setContinuousActions(List<float> values)
+    override public void setActions(List<float> values)
     {
         mFieldInfo.SetValue(mParent, new Vector2(values[0], values[1]));
     }
@@ -122,7 +122,7 @@ public class Vector2ActionInfo : ActionInfo
 
 public class Vector3ActionInfo : ActionInfo
 {
-    override public void setContinuousActions(List<float> values)
+    override public void setActions(List<float> values)
     {
         mFieldInfo.SetValue(mParent, new Vector3(values[0], values[1], values[2]));
     }
@@ -164,24 +164,14 @@ public class ActionInfo
 
     }
 
-    virtual public void setDiscreteActions(List<int> values)
+    virtual public void setActions(List<int> values)
     {
         Debug.LogError("Please implement setDiscreteActions function for class: " + GetType());
     }
 
-    virtual public void setContinuousActions(List<float> values)
+    virtual public void setActions(List<float> values)
     {
         Debug.LogError("Please implement setContinuousActions function for class: " + GetType());
-    }
-
-    virtual public void encodeDiscreteActions(List<int> values)
-    {
-        Debug.LogError("Please implement encodeDiscreteActions function for class: " + GetType());
-    }
-
-    virtual public void encodeContinuousActions(List<float> values)
-    {
-        Debug.LogError("Please implement encodeContinuousActions function for class: " + GetType());
     }
 
     virtual public int getIntegerCount()
@@ -344,11 +334,11 @@ public class EnvironmentAgent : EnvironmentComponent
 
             if (currentDiscreteBuffer.Count > 0)
             {
-                mActions[i].setDiscreteActions(currentDiscreteBuffer);
+                mActions[i].setActions(currentDiscreteBuffer);
             }
             if (currentContinuousBuffer.Count > 0)
             {
-                mActions[i].setContinuousActions(currentContinuousBuffer);
+                mActions[i].setActions(currentContinuousBuffer);
             }
         }
     }
