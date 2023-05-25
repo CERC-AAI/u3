@@ -18,8 +18,14 @@ public class GridPlayer : EnvironmentAgent
     Movement mMovement;
     HealthBar mHealthBar;
 
-    [Action((int)GridEnvironment.Actions.NOOP)]
-    public int doMovement;
+    [Action]
+    public bool test;
+
+    [Action]
+    public Vector3 test2;
+
+    [Action]
+    public GridEnvironment.Actions movementState;
 
 
     public float MaxSpeed
@@ -70,7 +76,7 @@ public class GridPlayer : EnvironmentAgent
 
     override public bool ShouldBlockDecision(ActionBuffers actions)
     {
-        return actions.DiscreteActions[0] == (int)GridEnvironment.Actions.NOOP;
+        return movementState == GridEnvironment.Actions.NOOP;
     }
 
     override public void OnUpdate(float deltaTime)
@@ -87,13 +93,7 @@ public class GridPlayer : EnvironmentAgent
 
     void Update()
     {
-        ReadAction();
         DoMovement();
-    }
-
-    void ReadAction()
-    {
-        doMovement = mDiscreteActions[0].mActionDiscrete;
     }
 
     void DoMovement()
@@ -104,7 +104,7 @@ public class GridPlayer : EnvironmentAgent
             speed = tilesPerSecondSpeed * mGridEngine.gridSize / mGridEngine.GetTurnTime();
         }
 
-        switch ((GridEnvironment.Actions)doMovement)
+        switch ((GridEnvironment.Actions)movementState)
         {
             case GridEnvironment.Actions.NOOP:
                 mMovement.Velocity = Vector2.zero * speed;
@@ -131,39 +131,31 @@ public class GridPlayer : EnvironmentAgent
         }
     }
 
-    /*override public void OnActionReceived(ActionBuffers actions)
+    override public void Heuristic(in ActionBuffers actionsOut)
     {
-        base.OnActionReceived(actions);
+        test = UnityEngine.Random.Range(0, 2) == 1;
+        test2 = UnityEngine.Random.onUnitSphere;
 
-        
-    }*/
-
-    public override void Heuristic(in ActionBuffers actionsOut)
-    {
-        ActionSegment<int> discreteActions = actionsOut.DiscreteActions;
-
-        discreteActions[0] = (int)GridEnvironment.Actions.NOOP;
+        movementState = GridEnvironment.Actions.NOOP;
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            discreteActions[0] = (int)GridEnvironment.Actions.RIGHT;
-            return;
+            movementState = GridEnvironment.Actions.RIGHT;
         }
         else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
-            discreteActions[0] = (int)GridEnvironment.Actions.UP;
-            return;
+            movementState = GridEnvironment.Actions.UP;
         }
         else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            discreteActions[0] = (int)GridEnvironment.Actions.LEFT;
-            return;
+            movementState = GridEnvironment.Actions.LEFT;
         }
         else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
-            discreteActions[0] = (int)GridEnvironment.Actions.DOWN;
-            return;
+            movementState = GridEnvironment.Actions.DOWN;
         }
+
+        base.Heuristic(actionsOut);
     }
 
     /*public override void OnCollision(EnvironmentObject otherObject)

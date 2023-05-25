@@ -37,8 +37,6 @@ public class U3Agent : Agent
                             BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
 
         List<ISensor> value = (List<ISensor>)field.GetValue(this);
-
-        Debug.Log(value.Count);
     }
 
     public void AddSensor(ISensor sensor)

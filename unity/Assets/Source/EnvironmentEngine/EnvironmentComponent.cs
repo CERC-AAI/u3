@@ -26,11 +26,43 @@ public class Callback : Attribute
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
 public class Action : Attribute
 {
-    public int actionCount = 1;
+    public float minValue = -ActionInfo.DEFAULT_VALUE_RANGE;
+    public float maxValue = ActionInfo.DEFAULT_VALUE_RANGE;
+    public ActionInfo.Heuristic heuristic;
 
-    public Action(int actionCount = 1)
+    public Action()
     {
-        this.actionCount = actionCount;
+    }
+
+    public Action(ActionInfo.Heuristic heuristic)
+    {
+        this.heuristic = heuristic;
+    }
+
+    public Action(float minValue = float.MinValue, float maxValue = float.MinValue)
+    {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
+
+    public Action(ActionInfo.Heuristic heuristic, float minValue = float.MinValue, float maxValue = float.MinValue)
+    {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.heuristic = heuristic;
+    }
+
+    public Action(int minValue = int.MinValue, int maxValue = int.MinValue)
+    {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
+
+    public Action(ActionInfo.Heuristic heuristic, int minValue = int.MinValue, int maxValue = int.MinValue)
+    {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.heuristic = heuristic;
     }
 }
 
@@ -188,19 +220,57 @@ public class EnvironmentComponent : MonoBehaviour
                 Action actionAttribute = fieldInfo.GetCustomAttribute<Action>();
                 if (actionAttribute != null)
                 {
-                    object fieldValue = fieldInfo.GetValue(this);
+                    Type actionInfoType = typeof(ActionInfo);
 
-                    if (fieldValue is int)
+                    if (ActionInfo.mActionInfoMap.ContainsKey(fieldInfo.FieldType))
                     {
-                        actionsList.Add(new ActionInfo((int)fieldValue, actionAttribute.actionCount));
+                        actionInfoType = ActionInfo.mActionInfoMap[fieldInfo.FieldType];
                     }
-                    else if (fieldValue is float)
+                    else if (fieldInfo.FieldType.IsEnum)
                     {
-                        actionsList.Add(new ActionInfo((float)fieldValue));
+                        actionInfoType = typeof(EnumActionInfo);
                     }
                     else
                     {
-                        Debug.Log("Cannot add Action" + name + "(" + fieldInfo.Name + "). Field must be of type int or float.");
+                        string typeName = fieldInfo.FieldType.Name;
+
+                        if (typeName.Length > 1)
+                        {
+                            typeName = char.ToUpper(typeName[0]) + typeName.Substring(1);
+                        }
+                        else
+                        {
+                            typeName = typeName.ToUpper();
+                        }
+
+                        typeName += "ActionInfo";
+
+                        if (Type.GetType(typeName) != null)
+                        {
+                            actionInfoType = Type.GetType(typeName);
+                        }
+                    }
+
+                    ActionInfo actionInfo = null;
+
+                    try
+                    {
+                        actionInfo = (ActionInfo)Activator.CreateInstance(actionInfoType);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("Could not create ActionInfo of type: " + actionInfoType + ". Does this class extend ActionInfo?");
+                        Debug.LogError(e.Message);
+                    }
+
+                    if (actionInfo != null && actionInfo.GetType().BaseType == typeof(ActionInfo))
+                    {
+                        actionInfo.setBaseValues(fieldInfo, this, actionAttribute);
+                        actionsList.Add(actionInfo);
+                    }
+                    else
+                    {
+                        Debug.LogError("Could not initalize ActionInfo for type: " + fieldInfo.FieldType + ".");
                     }
                 }
             }
