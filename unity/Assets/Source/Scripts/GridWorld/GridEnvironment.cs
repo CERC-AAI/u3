@@ -34,7 +34,7 @@ public class GridEnvironment : EnvironmentEngine
     public enum Actions
     {
         RIGHT = 0,
-        UP,
+        UP=2,
         LEFT,
         DOWN,
         NOOP,

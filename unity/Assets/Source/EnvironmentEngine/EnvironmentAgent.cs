@@ -84,7 +84,19 @@ public class EnumActionInfo : ActionInfo
 
     override public void encodeDiscreteActions(List<int> values)
     {
-        values[0] = (int)mFieldInfo.GetValue(mParent);
+        int enumValue = (int)mFieldInfo.GetValue(mParent);
+
+        int i = 0;
+        foreach (int value in mFieldInfo.FieldType.GetEnumValues())
+        {
+            if (value == enumValue)
+            {
+                values[0] = i;
+                return;
+            }
+
+            i++;
+        }         
     }
 
     override public int getIntegerCount()
