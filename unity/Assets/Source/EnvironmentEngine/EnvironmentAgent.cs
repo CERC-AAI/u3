@@ -25,6 +25,8 @@ public class EnvironmentAgent : EnvironmentComponent
         base.Initialize();
 
         BuildActionList();
+
+        mAgentScript.InitAgent();
     }
 
 
@@ -79,8 +81,8 @@ public class EnvironmentAgent : EnvironmentComponent
         behaviorParameters.BrainParameters.ActionSpec = totalAgentBehaviors;
 
         //Turn it off and on again to make sure the changes update.
-        GetComponent<Agent>().enabled = false;
-        GetComponent<Agent>().enabled = true;
+        //GetComponent<Agent>().enabled = false;
+        //GetComponent<Agent>().enabled = true;
     }
 
     protected override void DoRegisterCallbacks()

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
+  - component: {fileID: 2133283186}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -84,6 +85,26 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
+--- !u!114 &2133283186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AssetsPPU: 20
+  m_RefResolutionX: 320
+  m_RefResolutionY: 180
+  m_UpscaleRT: 0
+  m_PixelSnapping: 0
+  m_CropFrameX: 0
+  m_CropFrameY: 0
+  m_StretchFill: 0
 --- !u!1 &440992261960906313
 GameObject:
   m_ObjectHideFlags: 0
@@ -290,7 +311,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 20
   currentHP: 20
-  healthDrainRate: 0.5
+  healthDrainRate: 2
 --- !u!114 &309630477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -324,8 +345,8 @@ MonoBehaviour:
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
-      BranchSizes: 01000000
-    VectorActionSize: 01000000
+      BranchSizes: 
+    VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
@@ -351,6 +372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilesPerSecondSpeed: 1
   randomizeStartPosition: 1
+  movementState: 5
 --- !u!114 &309630483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,7 +385,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mPrefabPath: Assets/Resources/GameObjects/Common/Player.prefab
+  mPrefabPath: Assets/Resources/GameObjects/GridObjects/Player.prefab
 --- !u!114 &3224186649124330939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -378,6 +400,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mInterpolateRoot: {fileID: 2391324215875095687}
   interpolationSpeed: 1
+  syncRotation: 1
   mFacingRoot: {fileID: 8271338767921032818}
 --- !u!1 &8969151142281506889
 GameObject:

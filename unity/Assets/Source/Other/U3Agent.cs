@@ -17,8 +17,15 @@ public class U3Agent : Agent
     public void Start()
     {
         mAgent = GetComponent<EnvironmentAgent>();
+    }
 
-        AddSensor(new VectorSensor(9));
+    protected override void OnEnable()
+    {
+    }
+
+    public void InitAgent()
+    {
+        base.OnEnable();
     }
 
     public override void OnActionReceived(ActionBuffers actions)

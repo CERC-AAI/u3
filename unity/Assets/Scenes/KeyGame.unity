@@ -67,9 +67,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 0
@@ -104,7 +101,7 @@ NavMeshSettings:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_BuildSettings:
-    serializedVersion: 2
+    serializedVersion: 3
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
@@ -117,7 +114,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualTileSize: 0
     tileSize: 256
-    accuratePlacement: 0
+    buildHeightMesh: 0
     maxJobWorkers: 0
     preserveTilesOutsideBounds: 0
     debug:
@@ -702,13 +699,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &74978944
 GameObject:
   m_ObjectHideFlags: 1
@@ -846,6 +844,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 1612814792}
     m_Modifications:
     - target: {fileID: 170875322, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
@@ -861,7 +860,7 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
+      propertyPath: 'm_BrainParameters.VectorActionSize.Array.data[0]'
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
@@ -869,7 +868,7 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]
+      propertyPath: 'm_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]'
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 309630483, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
@@ -955,6 +954,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5255762186422406070, guid: 0e3676493a4b00f4a9c094454cc7b93a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2093436083}
   m_SourcePrefab: {fileID: 100100000, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
 --- !u!1 &106648156
 GameObject:
@@ -1308,12 +1314,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 47
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &139877668 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5255762186422406070, guid: 0e3676493a4b00f4a9c094454cc7b93a,
-    type: 3}
-  m_PrefabInstance: {fileID: 309630474}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &144680169
 GameObject:
   m_ObjectHideFlags: 1
@@ -2770,50 +2770,9 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 1612814792}
     m_Modifications:
-    - target: {fileID: 170875322, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: healthDrainRate
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: m_BrainParameters.VectorActionSize.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: m_BrainParameters.VectorActionSize.Array.data[1]
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[1]
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 309630483, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
-      propertyPath: mPrefabPath
-      value: Assets/Resources/GameObjects/GridObjects/Player.prefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 5255762186422406025, guid: 0e3676493a4b00f4a9c094454cc7b93a,
-        type: 3}
-      propertyPath: m_Mass
-      value: 0.001
-      objectReference: {fileID: 0}
-    - target: {fileID: 5255762186422406025, guid: 0e3676493a4b00f4a9c094454cc7b93a,
-        type: 3}
-      propertyPath: m_BodyType
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5255762186422406070, guid: 0e3676493a4b00f4a9c094454cc7b93a,
         type: 3}
       propertyPath: m_Name
@@ -2875,6 +2834,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
 --- !u!4 &309630475 stripped
 Transform:
@@ -2882,30 +2844,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 309630474}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &309630484 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7477727569484043807, guid: 0e3676493a4b00f4a9c094454cc7b93a,
-    type: 3}
-  m_PrefabInstance: {fileID: 309630474}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 139877668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb9f1fa1b2f12a1408303cd6ba53a809, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &309630491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 139877668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae4343056d7b62e4ca4f6fc7f70f7b48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &311672943
 GameObject:
   m_ObjectHideFlags: 1
@@ -4673,13 +4611,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &498011845
 GameObject:
   m_ObjectHideFlags: 1
@@ -7157,13 +7096,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &811696045
 GameObject:
   m_ObjectHideFlags: 1
@@ -7611,13 +7551,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!4 &898184116 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5924681136638269277, guid: 4aab427474666914086e618bb80a0642,
@@ -9623,13 +9564,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &1140488954
 GameObject:
   m_ObjectHideFlags: 1
@@ -12270,13 +12212,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &1395280706
 GameObject:
   m_ObjectHideFlags: 1
@@ -13251,6 +13194,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 179175318}
     m_Modifications:
     - target: {fileID: 1001360832783273774, guid: b132a3209c166e443a89515d22f0e3ba,
@@ -13319,6 +13263,9 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b132a3209c166e443a89515d22f0e3ba, type: 3}
 --- !u!4 &1525284230 stripped
 Transform:
@@ -14213,7 +14160,7 @@ MonoBehaviour:
   isTraining: 0
   fixedUpdatesPerTurn: 10
   levelImage: {fileID: 0}
-  player: {fileID: 309630484}
+  player: {fileID: 0}
   arenaX: 10
   arenaY: 10
   gridSize: 1
@@ -14318,13 +14265,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &1629332865
 GameObject:
   m_ObjectHideFlags: 1
@@ -15212,13 +15160,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &1767470151
 GameObject:
   m_ObjectHideFlags: 1
@@ -15666,13 +15615,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &1840039465
 GameObject:
   m_ObjectHideFlags: 1
@@ -15724,13 +15674,14 @@ MonoScript:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
-  m_Script: 
+  serializedVersion: 7
   m_DefaultReferences: {}
   m_Icon: {fileID: 0}
+  m_Type: 2
   m_ExecutionOrder: 0
   m_ClassName: AcademyFixedUpdateStepper
   m_Namespace: Unity.MLAgents
+  m_AssemblyName: 
 --- !u!1 &1843462912
 GameObject:
   m_ObjectHideFlags: 1
@@ -16220,6 +16171,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 179175318}
     m_Modifications:
     - target: {fileID: 1001360832783273774, guid: 4af037673c0e1f54fa548928ebc5711f,
@@ -16283,6 +16235,9 @@ PrefabInstance:
       value: Exit
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4af037673c0e1f54fa548928ebc5711f, type: 3}
 --- !u!4 &1901735131 stripped
 Transform:
@@ -17529,7 +17484,7 @@ LightingSettings:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Settings.lighting
-  serializedVersion: 4
+  serializedVersion: 7
   m_GIWorkflowMode: 1
   m_EnableBakedLightmaps: 0
   m_EnableRealtimeLightmaps: 0
@@ -17538,8 +17493,9 @@ LightingSettings:
   m_AlbedoBoost: 1
   m_IndirectOutputScale: 1
   m_UsingShadowmask: 1
-  m_BakeBackend: 0
+  m_BakeBackend: 1
   m_LightmapMaxSize: 1024
+  m_LightmapSizeFixed: 0
   m_BakeResolution: 40
   m_Padding: 2
   m_LightmapCompression: 3
@@ -17557,19 +17513,16 @@ LightingSettings:
   m_RealtimeResolution: 2
   m_ForceWhiteAlbedo: 0
   m_ForceUpdates: 0
-  m_FinalGather: 0
-  m_FinalGatherRayCount: 256
-  m_FinalGatherFiltering: 1
   m_PVRCulling: 1
   m_PVRSampling: 1
   m_PVRDirectSampleCount: 32
-  m_PVRSampleCount: 500
-  m_PVREnvironmentSampleCount: 500
+  m_PVRSampleCount: 512
+  m_PVREnvironmentSampleCount: 512
   m_PVREnvironmentReferencePointCount: 2048
   m_LightProbeSampleCountMultiplier: 4
   m_PVRBounces: 2
   m_PVRMinBounces: 2
-  m_PVREnvironmentMIS: 0
+  m_PVREnvironmentImportanceSampling: 0
   m_PVRFilteringMode: 2
   m_PVRDenoiserTypeDirect: 0
   m_PVRDenoiserTypeIndirect: 0
@@ -17584,6 +17537,7 @@ LightingSettings:
   m_PVRFilteringAtrousPositionSigmaIndirect: 2
   m_PVRFilteringAtrousPositionSigmaAO: 1
   m_PVRTiledBaking: 0
+  m_RespectSceneVisibilityWhenBakingGI: 0
 --- !u!1 &2073128357
 GameObject:
   m_ObjectHideFlags: 1
@@ -18268,32 +18222,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 311
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2133283182 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 519420028, guid: 0e3676493a4b00f4a9c094454cc7b93a,
-    type: 3}
-  m_PrefabInstance: {fileID: 309630474}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2133283186
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2133283182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_AssetsPPU: 20
-  m_RefResolutionX: 320
-  m_RefResolutionY: 180
-  m_UpscaleRT: 0
-  m_PixelSnapping: 0
-  m_CropFrameX: 0
-  m_CropFrameY: 0
-  m_StretchFill: 0
 --- !u!1 &2133376484
 GameObject:
   m_ObjectHideFlags: 1
@@ -18431,6 +18359,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 179175318}
     m_Modifications:
     - target: {fileID: 1001360832783273774, guid: c5247f161cda0da4ab6db0b8523b4d04,
@@ -18494,24 +18423,18 @@ PrefabInstance:
       value: Key
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c5247f161cda0da4ab6db0b8523b4d04, type: 3}
 --- !u!1001 &1477696666986477788
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 179175318}
     m_Modifications:
-    - target: {fileID: 8825828961999202064, guid: a226d305a824f7545a49ef1efacb594b,
-        type: 3}
-      propertyPath: mPrefabPath
-      value: Assets/Resources/GameObjects/GridObjects/Wall.prefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 8825828961999202065, guid: a226d305a824f7545a49ef1efacb594b,
-        type: 3}
-      propertyPath: m_Mass
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 8825828961999202067, guid: a226d305a824f7545a49ef1efacb594b,
         type: 3}
       propertyPath: m_Name
@@ -18573,6 +18496,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a226d305a824f7545a49ef1efacb594b, type: 3}
 --- !u!4 &1477696666986477789 stripped
 Transform:
@@ -18585,6 +18511,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 179175318}
     m_Modifications:
     - target: {fileID: 258226419, guid: b5fa677720991bb41b095babd7788b29, type: 3}
@@ -18657,12 +18584,16 @@ PrefabInstance:
       value: Door
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b5fa677720991bb41b095babd7788b29, type: 3}
 --- !u!1001 &6907745871464000448
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 179175318}
     m_Modifications:
     - target: {fileID: 5924681136638269276, guid: 4aab427474666914086e618bb80a0642,
@@ -18726,4 +18657,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4aab427474666914086e618bb80a0642, type: 3}

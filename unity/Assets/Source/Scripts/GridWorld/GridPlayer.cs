@@ -19,12 +19,6 @@ public class GridPlayer : EnvironmentAgent
     HealthBar mHealthBar;
 
     [Action]
-    public bool test;
-
-    [Action]
-    public Vector3 test2;
-
-    [Action]
     public GridEnvironment.Actions movementState;
 
 
@@ -133,8 +127,8 @@ public class GridPlayer : EnvironmentAgent
 
     override public void Heuristic(in ActionBuffers actionsOut)
     {
-        test = UnityEngine.Random.Range(0, 2) == 1;
-        test2 = UnityEngine.Random.onUnitSphere;
+        /*test = UnityEngine.Random.Range(0, 2) == 1;
+        test2 = UnityEngine.Random.onUnitSphere;*/
 
         movementState = GridEnvironment.Actions.NOOP;
 
