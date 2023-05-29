@@ -26,6 +26,7 @@ public class EnvironmentAgent : EnvironmentComponent
         base.Initialize();
 
         BuildActionList();
+
         BuildSensorList();
 
         mAgentScript.InitAgent();
@@ -98,10 +99,9 @@ public class EnvironmentAgent : EnvironmentComponent
             environmentComponents[i].AppendSensorLists(mSensors);
         }
 
-        for (int i = 0; i < mSensors.Count; i++)
+        foreach (var sensorInfo in mSensors)
         {
-            ISensor sensor = mSensors[i].CreateSensor();
-            AddSensor(sensor);
+            AddSensor(sensorInfo.CreateSensor());
         }
     }
 

@@ -34,6 +34,13 @@ public class SensorInfo
     {
         // Any sensor-specific code goes here
     }
+
+    public virtual ISensor CreateSensor()
+    {
+        // This method should be overridden by subclasses.
+        throw new NotImplementedException("CreateSensor() must be implemented in subclasses of SensorInfo");
+    }
+
 }
 
 public class PositionSensorInfo : SensorInfo
@@ -48,6 +55,13 @@ public class PositionSensorInfo : SensorInfo
         Transform transform = (Transform)mFieldInfo.GetValue(mParent);
         sensor.AddObservation(transform.localPosition);
     }
+
+    public override ISensor CreateSensor()
+    {
+        // Create and return a sensor that observes the local position.
+        return new VectorSensor(3); // This is just an example, you should replace this with the actual code to create the sensor.
+    }
+
 }
 
 public class RotationSensorInfo : SensorInfo
@@ -62,4 +76,11 @@ public class RotationSensorInfo : SensorInfo
         Transform transform = (Transform)mFieldInfo.GetValue(mParent);
         sensor.AddObservation(transform.localRotation);
     }
+
+    public override ISensor CreateSensor()
+    {
+        // Create and return a sensor that observes the local rotation.
+        return new VectorSensor(4); // This is just an example, you should replace this with the actual code to create the sensor.
+    }
+
 }
