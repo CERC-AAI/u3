@@ -16,6 +16,7 @@ public class EnvironmentAgent : EnvironmentComponent
     BehaviorParameters mBehaviorParameters;
 
     public List<ActionInfo> mActions = new List<ActionInfo>();
+    public List<SensorInfo> mSensors = new List<SensorInfo>();
 
     protected override void Initialize()
     {
@@ -25,6 +26,7 @@ public class EnvironmentAgent : EnvironmentComponent
         base.Initialize();
 
         BuildActionList();
+        BuildSensorList();
 
         mAgentScript.InitAgent();
     }
@@ -84,6 +86,25 @@ public class EnvironmentAgent : EnvironmentComponent
         //GetComponent<Agent>().enabled = false;
         //GetComponent<Agent>().enabled = true;
     }
+
+    protected virtual void BuildSensorList()
+    {
+        EnvironmentComponent[] environmentComponents = GetComponents<EnvironmentComponent>();
+
+        mSensors.Clear();
+
+        for (int i = 0; i < environmentComponents.Length; i++)
+        {
+            environmentComponents[i].AppendSensorLists(mSensors);
+        }
+
+        for (int i = 0; i < mSensors.Count; i++)
+        {
+            ISensor sensor = mSensors[i].CreateSensor();
+            AddSensor(sensor);
+        }
+    }
+
 
     protected override void DoRegisterCallbacks()
     {
