@@ -39,7 +39,7 @@ public class Pushable : EnvironmentComponent
 
     virtual public void OnEndTurn()
     {
-        Debug.Log("OnEndTurn");
+        //Debug.Log("OnEndTurn");
 
         if (mHadCollision)
         {

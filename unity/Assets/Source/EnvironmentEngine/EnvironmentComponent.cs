@@ -46,6 +46,21 @@ public class Action : Attribute
     }
 }
 
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
+public class Sensor : Attribute
+{
+    // You can add more properties as needed for your sensor.
+    public string sensorName;
+    public string sensorType;
+
+    public Sensor(string sensorName, string sensorType)
+    {
+        this.sensorName = sensorName;
+        this.sensorType = sensorType;
+    }
+}
+
+
 [AttributeUsage(AttributeTargets.Property)]
 public class NotSaved : Attribute
 {
@@ -272,6 +287,55 @@ public class EnvironmentComponent : MonoBehaviour
         }
         while (currentType == typeof(EnvironmentComponent) || currentType.IsSubclassOf(typeof(EnvironmentComponent)));
     }
+
+    public virtual void AppendSensorLists(List<SensorInfo> sensorList)
+    {
+        Type currentType = GetType();
+        do
+        {
+            FieldInfo[] fieldInfos = currentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+            foreach (FieldInfo fieldInfo in fieldInfos)
+            {
+                Sensor sensorAttribute = fieldInfo.GetCustomAttribute<Sensor>();
+                if (sensorAttribute != null)
+                {
+                    Type sensorInfoType = typeof(SensorInfo);
+
+                    if (SensorInfo.mSensorInfoMap.ContainsKey(fieldInfo.FieldType))
+                    {
+                        sensorInfoType = SensorInfo.mSensorInfoMap[fieldInfo.FieldType];
+                    }
+
+                    SensorInfo sensorInfo = null;
+
+                    try
+                    {
+                        sensorInfo = (SensorInfo)Activator.CreateInstance(sensorInfoType);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("Could not create SensorInfo of type: " + sensorInfoType + ". Does this class extend SensorInfo?");
+                        Debug.LogError(e.Message);
+                    }
+
+                    if (sensorInfo != null && sensorInfo.GetType().BaseType == typeof(SensorInfo))
+                    {
+                        sensorInfo.setBaseValues(fieldInfo, this.gameObject, sensorAttribute);
+                        sensorList.Add(sensorInfo);
+                    }
+                    else
+                    {
+                        Debug.LogError("Could not initalize SensorInfo for type: " + fieldInfo.FieldType + ". Please add it to SensorInfo.mSensorInfoMap.");
+                    }
+                }
+            }
+
+            currentType = currentType.BaseType;
+        }
+        while (currentType == typeof(EnvironmentComponent) || currentType.IsSubclassOf(typeof(EnvironmentComponent)));
+    }
+
 
     protected virtual void DoRegisterCallbacks()
     {
