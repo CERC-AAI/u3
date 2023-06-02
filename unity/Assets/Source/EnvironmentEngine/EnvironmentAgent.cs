@@ -91,17 +91,24 @@ public class EnvironmentAgent : EnvironmentComponent
     protected virtual void BuildSensorList()
     {
         EnvironmentComponent[] environmentComponents = GetComponents<EnvironmentComponent>();
-
         mSensors.Clear();
 
         for (int i = 0; i < environmentComponents.Length; i++)
         {
             environmentComponents[i].AppendSensorLists(mSensors);
+            Debug.Log("Number of sensors after appending: " + mSensors.Count);
         }
 
-        foreach (var sensorInfo in mSensors)
+        // Get the existing U3SensorComponent or add a new one if it doesn't exist
+        U3SensorComponent sensorComponent = gameObject.GetComponent<U3SensorComponent>();
+        if (sensorComponent == null)
         {
-            AddSensor(sensorInfo.CreateSensor());
+            sensorComponent = gameObject.AddComponent<U3SensorComponent>();
+        }
+
+        foreach (SensorInfo sensorInfo in mSensors)
+        {
+            sensorComponent.AddSensorInfo(sensorInfo);
         }
     }
 
@@ -125,12 +132,11 @@ public class EnvironmentAgent : EnvironmentComponent
 
     public void RequestDecision()
     {
-        CollectObservations();
 
         mAgentScript.RequestDecision();
     }
 
-    void CollectObservations()
+    public void CollectObservations()
     {
     }
 
@@ -225,6 +231,8 @@ public class EnvironmentAgent : EnvironmentComponent
             discreteOffset += mActions[i].getIntegerCount();
             continuousOffset += mActions[i].getFloatCount();
         }*/
+        Debug.Log("Heuristic actions: " + actionsOut.ToString());
+
     }
 
     virtual public void DoEndEpisode(bool timedOut = false)

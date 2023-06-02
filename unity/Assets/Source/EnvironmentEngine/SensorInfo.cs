@@ -4,83 +4,189 @@ using UnityEngine;
 using Unity.MLAgents.Sensors;
 using System.Reflection;
 
-
-public class SensorInfo
+public abstract class SensorInfo : ISensor
 {
     protected FieldInfo mFieldInfo;
-    protected GameObject mParent;
+    protected object mParent;
+    protected ObservationSpec mObservationSpec;
+    protected string mName;
 
+
+    public SensorInfo()
+    {
+    }
+
+    // TODO: fix this with primitive types, specifically to map from C# primitives to SensorInfo
+    // TODO: only need this for ints and bools since we have the autonaming convention
     public static Dictionary<Type, Type> mSensorInfoMap = new Dictionary<Type, Type>()
     {
-        // Add mappings here like this:
-        // [typeof(YourType)] = typeof(YourSensorInfoSubclass),
+    {typeof(Vector3), typeof(Vector3SensorInfo)},
+    {typeof(Quaternion), typeof(QuaternionSensorInfo)},
+    {typeof(Camera), typeof(CameraSensorInfo)},
     };
 
 
-    public void setBaseValues(FieldInfo fieldInfo, GameObject parent, Sensor sensorAttribute)
+    public void setBaseValues(FieldInfo fieldInfo, object parent, Sensor sensorAttribute)
     {
         mFieldInfo = fieldInfo;
-        mParent = parent;
-        // Now you can use sensorAttribute as you need
-        init();
+        mParent = parent;  // Get the EnvironmentAgent component
+                           // Now you can use sensorAttribute as you need
+        mName = sensorAttribute.sensorName;
+        init(sensorAttribute);
+        mObservationSpec = setObservationSpec();
     }
 
-    public virtual void init()
+
+    public virtual void init(Sensor sensorAttribute)
     {
-        // Any initialization code goes here
     }
 
-    virtual public void CollectObservations(VectorSensor sensor)
+    public abstract ObservationSpec setObservationSpec();
+
+    public virtual ObservationSpec GetObservationSpec()
     {
-        // Any sensor-specific code goes here
+        return mObservationSpec;
     }
 
-    public virtual ISensor CreateSensor()
+    public abstract int Write(ObservationWriter writer);
+
+    public virtual byte[] GetCompressedObservation()
     {
-        // This method should be overridden by subclasses.
-        throw new NotImplementedException("CreateSensor() must be implemented in subclasses of SensorInfo");
+        return null;
+    }
+
+    public virtual void Update()
+    {
+
+    }
+
+    public virtual void Reset()
+    {
+
+    }
+
+    public virtual CompressionSpec GetCompressionSpec()
+    {
+        return CompressionSpec.Default();
+    }
+
+    public virtual string GetName()
+    {
+        if (mName == null)
+        {
+            return mFieldInfo.Name;
+        }
+        else
+        {
+            return mName;
+        }
+    }
+}
+
+public class Vector3SensorInfo : SensorInfo
+{
+    public override ObservationSpec setObservationSpec()
+    {
+        return ObservationSpec.Vector(3);
+    }
+
+    public override int Write(ObservationWriter writer)
+    {
+        Vector3 observation = (Vector3)mFieldInfo.GetValue(mParent);
+        List<float> observation_list = new List<float> { observation.x, observation.y, observation.z };
+        writer.AddList(observation_list);
+        Debug.Log("Vector3SensorInfo.Write: " + observation);
+        return observation_list.Count;
+    }
+}
+
+public class QuaternionSensorInfo : SensorInfo
+{
+    public override ObservationSpec setObservationSpec()
+    {
+        return ObservationSpec.Vector(4);
+    }
+
+    public override int Write(ObservationWriter writer)
+    {
+        Quaternion observation = (Quaternion)mFieldInfo.GetValue(mParent);
+        List<float> observation_list = new List<float> { observation.x, observation.y, observation.z, observation.w };
+        writer.AddList(observation_list);
+        return observation_list.Count;
     }
 
 }
 
-public class PositionSensorInfo : SensorInfo
+public class CameraSensorInfo : SensorInfo
 {
-    public override void init()
+    CameraSensor mCameraSensor;
+
+    //If the values are set you pass them into the CameraSensor constructor in init(Sensor sensorAttribute)
+    // if they're not set, you use the FieldInfo to get the Camera object, and query it for good default values
+
+
+    public override void init(Sensor sensorAttribute)
     {
-        // Any position-specific initialization code goes here
+        Camera myCamera = (Camera)mFieldInfo.GetValue(mParent);
+        mName = sensorAttribute.sensorName;
+        bool grayscale = sensorAttribute.grayscale;
+        SensorCompressionType compression = sensorAttribute.compressionType;
+
+        int width;
+        int height;
+
+        if (sensorAttribute.width is not 0)
+        {
+            width = sensorAttribute.width;
+            height = sensorAttribute.height;
+        }
+        else
+        {
+            // TODO: test the defaults here
+            width = myCamera.pixelWidth;
+            height = myCamera.pixelHeight;
+        }
+
+        mCameraSensor = new CameraSensor(myCamera, width, height, grayscale, mName, compression);
     }
 
-    public override void CollectObservations(VectorSensor sensor)
+    public override ObservationSpec setObservationSpec()
     {
-        Transform transform = (Transform)mFieldInfo.GetValue(mParent);
-        sensor.AddObservation(transform.localPosition);
+        mObservationSpec = mCameraSensor.GetObservationSpec();
+        Debug.Log("CameraSensorInfo.setObservationSpec: " + mObservationSpec);
+        return mObservationSpec;
     }
 
-    public override ISensor CreateSensor()
+    public override int Write(ObservationWriter writer)
     {
-        // Create and return a sensor that observes the local position.
-        return new VectorSensor(3); // This is just an example, you should replace this with the actual code to create the sensor.
+        Debug.Log("CameraSensorInfo.Write: " + mCameraSensor.GetCompressedObservation());
+        return mCameraSensor.Write(writer);
+
     }
 
-}
-
-public class RotationSensorInfo : SensorInfo
-{
-    public override void init()
+    public override ObservationSpec GetObservationSpec()
     {
-        // Any rotation-specific initialization code goes here
+        return mObservationSpec;
     }
 
-    public override void CollectObservations(VectorSensor sensor)
+    public override byte[] GetCompressedObservation()
     {
-        Transform transform = (Transform)mFieldInfo.GetValue(mParent);
-        sensor.AddObservation(transform.localRotation);
+        return mCameraSensor.GetCompressedObservation();
     }
 
-    public override ISensor CreateSensor()
+    public override void Update()
     {
-        // Create and return a sensor that observes the local rotation.
-        return new VectorSensor(4); // This is just an example, you should replace this with the actual code to create the sensor.
+        mCameraSensor.Update();
+    }
+
+    public override void Reset()
+    {
+        mCameraSensor.Reset();
+    }
+
+    public override CompressionSpec GetCompressionSpec()
+    {
+        return mCameraSensor.GetCompressionSpec();
     }
 
 }

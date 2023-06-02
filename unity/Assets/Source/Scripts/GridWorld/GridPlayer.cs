@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 
 [RequireComponent(typeof(Movement))]
 public class GridPlayer : EnvironmentAgent
@@ -20,6 +21,15 @@ public class GridPlayer : EnvironmentAgent
 
     [Action]
     public GridEnvironment.Actions movementState;
+
+    // Should be 3 vector3s for position, rotation, and scale
+    [Sensor]
+    public Vector3 position;
+
+    // Add a dummy Camera to the agent
+    // Give height and width of the camera to Sensor()
+    [Sensor(width: 84, height: 84, grayscale = false, sensorName = "Camera")]
+    public Camera camera;
 
 
     public float MaxSpeed
@@ -42,8 +52,8 @@ public class GridPlayer : EnvironmentAgent
         mMovement = GetComponent<Movement>();
         mHealthBar = GetComponent<HealthBar>();
         mGridEngine = GetComponentInParent<GridEnvironment>();
-
         base.Initialize();
+
     }
 
     public override void OnRunStarted()
@@ -76,6 +86,7 @@ public class GridPlayer : EnvironmentAgent
     override public void OnUpdate(float deltaTime)
     {
         base.OnUpdate(deltaTime);
+        // TODO: think about keeping observations every step or every frame
     }
 
     protected override void OnDied()
@@ -88,6 +99,8 @@ public class GridPlayer : EnvironmentAgent
     void Update()
     {
         DoMovement();
+        position = transform.position;
+
     }
 
     void DoMovement()

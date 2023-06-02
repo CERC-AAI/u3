@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
+using Unity.MLAgents.Sensors;
+
 
 public enum CallbackScope
 {
@@ -51,15 +53,24 @@ public class Sensor : Attribute
 {
     // You can add more properties as needed for your sensor.
     public string sensorName;
-    public string sensorType;
+    public int height;
+    public int width;
+    public bool grayscale;
+    public SensorCompressionType compressionType;
+    // TODO: add new properties here for different sensor types, 
+    // e.g. height and width for camera sensors
+    // but add unit testing for property mismatching
 
-    public Sensor(string sensorName, string sensorType)
+    //Constructor for the cameraSensor
+    public Sensor(int height = 0, int width = 0, bool grayscale = false, SensorCompressionType compressionType = SensorCompressionType.None, string sensorName = null)
     {
         this.sensorName = sensorName;
-        this.sensorType = sensorType;
+        this.height = height;
+        this.width = width;
+        this.grayscale = grayscale;
+        this.compressionType = compressionType;
     }
 }
-
 
 [AttributeUsage(AttributeTargets.Property)]
 public class NotSaved : Attribute
@@ -297,14 +308,44 @@ public class EnvironmentComponent : MonoBehaviour
 
             foreach (FieldInfo fieldInfo in fieldInfos)
             {
-                Sensor sensorAttribute = fieldInfo.GetCustomAttribute<Sensor>();
-                if (sensorAttribute != null)
+                // Get all Sensor attributes
+                Sensor[] sensorAttributes = (Sensor[])fieldInfo.GetCustomAttributes(typeof(Sensor), true);
+                foreach (Sensor sensorAttribute in sensorAttributes)
                 {
                     Type sensorInfoType = typeof(SensorInfo);
 
+                    // Check the type of the attribute, not the field
                     if (SensorInfo.mSensorInfoMap.ContainsKey(fieldInfo.FieldType))
                     {
                         sensorInfoType = SensorInfo.mSensorInfoMap[fieldInfo.FieldType];
+                    }
+                    // add autocreation, copy-paste from ActionInfo code, just change variable names
+                    // TODO: debug this
+                    // else if (sensorAttribute.GetType().IsEnum)
+                    // {
+                    //     sensorInfoType = typeof(EnumSensorInfo);
+                    // }
+                    // add autocreation, copy-paste from ActionInfo code, just change variable names
+                    // TODO: debug this
+                    else
+                    {
+                        string typeName = fieldInfo.FieldType.Name;
+
+                        if (typeName.Length > 1)
+                        {
+                            typeName = char.ToUpper(typeName[0]) + typeName.Substring(1);
+                        }
+                        else
+                        {
+                            typeName = typeName.ToUpper();
+                        }
+
+                        typeName += "SensorInfo";
+
+                        if (Type.GetType(typeName) != null)
+                        {
+                            sensorInfoType = Type.GetType(typeName);
+                        }
                     }
 
                     SensorInfo sensorInfo = null;
@@ -321,12 +362,25 @@ public class EnvironmentComponent : MonoBehaviour
 
                     if (sensorInfo != null && sensorInfo.GetType().BaseType == typeof(SensorInfo))
                     {
-                        sensorInfo.setBaseValues(fieldInfo, this.gameObject, sensorAttribute);
+                        sensorInfo.setBaseValues(fieldInfo, this, sensorAttribute);
                         sensorList.Add(sensorInfo);
                     }
                     else
                     {
-                        Debug.LogError("Could not initalize SensorInfo for type: " + fieldInfo.FieldType + ". Please add it to SensorInfo.mSensorInfoMap.");
+                        string typeName = fieldInfo.FieldType.Name;
+
+                        if (typeName.Length > 1)
+                        {
+                            typeName = char.ToUpper(typeName[0]) + typeName.Substring(1);
+                        }
+                        else
+                        {
+                            typeName = typeName.ToUpper();
+                        }
+
+                        typeName += "SensorInfo";
+
+                        Debug.LogError("Could not initialize SensorInfo for attribute type: " + fieldInfo.FieldType + ". Please add it to SensorInfo.mSensorInfoMap, or make sure the class is named: " + typeName);
                     }
                 }
             }

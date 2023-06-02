@@ -14,6 +14,12 @@ public class U3Agent : Agent
     EnvironmentAgent mAgent;
     bool mUsingHeuristics = false;
 
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        // Your observation collection logic here
+        mAgent.CollectObservations();
+    }
+
     public void Start()
     {
         mAgent = GetComponent<EnvironmentAgent>();
@@ -63,6 +69,10 @@ public class U3Agent : Agent
             List<ISensor> value = (List<ISensor>)field.GetValue(this);
             value.Add(sensor);
             field.SetValue(this, value);
+            Debug.Log("Adding sensor of type: " + sensor.GetType());
+
         }
     }
+
+
 }
