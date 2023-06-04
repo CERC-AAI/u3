@@ -1,1 +1,80 @@
-{"count":1,"self":107.8047488,"total":107.821744,"children":{"InitializeActuators":{"count":1,"self":0.0055848,"total":0.0055848,"children":null},"InitializeSensors":{"count":1,"self":0.0015076,"total":0.0015076,"children":null},"AgentSendState":{"count":3,"self":0.0054532,"total":0.0093054,"children":{"CollectObservations":{"count":3,"self":0,"total":0,"children":null},"WriteActionMask":{"count":3,"self":0,"total":0,"children":null},"RequestDecision":{"count":3,"self":0.0028504999999999997,"total":0.0038521999999999996,"children":{"CameraSensor.GetCompressedObservation":{"count":3,"self":0.0010017,"total":0.0010017,"children":null}}}}}},"gauges":{},"metadata":{"timer_format_version":"0.1.0","start_time_seconds":"1685913441","unity_version":"2023.1.0b18","command_line_arguments":"C:\\Program Files\\Unity\\Hub\\Editor\\2023.1.0b18\\Editor\\Unity.exe -projectpath C:\\Users\\Andrew Williams\\Documents\\github\\u3_extendObservableAttribute\\unity -useHub -hubIPC -cloudEnvironment production -licensingIpc LicenseClient-Andrew Williams -hubSessionId 3521d5d3-acab-4883-b929-797eaf28a130 -accessToken dylCPoCnKX1yy3L7eWPxFcBL00lW3puGjwBQ-JwLp84003f","communication_protocol_version":"1.5.0","com.unity.ml-agents_version":"2.0.1","scene_name":"KeyGame","end_time_seconds":"1685913549"}}
+{
+    "count": 1,
+    "self": 11.027878399999999,
+    "total": 13.2136008,
+    "children": {
+        "InitializeActuators": {
+            "count": 1,
+            "self": 0.0009991,
+            "total": 0.0009991,
+            "children": null
+        },
+        "InitializeSensors": {
+            "count": 1,
+            "self": 0.0010063,
+            "total": 0.0010063,
+            "children": null
+        },
+        "AgentSendState": {
+            "count": 1090,
+            "self": 0.0192943,
+            "total": 2.1227652999999997,
+            "children": {
+                "CollectObservations": {
+                    "count": 233,
+                    "self": 0.0010004,
+                    "total": 0.0010004,
+                    "children": null
+                },
+                "WriteActionMask": {
+                    "count": 233,
+                    "self": 0.0009983,
+                    "total": 0.0009983,
+                    "children": null
+                },
+                "RequestDecision": {
+                    "count": 233,
+                    "self": 0.177314,
+                    "total": 2.1014722999999997,
+                    "children": {
+                        "CameraSensor.GetCompressedObservation": {
+                            "count": 233,
+                            "self": 0.4364243,
+                            "total": 0.4364243,
+                            "children": null
+                        },
+                        "CameraSensor.WriteToTensor": {
+                            "count": 233,
+                            "self": 1.487734,
+                            "total": 1.487734,
+                            "children": null
+                        }
+                    }
+                }
+            }
+        },
+        "DecideAction": {
+            "count": 1090,
+            "self": 0.054960999999999996,
+            "total": 0.054960999999999996,
+            "children": null
+        },
+        "AgentAct": {
+            "count": 1090,
+            "self": 0.0049905999999999996,
+            "total": 0.0049905999999999996,
+            "children": null
+        }
+    },
+    "gauges": {},
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1685913534",
+        "unity_version": "2023.1.0b15",
+        "command_line_arguments": "C:\\Program Files\\Unity\\Hub\\Editor\\2023.1.0b15\\Editor\\Unity.exe -projectpath H:\\Git\\u3\\unity -useHub -hubIPC -cloudEnvironment production -licensingIpc LicenseClient-Shars -hubSessionId eb661440-031b-11ee-8a1d-99ecf12be9f7 -accessToken g4GnFq6fSXUjERKj6YLXbAZxy8VeGx6S59t7AeV3mW0001f",
+        "communication_protocol_version": "1.5.0",
+        "com.unity.ml-agents_version": "2.0.1",
+        "scene_name": "KeyGame",
+        "end_time_seconds": "1685913547"
+    }
+}
