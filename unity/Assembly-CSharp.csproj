@@ -71,6 +71,7 @@
     <Compile Include="Assets\Source\Scripts\LineGame\NoInput.cs" />
     <Compile Include="Assets\Source\Other\U3Agent.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\5- Adding velocities and impulses\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\SensorInfo.cs" />
     <Compile Include="Assets\StarterAssets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Source\Other\Player3D.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Assets\StarterAssets\FirstPersonController\Scripts\BasicRigidBodyPush.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\GridEnvironment.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PlanetManager.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\U3SensorComponent.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Libraries\JSONLoader.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\14- Climbing Ladders\Scripts\MyLadder.cs" />
