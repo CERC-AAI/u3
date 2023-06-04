@@ -12000,6 +12000,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 38
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &1339382573 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 519420031, guid: 0e3676493a4b00f4a9c094454cc7b93a,
+    type: 3}
+  m_PrefabInstance: {fileID: 309630474}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1352525394
 GameObject:
   m_ObjectHideFlags: 1
