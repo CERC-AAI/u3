@@ -2773,6 +2773,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1612814792}
     m_Modifications:
+    - target: {fileID: 309630479, guid: 0e3676493a4b00f4a9c094454cc7b93a, type: 3}
+      propertyPath: m_BrainParameters.VectorObservationSize
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5255762186422406070, guid: 0e3676493a4b00f4a9c094454cc7b93a,
         type: 3}
       propertyPath: m_Name
