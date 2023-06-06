@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
 using System;
+using KinematicCharacterController.Examples;
+using Unity.MLAgents.Actuators;
 
 public enum CharacterState
 {
@@ -31,6 +33,7 @@ public struct PlayerCharacterInputs
     public bool CrouchUp;
 }
 
+// TODO: Not going to be using this. Delete ?
 public struct AICharacterInputs
 {
     public Vector3 MoveVector;
@@ -44,8 +47,32 @@ public enum BonusOrientationMethod
     TowardsGroundSlopeAndGravity,
 }
 
-public class U3DPlayer : MonoBehaviour, ICharacterController
+public class U3DPlayer : EnvironmentAgent, ICharacterController
 {
+    [Header("Inputs")]
+
+    [Action]
+    public float mouseLookAxisUp;
+    [Action]
+    public float mouseLookAxisRight;
+    [Action]
+    public float scrollInput;
+    [Action]
+    public bool getLeftMouseButtonDownInput;
+    [Action]
+    public bool getRightMouseButtonDownInput;
+
+    [Action]
+    public float MoveAxisForward;
+    [Action]
+    public float MoveAxisRight;
+    [Action]
+    public bool JumpDown;
+    [Action]
+    public bool CrouchDown;
+    [Action]
+    public bool CrouchUp;
+
     [Header("References")]
     public U3DCamera CharacterCamera;
 
@@ -102,8 +129,9 @@ public class U3DPlayer : MonoBehaviour, ICharacterController
 
     private Vector3 lastInnerNormal = Vector3.zero;
     private Vector3 lastOuterNormal = Vector3.zero;
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         Cursor.lockState = CursorLockMode.Locked;
 
         // Tell camera to follow transform
@@ -116,12 +144,19 @@ public class U3DPlayer : MonoBehaviour, ICharacterController
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+
+        if (getLeftMouseButtonDownInput)
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
 
         HandleCharacterInput();
+    }
+
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        base.Heuristic(actionsOut);
+        GetInputs();
     }
 
     private void LateUpdate()
@@ -139,8 +174,6 @@ public class U3DPlayer : MonoBehaviour, ICharacterController
     private void HandleCameraInput()
     {
         // Create the look input vector for the camera
-        float mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
-        float mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);
         Vector3 lookInputVector = new Vector3(mouseLookAxisRight, mouseLookAxisUp, 0f);
 
         // Prevent moving the camera while the cursor isn't locked
@@ -149,8 +182,6 @@ public class U3DPlayer : MonoBehaviour, ICharacterController
             lookInputVector = Vector3.zero;
         }
 
-        // Input for zooming the camera (disabled in WebGL because it can cause problems)
-        float scrollInput = -Input.GetAxis(MouseScrollInput);
 #if UNITY_WEBGL
         scrollInput = 0f;
 #endif
@@ -159,7 +190,7 @@ public class U3DPlayer : MonoBehaviour, ICharacterController
         CharacterCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
 
         // Handle toggling zoom level
-        if (Input.GetMouseButtonDown(1))
+        if (getRightMouseButtonDownInput)
         {
             CharacterCamera.TargetDistance = (CharacterCamera.TargetDistance == 0f) ? CharacterCamera.DefaultDistance : 0f;
         }
@@ -170,18 +201,34 @@ public class U3DPlayer : MonoBehaviour, ICharacterController
         PlayerCharacterInputs characterInputs = new PlayerCharacterInputs();
 
         // Build the CharacterInputs struct
-        characterInputs.MoveAxisForward = Input.GetAxisRaw(VerticalInput);
-        characterInputs.MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
+        characterInputs.MoveAxisForward = MoveAxisForward;
+        characterInputs.MoveAxisRight = MoveAxisRight;
         characterInputs.CameraRotation = CharacterCamera.Transform.rotation;
-        characterInputs.JumpDown = Input.GetKeyDown(KeyCode.Space);
-        characterInputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
-        characterInputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
+        characterInputs.JumpDown = JumpDown;
+        characterInputs.CrouchDown = CrouchDown;
+        characterInputs.CrouchUp = CrouchUp;
 
         // Apply inputs to character
         SetInputs(ref characterInputs);
     }
 
-private void Awake()
+    private void GetInputs()
+    {
+        // get the values of the actions from the player inputs
+        mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
+        mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);
+        scrollInput = -Input.GetAxis(MouseScrollInput);
+        getLeftMouseButtonDownInput = Input.GetMouseButtonDown(0);
+        getRightMouseButtonDownInput = Input.GetMouseButtonDown(1);
+
+        MoveAxisForward = Input.GetAxisRaw(VerticalInput);
+        MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
+        JumpDown = Input.GetKeyDown(KeyCode.Space);
+        CrouchDown = Input.GetKeyDown(KeyCode.C);
+        CrouchUp = Input.GetKeyUp(KeyCode.C);
+    }
+
+    private void Awake()
     {
         // Handle initial state
         TransitionToState(CharacterState.Default);
