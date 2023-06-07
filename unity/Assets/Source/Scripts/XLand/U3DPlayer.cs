@@ -58,9 +58,9 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     [Action]
     public float scrollInput;
     [Action]
-    public bool getLeftMouseButtonDownInput;
+    public bool getLeftMouseButtonInput;
     [Action]
-    public bool getRightMouseButtonDownInput;
+    public bool getRightMouseButtonInput;
 
     [Action]
     public float MoveAxisForward;
@@ -75,6 +75,9 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     [Header("References")]
     public U3DCamera CharacterCamera;
+
+    // [Sensor(width = 256, height = 256)]
+    private Camera Camera;
 
     private const string MouseXInput = "Mouse X";
     private const string MouseYInput = "Mouse Y";
@@ -142,21 +145,15 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         CharacterCamera.IgnoredColliders.AddRange(GetComponentsInChildren<Collider>());
     }
 
-    private void Update()
+    public override void Update()
     {
-
-        if (getLeftMouseButtonDownInput)
+        base.Update();
+        if (getLeftMouseButtonInput)
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
 
         HandleCharacterInput();
-    }
-
-    public override void Heuristic(in ActionBuffers actionsOut)
-    {
-        base.Heuristic(actionsOut);
-        GetInputs();
     }
 
     private void LateUpdate()
@@ -190,7 +187,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         CharacterCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
 
         // Handle toggling zoom level
-        if (getRightMouseButtonDownInput)
+        if (getRightMouseButtonInput)
         {
             CharacterCamera.TargetDistance = (CharacterCamera.TargetDistance == 0f) ? CharacterCamera.DefaultDistance : 0f;
         }
@@ -212,24 +209,32 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         SetInputs(ref characterInputs);
     }
 
-    private void GetInputs()
+    public override void StoreUserInputs()
     {
-        // get the values of the actions from the player inputs
+        // wrap input functionalitty to queue these events for us
+        // Add a bunch of functions e.g. GetKeyDown, but wrap them in some sort of structure saved in the environment component
         mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
         mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);
         scrollInput = -Input.GetAxis(MouseScrollInput);
-        getLeftMouseButtonDownInput = Input.GetMouseButtonDown(0);
-        getRightMouseButtonDownInput = Input.GetMouseButtonDown(1);
+        getLeftMouseButtonInput = Input.GetMouseButtonDown(0);
+        getRightMouseButtonInput = Input.GetMouseButtonDown(1);
 
         MoveAxisForward = Input.GetAxisRaw(VerticalInput);
         MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
         JumpDown = Input.GetKeyDown(KeyCode.Space);
         CrouchDown = Input.GetKeyDown(KeyCode.C);
-        CrouchUp = Input.GetKeyUp(KeyCode.C);
+        CrouchUp = !Input.GetKeyDown(KeyCode.C);
+    }
+
+    protected override void Initialize()
+    {
+        Camera = CharacterCamera.GetComponentInChildren<Camera>();
+        base.Initialize();
     }
 
     private void Awake()
     {
+
         // Handle initial state
         TransitionToState(CharacterState.Default);
 

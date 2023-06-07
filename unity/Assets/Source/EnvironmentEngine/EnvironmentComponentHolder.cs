@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-//base class for dealing with muliple components
+//base class for dealing with multiple components
 public class EnvironmentComponentHolder : EnvironmentComponent
 {
     protected EnvironmentComponent[] mComponents = null;
@@ -18,7 +18,7 @@ public class EnvironmentComponentHolder : EnvironmentComponent
         base.Initialize();
 
 
-        CheckComponents(); 
+        CheckComponents();
         for (int i = 0; i < mComponents.Length; i++)
         {
             if (mComponents[i] != this)
@@ -35,6 +35,11 @@ public class EnvironmentComponentHolder : EnvironmentComponent
             mComponentsInitialized = true;
             mComponents = GetComponents<EnvironmentComponent>();
         }
+    }
+
+    public EnvironmentComponent[] GetEnvironmentComponents()
+    {
+        return (EnvironmentComponent[])mComponents.Clone();
     }
 
     virtual public void RunStarted()
