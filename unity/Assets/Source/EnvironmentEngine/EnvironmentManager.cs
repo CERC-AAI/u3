@@ -8,6 +8,8 @@ using Unity.MLAgents.SideChannels;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 public class EnvironmentManager : MonoBehaviour
 {
@@ -119,7 +121,11 @@ public class EnvironmentManager : MonoBehaviour
 
         if (mDecisionRequests.Count > 0)
         {
+            InputSystem.Update();
+
             Academy.Instance.EnvironmentStep();
+
+            //Debug.Log(InputSystem.metrics.totalEventCount);
         }
 
         if (debugMode)

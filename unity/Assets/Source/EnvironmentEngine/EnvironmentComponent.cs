@@ -97,6 +97,14 @@ public delegate void EnvironmentCallback<T>(T value = default(T));
 //base class for environment objects
 public class EnvironmentComponent : MonoBehaviour
 {
+    public enum InputStates
+    {
+        NONE,
+        PRESSED,
+        RELEASED,
+        IN_PROGRESS
+    }
+
     // Public members
     List<ActionInfo> mLocalActionInfos = new List<ActionInfo>();
     // Private members
@@ -116,9 +124,6 @@ public class EnvironmentComponent : MonoBehaviour
 
 
 
-    protected PlayerInput mInput;
-
-
     //Dictionary<EnvironmentCallback, EnvironmentCallback> mRegisteredCallbacks = new Dictionary<EnvironmentCallback, EnvironmentCallback>();
 
 
@@ -129,11 +134,6 @@ public class EnvironmentComponent : MonoBehaviour
         {
             CheckInitialized();
         }
-    }
-
-    protected virtual void Awake()
-    {
-        mInput = GetComponent<PlayerInput>();
     }
 
     public void CheckInitialized(bool force = false)
@@ -178,6 +178,16 @@ public class EnvironmentComponent : MonoBehaviour
             Debug.LogError("Please implement StoreUserInputs() in " + GetType().ToString());
         }
 
+    }
+
+    public bool GetInputPressedThisUpdate(string actionName)
+    {
+        return mParentObject.GetInputPressedThisUpdate(actionName);
+    }
+
+    public bool GetInputReleasedThisUpdate(string actionName)
+    {
+        return mParentObject.GetInputReleasedThisUpdate(actionName);
     }
 
     private void OnDestroy()

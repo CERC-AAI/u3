@@ -77,7 +77,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     [Header("References")]
     public U3DCamera CharacterCamera;
 
-    // [Sensor(width = 256, height = 256)]
+    //[Sensor(width = 256, height = 256)]
     private Camera Camera;
 
     private const string MouseXInput = "Mouse X";
@@ -147,9 +147,8 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         CharacterCamera.IgnoredColliders.AddRange(GetComponentsInChildren<Collider>());
     }
 
-    public override void Update()
+    public override void OnUpdate(float deltaTime)
     {
-        base.Update();
         if (getLeftMouseButtonInput)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -158,7 +157,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         HandleCharacterInput();
     }
 
-    private void LateUpdate()
+    public override void OnLateUpdate(float deltaTime)
     {
         // Handle rotating the camera along with physics movers
         if (CharacterCamera.RotateWithPhysicsMover && Motor.AttachedRigidbody != null)
@@ -224,7 +223,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
         MoveAxisForward = Input.GetAxisRaw(VerticalInput);
         MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
-        JumpDown = mInput.actions["Jump"].WasPerformedThisFrame();
+        JumpDown = GetInputPressedThisUpdate("Jump");
         CrouchDown = Input.GetKeyDown(KeyCode.C);
         CrouchUp = !Input.GetKeyDown(KeyCode.C);
     }
@@ -233,13 +232,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     {
         Camera = CharacterCamera.GetComponentInChildren<Camera>();
         base.Initialize();
-    }
 
-    protected override void Awake()
-    {
-        base.Awake();
-
-        // Handle initial state
         TransitionToState(CharacterState.Default);
 
         // Assign the characterController to the motor

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -46,6 +47,9 @@ public class EnvironmentObject : EnvironmentComponentHolder
     [HideInInspector]
     public string mPrefabPath;
 
+    protected PlayerInput mInput;
+    protected Dictionary<string, InputStates> mInputStates;
+
     List<EnvironmentObject> mStepCollisions = new List<EnvironmentObject>();
     List<EnvironmentObject> mFixedUpdateCollisions = new List<EnvironmentObject>();
     //GameObject mBaseObject;
@@ -53,12 +57,33 @@ public class EnvironmentObject : EnvironmentComponentHolder
     Collider2D[] mColliders2D;
     Collider[] mColliders;
 
+
     override protected void Initialize()
     {
         mColliders2D = GetComponentsInChildren<Collider2D>();
         mColliders = GetComponentsInChildren<Collider>();
 
         CheckComponents();
+
+        mInput = GetComponent<PlayerInput>();
+        if (mInput != null)
+        {
+            mInputStates = new Dictionary<string, InputStates>();
+            foreach (InputAction action in mInput.actions)
+            {
+                if (action != null)
+                {
+                    if (action.IsInProgress())
+                    {
+                        mInputStates[action.name] = InputStates.IN_PROGRESS;
+                    }
+                    else
+                    {
+                        mInputStates[action.name] = InputStates.NONE;
+                    }
+                }
+            }
+        }
 
         base.Initialize();
     }
@@ -345,5 +370,83 @@ public class EnvironmentObject : EnvironmentComponentHolder
         {
             mColliders2D[i].enabled = true;
         }
+    }
+
+    public PlayerInput GetInputSystem()
+    {
+        return mInput;
+    }
+
+    public void ProcessInputs()
+    {
+        if (mInput != null && mInputStates != null)
+        {
+            foreach (InputAction action in mInput.actions)
+            {
+                if (action != null)
+                {
+                    if (action.IsInProgress())
+                    {
+                        if (mInputStates[action.name] == InputStates.IN_PROGRESS)
+                        {
+
+                        }
+                        else if (mInputStates[action.name] == InputStates.PRESSED)
+                        {
+                            mInputStates[action.name] = InputStates.IN_PROGRESS;
+                        }
+                        else
+                        {
+                            mInputStates[action.name] = InputStates.PRESSED;
+                        }
+                    }
+                    else
+                    {
+                        if (mInputStates[action.name] == InputStates.NONE)
+                        {
+
+                        }
+                        else if (mInputStates[action.name] == InputStates.RELEASED)
+                        {
+                            mInputStates[action.name] = InputStates.NONE;
+                        }
+                        else
+                        {
+                            mInputStates[action.name] = InputStates.RELEASED;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    new public bool GetInputPressedThisUpdate(string actionName)
+    {
+        if (mInput == null)
+        {
+            Debug.LogError(name + "(" + GetType().ToString() + ") tried to access inputs, but none exist. Please add a PlayerInput component to the object.");
+            return false;
+        }
+        if (mInput.actions[actionName] == null)
+        {
+            Debug.LogError(name + "(" + GetType().ToString() + ") Tried to access action that doesn't exist (" + actionName + "). Please add a this action to the PlayerInput component on the object.");
+            return false;
+        }
+        return mInputStates[actionName] == InputStates.PRESSED;
+    }
+
+    new public bool GetInputReleasedThisUpdate(string actionName)
+    {
+        if (mInput == null)
+        {
+            Debug.LogError(name + "(" + GetType().ToString() + ") tried to access inputs, but none exist. Please add a PlayerInput component to the object.");
+            return false;
+        }
+        if (mInput.actions[actionName] == null)
+        {
+            Debug.LogError(name + "(" + GetType().ToString() + ") Tried to access action that doesn't exist (" + actionName + "). Please add a this action to the PlayerInput component on the object.");
+            return false;
+        }
+        return mInputStates[actionName] == InputStates.RELEASED;
     }
 }

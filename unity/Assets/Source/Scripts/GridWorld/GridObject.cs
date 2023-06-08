@@ -56,6 +56,7 @@ public class GridObject : EnvironmentObject
 
     override public void OnUpdate(float deltaTime)
     {
+        base.OnUpdate(deltaTime);
     }
 
     /*public override bool OnActionRecieved(float[] vectorAction)

@@ -33,12 +33,12 @@ public class GravityGun : EnvironmentComponent
 
     public override void StoreUserInputs()
     {
-        getLeftMouseButton = Input.GetMouseButtonDown(0);
+        getLeftMouseButton = GetInputPressedThisUpdate("Grab");
         getRightMouseButton = Input.GetMouseButtonDown(1);
         mousePosition = Input.mousePosition;
     }
 
-    private void Update()
+    public override void OnFixedUpdate(float fixedDeltaTime)
     {
         if (getLeftMouseButton)
         {
@@ -50,10 +50,7 @@ public class GravityGun : EnvironmentComponent
             mHadRightClick = true;
             mHadLeftClick = false;
         }
-    }
 
-    void FixedUpdate()
-    {
         if (mHadRightClick)
         {
             if (heldObject != null)
