@@ -120,12 +120,10 @@ namespace KinematicCharacterController
             _instance = this;
         }
 
-        private void FixedUpdate()
+        public static void FixedUpdate(float deltaTime)
         {
             if (Settings.AutoSimulation)
             {
-                float deltaTime = Time.deltaTime;
-
                 if (Settings.Interpolate)
                 {
                     PreSimulationInterpolationUpdate(deltaTime);
@@ -140,7 +138,7 @@ namespace KinematicCharacterController
             }
         }
 
-        private void LateUpdate()
+        public static void LateUpdate()
         {
             if (Settings.Interpolate)
             {

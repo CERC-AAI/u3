@@ -63,7 +63,7 @@ public class Sensor : Attribute
     // but add unit testing for property mismatching
 
     //Constructor for the cameraSensor
-    public Sensor(int height = 0, int width = 0, bool grayscale = false, SensorCompressionType compressionType = SensorCompressionType.None, string sensorName = null)
+    public Sensor(int height = 0, int width = 0, bool grayscale = false, SensorCompressionType compressionType = SensorCompressionType.PNG, string sensorName = null)
     {
         this.sensorName = sensorName;
         this.height = height;

@@ -305,6 +305,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
                 if (!WaitingForPhysics())
                 {
+                    //Fix the code here to be local to each environment
+                    KinematicCharacterController.KinematicCharacterSystem.LateUpdate();
                     OnObjectLateUpdate(deltaTime);
                     for (int i = 0; i < mEnvironmentObjects.Count; i++)
                     {
@@ -334,6 +336,9 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
             mPhysicsScene.Simulate(GetFixedDeltaTime());
             mPhysicsScene2D.Simulate(GetFixedDeltaTime());
+
+            //Fix the code here to be local to each environment
+            KinematicCharacterController.KinematicCharacterSystem.FixedUpdate(GetFixedDeltaTime());
 
             EnvironmentManager.Instance.QueueFixedUpdate(this);
             mPhysicsQueuedUpdateDelta = deltaTime;

@@ -1,4 +1,5 @@
 from mlagents_envs.logging_util import *
+import cv2
 
 _log_level = INFO
 logger = get_logger(__name__)
@@ -10,7 +11,7 @@ import u3_env
 
 env = u3_env.create_environment(0)
 
-for t in range(1000):
+for t in range(100):
     # Render the environment (optional, for visualization)
     env.render()
 
@@ -25,7 +26,8 @@ for t in range(1000):
         print("Episode finished after {} timesteps".format(t + 1))
         break
 
-    # print the observation in the console
-    print(observation)
+    image = cv2.cvtColor(observation, cv2.COLOR_RGB2BGR)
+    cv2.imwrite(f'python/Images/frame{t}.png', image)
+    print(action)
 
 env.close()

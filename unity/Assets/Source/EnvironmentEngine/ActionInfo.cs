@@ -27,7 +27,7 @@ public class BooleanActionInfo : ActionInfo
     public override void init()
     {
         mMinValue = 0;
-        mMaxValue = 1;
+        mMaxValue = 2;
 
         base.init();
     }

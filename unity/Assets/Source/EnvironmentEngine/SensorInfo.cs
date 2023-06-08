@@ -153,13 +153,13 @@ public class CameraSensorInfo : SensorInfo
     public override ObservationSpec setObservationSpec()
     {
         mObservationSpec = mCameraSensor.GetObservationSpec();
-        Debug.Log("CameraSensorInfo.setObservationSpec: " + mObservationSpec);
+        //Debug.Log("CameraSensorInfo.setObservationSpec: " + mObservationSpec);
         return mObservationSpec;
     }
 
     public override int Write(ObservationWriter writer)
     {
-        Debug.Log("CameraSensorInfo.Write: " + mCameraSensor.GetCompressedObservation());
+        //Debug.Log("CameraSensorInfo.Write: " + mCameraSensor.GetCompressedObservation());
         return mCameraSensor.Write(writer);
 
     }

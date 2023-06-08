@@ -96,7 +96,7 @@ public class EnvironmentAgent : EnvironmentComponent
         for (int i = 0; i < environmentComponents.Length; i++)
         {
             environmentComponents[i].AppendSensorLists(mSensors);
-            Debug.Log("Number of sensors after appending: " + mSensors.Count);
+            //Debug.Log("Number of sensors after appending: " + mSensors.Count);
         }
 
         // Get the existing U3SensorComponent or add a new one if it doesn't exist

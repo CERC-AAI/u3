@@ -52,32 +52,32 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 {
     [Header("Inputs")]
 
-    [Action]
+    //[Action]
     public float mouseLookAxisUp;
-    [Action]
+   // [Action]
     public float mouseLookAxisRight;
-    [Action]
+    //[Action]
     public float scrollInput;
-    [Action]
+    //[Action]
     public bool getLeftMouseButtonInput;
-    [Action]
+    //[Action]
     public bool getRightMouseButtonInput;
 
-    [Action]
+    //[Action]
     public float MoveAxisForward;
-    [Action]
+   // [Action]
     public float MoveAxisRight;
     [Action]
     public bool JumpDown;
-    [Action]
+    //[Action]
     public bool CrouchDown;
-    [Action]
+    //[Action]
     public bool CrouchUp;
 
     [Header("References")]
     public U3DCamera CharacterCamera;
 
-    //[Sensor(width = 256, height = 256)]
+    [Sensor(width = 256, height = 256)]
     private Camera Camera;
 
     private const string MouseXInput = "Mouse X";
@@ -134,9 +134,8 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     private Vector3 lastInnerNormal = Vector3.zero;
     private Vector3 lastOuterNormal = Vector3.zero;
 
-    protected override void Start()
+    protected override void Initialize()
     {
-        base.Start();
         Cursor.lockState = CursorLockMode.Locked;
 
         // Tell camera to follow transform
@@ -145,6 +144,14 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         // Ignore the character's collider(s) for camera obstruction checks
         CharacterCamera.IgnoredColliders.Clear();
         CharacterCamera.IgnoredColliders.AddRange(GetComponentsInChildren<Collider>());
+
+        Camera = CharacterCamera.GetComponentInChildren<Camera>();
+        base.Initialize();
+
+        TransitionToState(CharacterState.Default);
+
+        // Assign the characterController to the motor
+        Motor.CharacterController = this;
     }
 
     public override void OnUpdate(float deltaTime)
@@ -226,17 +233,6 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         JumpDown = GetInputPressedThisUpdate("Jump");
         CrouchDown = Input.GetKeyDown(KeyCode.C);
         CrouchUp = !Input.GetKeyDown(KeyCode.C);
-    }
-
-    protected override void Initialize()
-    {
-        Camera = CharacterCamera.GetComponentInChildren<Camera>();
-        base.Initialize();
-
-        TransitionToState(CharacterState.Default);
-
-        // Assign the characterController to the motor
-        Motor.CharacterController = this;
     }
 
     /// <summary>
