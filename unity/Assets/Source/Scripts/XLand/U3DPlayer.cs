@@ -5,6 +5,7 @@ using KinematicCharacterController;
 using System;
 using KinematicCharacterController.Examples;
 using Unity.MLAgents.Actuators;
+using UnityEngine.InputSystem;
 
 public enum CharacterState
 {
@@ -132,6 +133,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     private Vector3 lastInnerNormal = Vector3.zero;
     private Vector3 lastOuterNormal = Vector3.zero;
+
     protected override void Start()
     {
         base.Start();
@@ -213,6 +215,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     {
         // wrap input functionalitty to queue these events for us
         // Add a bunch of functions e.g. GetKeyDown, but wrap them in some sort of structure saved in the environment component
+
         mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
         mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);
         scrollInput = -Input.GetAxis(MouseScrollInput);
@@ -221,7 +224,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
         MoveAxisForward = Input.GetAxisRaw(VerticalInput);
         MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
-        JumpDown = Input.GetKeyDown(KeyCode.Space);
+        JumpDown = mInput.actions["Jump"].WasPerformedThisFrame();
         CrouchDown = Input.GetKeyDown(KeyCode.C);
         CrouchUp = !Input.GetKeyDown(KeyCode.C);
     }
@@ -232,8 +235,9 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         base.Initialize();
     }
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
 
         // Handle initial state
         TransitionToState(CharacterState.Default);

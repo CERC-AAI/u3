@@ -187,21 +187,21 @@ public class EnvironmentAgent : EnvironmentComponent
 
     public virtual void Update()
     {
-        EnvironmentComponent[] environmentComponents = mParentObject.GetEnvironmentComponents();
+        /*EnvironmentComponent[] environmentComponents = mParentObject.GetEnvironmentComponents();
         for (int i = 0; i < environmentComponents.Length; i++)
         {
             environmentComponents[i].StoreUserInputs();
-        }
+        }*/
         Debug.Log("Update is called.");
     }
 
     virtual public void Heuristic(in ActionBuffers actionsOut)
     {
-        // EnvironmentComponent[] environmentComponents = mParentObject.GetEnvironmentComponents();
-        // for (int i = 0; i < environmentComponents.Length; i++)
-        // {
-        //     environmentComponents[i].StoreUserInputs();
-        // }
+        EnvironmentComponent[] environmentComponents = mParentObject.GetEnvironmentComponents();
+        for (int i = 0; i < environmentComponents.Length; i++)
+        {
+            environmentComponents[i].StoreUserInputs();
+        }
         // Debug.Log("Heuristic is called.");
     }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
 using Unity.MLAgents.Sensors;
+using UnityEngine.InputSystem;
 
 
 public enum CallbackScope
@@ -114,6 +115,10 @@ public class EnvironmentComponent : MonoBehaviour
     Dictionary<Type, object> mCachedComponents = new Dictionary<Type, object>();
 
 
+
+    protected PlayerInput mInput;
+
+
     //Dictionary<EnvironmentCallback, EnvironmentCallback> mRegisteredCallbacks = new Dictionary<EnvironmentCallback, EnvironmentCallback>();
 
 
@@ -124,6 +129,11 @@ public class EnvironmentComponent : MonoBehaviour
         {
             CheckInitialized();
         }
+    }
+
+    protected virtual void Awake()
+    {
+        mInput = GetComponent<PlayerInput>();
     }
 
     public void CheckInitialized(bool force = false)
