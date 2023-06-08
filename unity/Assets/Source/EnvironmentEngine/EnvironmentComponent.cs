@@ -92,11 +92,12 @@ public class DefaultValue : Attribute
 public delegate void EnvironmentCallback();
 public delegate void EnvironmentCallback<T>(T value = default(T));
 
+[RequireComponent(typeof(EnvironmentObject))]
 //base class for environment objects
 public class EnvironmentComponent : MonoBehaviour
 {
     // Public members
-
+    List<ActionInfo> mLocalActionInfos = new List<ActionInfo>();
     // Private members
     protected EnvironmentEngine mEngine;
     protected EnvironmentObject mParentObject;
@@ -158,6 +159,15 @@ public class EnvironmentComponent : MonoBehaviour
         {
             Debug.LogError(name + "(" + GetType().ToString() + ") Each EnvironmentComponent must be attached to a GameObject with an EnvironmentObject, or a EnvironmentEngine derived class.");
         }
+    }
+
+    public virtual void StoreUserInputs()
+    {
+        if (mLocalActionInfos.Count > 0)
+        {
+            Debug.LogError("Please implement StoreUserInputs() in " + GetType().ToString());
+        }
+
     }
 
     private void OnDestroy()
@@ -273,6 +283,7 @@ public class EnvironmentComponent : MonoBehaviour
                     {
                         actionInfo.setBaseValues(fieldInfo, this, actionAttribute);
                         actionsList.Add(actionInfo);
+                        mLocalActionInfos.Add(actionInfo);
                     }
                     else
                     {

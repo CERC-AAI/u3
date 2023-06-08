@@ -185,54 +185,24 @@ public class EnvironmentAgent : EnvironmentComponent
         }
     }
 
+    public virtual void Update()
+    {
+        EnvironmentComponent[] environmentComponents = mParentObject.GetEnvironmentComponents();
+        for (int i = 0; i < environmentComponents.Length; i++)
+        {
+            environmentComponents[i].StoreUserInputs();
+        }
+        Debug.Log("Update is called.");
+    }
+
     virtual public void Heuristic(in ActionBuffers actionsOut)
     {
-        /*ActionSegment<int> discreteActions = actionsOut.DiscreteActions;
-        ActionSegment<float> continuousActions = actionsOut.ContinuousActions;
-
-        List<int> currentDiscreteBuffer = new List<int>();
-        List<float> currentContinuousBuffer = new List<float>();
-        int discreteOffset = 0;
-        int continuousOffset = 0;
-
-        for (int i = 0; i < mActions.Count; i++)
-        {
-            currentDiscreteBuffer.Clear();
-            currentContinuousBuffer.Clear();
-
-            if (mActions[i].getIntegerCount() > 0)
-            {
-                for (int j = 0; j < mActions[i].getIntegerCount(); j++)
-                {
-                    currentDiscreteBuffer.Add(0);
-                }
-
-                mActions[i].encodeDiscreteActions(currentDiscreteBuffer);
-            }
-            if (mActions[i].getFloatCount() > 0)
-            {
-                for (int j = 0; j < mActions[i].getFloatCount(); j++)
-                {
-                    currentContinuousBuffer.Add(0);
-                }
-
-                mActions[i].encodeContinuousActions(currentContinuousBuffer);
-            }
-
-            for (int j = 0; j < currentDiscreteBuffer.Count; j++)
-            {
-                discreteActions[discreteOffset + j] = currentDiscreteBuffer[j];
-            }
-            for (int j = 0; j < currentContinuousBuffer.Count; j++)
-            {
-                continuousActions[continuousOffset + j] = currentContinuousBuffer[j];
-            }
-
-            discreteOffset += mActions[i].getIntegerCount();
-            continuousOffset += mActions[i].getFloatCount();
-        }*/
-        Debug.Log("Heuristic actions: " + actionsOut.ToString());
-
+        // EnvironmentComponent[] environmentComponents = mParentObject.GetEnvironmentComponents();
+        // for (int i = 0; i < environmentComponents.Length; i++)
+        // {
+        //     environmentComponents[i].StoreUserInputs();
+        // }
+        // Debug.Log("Heuristic is called.");
     }
 
     virtual public void DoEndEpisode(bool timedOut = false)

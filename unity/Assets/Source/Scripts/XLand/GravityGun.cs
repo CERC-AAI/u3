@@ -1,7 +1,14 @@
 ﻿using UnityEngine;
 
-public class GravityGun : MonoBehaviour
+public class GravityGun : EnvironmentComponent
 {
+
+    [Header("Inputs")]
+    bool getLeftMouseButton;
+    bool getRightMouseButton;
+    Vector3 mousePosition;
+
+    [Header("Misc")]
     public float holdDistance = 2.0f;   // Distance from player's camera
     public float pullingSpeed = 2.0f;  // Speed to pull object
     public float throwingImpulse = 10.0f;  // Impulse to throw object away
@@ -17,19 +24,27 @@ public class GravityGun : MonoBehaviour
     bool mHadLeftClick = false;
     bool mHadRightClick = false;
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         playerCamera = Camera.main;
+    }
+
+    public override void StoreUserInputs()
+    {
+        getLeftMouseButton = Input.GetMouseButtonDown(0);
+        getRightMouseButton = Input.GetMouseButtonDown(1);
+        mousePosition = Input.mousePosition;
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (getLeftMouseButton)
         {
             mHadLeftClick = true;
             mHadRightClick = false;
         }
-        if (Input.GetMouseButtonDown(1))
+        if (getRightMouseButton)
         {
             mHadRightClick = true;
             mHadLeftClick = false;
@@ -52,7 +67,7 @@ public class GravityGun : MonoBehaviour
             if (heldObject == null)
             {
                 // Find the closest object with a rigidbody using a mouse raycast
-                Ray mouseRay = playerCamera.ScreenPointToRay(Input.mousePosition);
+                Ray mouseRay = playerCamera.ScreenPointToRay(mousePosition);
                 RaycastHit hitInfo;
                 float closestDistance = Mathf.Infinity;
                 Rigidbody closestObject = null;
@@ -78,7 +93,7 @@ public class GravityGun : MonoBehaviour
                 {
                     heldObject = closestObject;
                     heldObject.useGravity = false; // Disable gravity
-                    
+
                 }
             }
             else
@@ -109,7 +124,7 @@ public class GravityGun : MonoBehaviour
 
                     heldObject.velocity = heldObject.velocity.normalized * Mathf.Min(forceDirection.magnitude * pullingSpeed, heldObject.velocity.magnitude);
 
-                    heldObject.AddForce(-heldObject.velocity * 0.2f, ForceMode.VelocityChange);                    
+                    heldObject.AddForce(-heldObject.velocity * 0.2f, ForceMode.VelocityChange);
 
                     heldObject.AddForce(forceDirection.normalized * forceMagnitude, ForceMode.Force);
                 }
@@ -120,12 +135,12 @@ public class GravityGun : MonoBehaviour
 
                 heldObject.AddForce(forceDirection.normalized * forceMagnitude, ForceMode.Force);
             }
-            
+
             heldObject.angularVelocity *= 0.99f;
         }
 
         // Draw the mouse ray on the screen using a debug line
-        Ray debugRay = playerCamera.ScreenPointToRay(Input.mousePosition);
+        Ray debugRay = playerCamera.ScreenPointToRay(mousePosition);
         Debug.DrawRay(debugRay.origin, debugRay.direction * 100.0f, debugLineColor);
 
         mHadLeftClick = false;
