@@ -52,6 +52,8 @@ namespace KinematicCharacterController.Walkthrough.MovingPlatform
         {
             Director.time = time % Director.duration;
             Director.Evaluate();
+
+            Debug.Log("Move elevator");
         }
     }
 }

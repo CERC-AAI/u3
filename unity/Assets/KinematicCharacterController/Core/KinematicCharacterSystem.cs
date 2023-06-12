@@ -49,6 +49,11 @@ namespace KinematicCharacterController
             return _instance;
         }
 
+        private void Awake()
+        {
+            _instance = this;
+        }
+
         /// <summary>
         /// Sets the maximum capacity of the character motors list, to prevent allocations when adding characters
         /// </summary>
@@ -109,19 +114,14 @@ namespace KinematicCharacterController
             PhysicsMovers.Remove(mover);
         }
 
-        // This is to prevent duplicating the singleton gameobject on script recompiles
-        private void OnDisable()
-        {
-            Destroy(this.gameObject);
-        }
-
-        private void Awake()
+        /*private void Awake()
         {
             _instance = this;
-        }
+        }*/
 
-        public static void FixedUpdate(float deltaTime)
+        public void FixedUpdate()
         {
+            float deltaTime = Time.fixedDeltaTime;
             if (Settings.AutoSimulation)
             {
                 if (Settings.Interpolate)
@@ -138,7 +138,7 @@ namespace KinematicCharacterController
             }
         }
 
-        public static void LateUpdate()
+        public void LateUpdate()
         {
             if (Settings.Interpolate)
             {

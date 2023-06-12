@@ -1199,6 +1199,8 @@ namespace KinematicCharacterController
             }
 
             CharacterController.AfterCharacterUpdate(deltaTime);
+
+            Debug.Log("Character p2");
         }
 
         /// <summary>
