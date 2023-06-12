@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Unity.MLAgents;
 
+
 public class EnvironmentEngine : EnvironmentComponentHolder
 {
     // Public members
@@ -306,7 +307,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                 if (!WaitingForPhysics())
                 {
                     //Fix the code here to be local to each environment
-                    KinematicCharacterController.KinematicCharacterSystem.LateUpdate();
+                    //KinematicCharacterController.KinematicCharacterSystem.LateUpdate();
                     OnObjectLateUpdate(deltaTime);
                     for (int i = 0; i < mEnvironmentObjects.Count; i++)
                     {
@@ -337,9 +338,6 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             mPhysicsScene.Simulate(GetFixedDeltaTime());
             mPhysicsScene2D.Simulate(GetFixedDeltaTime());
 
-            //Fix the code here to be local to each environment
-            KinematicCharacterController.KinematicCharacterSystem.FixedUpdate(GetFixedDeltaTime());
-
             EnvironmentManager.Instance.QueueFixedUpdate(this);
             mPhysicsQueuedUpdateDelta = deltaTime;
         }
@@ -364,28 +362,34 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             mEnvironmentObjects[i].OnObjectLateUpdate(mPhysicsQueuedUpdateDelta);
         }
 
+        OnFinalUpdate(mPhysicsQueuedUpdateDelta);
+
         mPhysicsQueuedUpdateDelta = 0;
 
         IncrementSimulation();
     }
 
-    void IncrementSimulation()
+    virtual protected void OnFinalUpdate(float deltaTime)
+    {
+    }
+
+    protected void IncrementSimulation()
     {
         mFixedTime++;
         mNextFixedUpdate += GetFixedDeltaTime();
     }
 
-    sealed override public void OnObjectUpdate(float deltaTime)
+    override public void OnObjectUpdate(float deltaTime)
     {
         base.OnObjectUpdate(deltaTime);
     }
 
-    sealed override public void OnObjectFixedUpdate(float fixedDeltaTime)
+    override public void OnObjectFixedUpdate(float fixedDeltaTime)
     {
         base.OnObjectFixedUpdate(fixedDeltaTime);
     }
 
-    sealed override public void OnObjectLateFixedUpdate(float fixedDeltaTime)
+    override public void OnObjectLateFixedUpdate(float fixedDeltaTime)
     {
         base.OnObjectLateFixedUpdate(fixedDeltaTime);
     }
@@ -803,5 +807,10 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                 mGameEvents["Inputs"].Add(new JSONObject(eventData));
             }
         }
+    }
+
+    virtual public U3CharacterSystem GetKinematicCharacterSystem()
+    {
+        return null;
     }
 }

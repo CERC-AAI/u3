@@ -76,17 +76,16 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     [Header("References")]
     public U3DCamera CharacterCamera;
+    public U3CharacterMotor Motor;
 
     [Sensor(width = 256, height = 256)]
-    private Camera Camera;
+    public Camera Camera;
 
     private const string MouseXInput = "Mouse X";
     private const string MouseYInput = "Mouse Y";
     private const string MouseScrollInput = "Mouse ScrollWheel";
     private const string HorizontalInput = "Horizontal";
     private const string VerticalInput = "Vertical";
-
-    public KinematicCharacterMotor Motor;
 
     [Header("Stable Movement")]
     public float MaxStableMoveSpeed = 10f;
@@ -138,42 +137,73 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     {
         Cursor.lockState = CursorLockMode.Locked;
 
+        if (CharacterCamera == null)
+        {
+            CharacterCamera = GetComponentInChildren<U3DCamera>();
+        }
+
         // Tell camera to follow transform
-        CharacterCamera.SetFollowTransform(CameraFollowPoint);
+        if (CharacterCamera != null)
+        {
+            CharacterCamera.SetFollowTransform(CameraFollowPoint);
 
-        // Ignore the character's collider(s) for camera obstruction checks
-        CharacterCamera.IgnoredColliders.Clear();
-        CharacterCamera.IgnoredColliders.AddRange(GetComponentsInChildren<Collider>());
+            // Ignore the character's collider(s) for camera obstruction checks
+            CharacterCamera.IgnoredColliders.Clear();
+            CharacterCamera.IgnoredColliders.AddRange(GetComponentsInChildren<Collider>());
 
-        Camera = CharacterCamera.GetComponentInChildren<Camera>();
+            if (Camera == null)
+            {
+                Camera = CharacterCamera.GetComponentInChildren<Camera>();
+            }
+        }
+
         base.Initialize();
 
         TransitionToState(CharacterState.Default);
 
-        // Assign the characterController to the motor
-        Motor.CharacterController = this;
+        if (Motor == null)
+        {
+            Motor = GetComponentInChildren<U3CharacterMotor>();
+        }
+
+        if (Motor == null)
+        {
+            Debug.LogError("You must include a KinematicCharacterMotor component in the childern of a U3Player object.");
+        }
+        else
+        {
+            // Assign the characterController to the motor
+            Motor.CharacterController = this;
+        }
     }
 
     public override void OnUpdate(float deltaTime)
     {
-        if (getLeftMouseButtonInput)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        Cursor.lockState = CursorLockMode.Locked;
 
-        HandleCharacterInput();
+        
     }
 
     public override void OnLateUpdate(float deltaTime)
     {
+        HandleCharacterInput();
+
         // Handle rotating the camera along with physics movers
-        if (CharacterCamera.RotateWithPhysicsMover && Motor.AttachedRigidbody != null)
+        if (CharacterCamera != null && CharacterCamera.RotateWithPhysicsMover && Motor.AttachedRigidbody != null)
         {
             CharacterCamera.PlanarDirection = Motor.AttachedRigidbody.GetComponent<PhysicsMover>().RotationDeltaFromInterpolation * CharacterCamera.PlanarDirection;
             CharacterCamera.PlanarDirection = Vector3.ProjectOnPlane(CharacterCamera.PlanarDirection, Motor.CharacterUp).normalized;
         }
 
         HandleCameraInput();
+    }
+
+    void LateUpdate()
+    {
+        if (!EnvironmentManager.Instance.IsPython())
+        {
+            HandleCameraInput();
+        }
     }
 
     private void HandleCameraInput()
@@ -192,13 +222,16 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 #endif
 
         // Apply inputs to the camera
-        CharacterCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
+        if (CharacterCamera != null)
+        {
+            CharacterCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
+        }
 
         // Handle toggling zoom level
-        if (getRightMouseButtonInput)
+        /*if (getRightMouseButtonInput)
         {
             CharacterCamera.TargetDistance = (CharacterCamera.TargetDistance == 0f) ? CharacterCamera.DefaultDistance : 0f;
-        }
+        }*/
     }
 
     private void HandleCharacterInput()
@@ -208,7 +241,14 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         // Build the CharacterInputs struct
         characterInputs.MoveAxisForward = MoveAxisForward;
         characterInputs.MoveAxisRight = MoveAxisRight;
-        characterInputs.CameraRotation = CharacterCamera.Transform.rotation;
+        if (CharacterCamera != null)
+        {
+            characterInputs.CameraRotation = CharacterCamera.Transform.rotation;
+        }
+        else
+        {
+            characterInputs.CameraRotation = Quaternion.identity;
+        }
         characterInputs.JumpDown = JumpDown;
         characterInputs.CrouchDown = CrouchDown;
         characterInputs.CrouchUp = CrouchUp;
@@ -222,14 +262,18 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         // wrap input functionalitty to queue these events for us
         // Add a bunch of functions e.g. GetKeyDown, but wrap them in some sort of structure saved in the environment component
 
-        mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
-        mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);
-        scrollInput = -Input.GetAxis(MouseScrollInput);
+        Vector2 lookVector = mParentObject.GetInputSystem().actions["Look"].ReadValue<Vector2>() * 0.2f;
+        Vector2 moveVector = mParentObject.GetInputSystem().actions["Move"].ReadValue<Vector2>();
+        Vector2 scrollVector = mParentObject.GetInputSystem().actions["ScrollWheel"].ReadValue<Vector2>();
+
+        mouseLookAxisUp = lookVector.y;
+        mouseLookAxisRight = lookVector.x;
+        scrollInput = -scrollVector.y;
         getLeftMouseButtonInput = Input.GetMouseButtonDown(0);
         getRightMouseButtonInput = Input.GetMouseButtonDown(1);
 
-        MoveAxisForward = Input.GetAxisRaw(VerticalInput);
-        MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
+        MoveAxisForward = moveVector.y;
+        MoveAxisRight = moveVector.x;
         JumpDown = GetInputPressedThisUpdate("Jump");
         CrouchDown = Input.GetKeyDown(KeyCode.C);
         CrouchUp = !Input.GetKeyDown(KeyCode.C);

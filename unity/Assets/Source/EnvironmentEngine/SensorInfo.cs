@@ -26,19 +26,28 @@ public abstract class SensorInfo : ISensor
     };
 
 
-    public void setBaseValues(FieldInfo fieldInfo, object parent, Sensor sensorAttribute)
+    public bool setBaseValues(FieldInfo fieldInfo, object parent, Sensor sensorAttribute)
     {
+        bool wasInitialized = false;
+
         mFieldInfo = fieldInfo;
         mParent = parent;  // Get the EnvironmentAgent component
                            // Now you can use sensorAttribute as you need
         mName = sensorAttribute.sensorName;
-        init(sensorAttribute);
-        mObservationSpec = setObservationSpec();
+        wasInitialized = init(sensorAttribute);
+
+        if (wasInitialized)
+        {
+            mObservationSpec = setObservationSpec();
+        }
+
+        return wasInitialized;
     }
 
 
-    public virtual void init(Sensor sensorAttribute)
+    public virtual bool init(Sensor sensorAttribute)
     {
+        return true;
     }
 
     public abstract ObservationSpec setObservationSpec();
@@ -125,9 +134,15 @@ public class CameraSensorInfo : SensorInfo
     // if they're not set, you use the FieldInfo to get the Camera object, and query it for good default values
 
 
-    public override void init(Sensor sensorAttribute)
+    public override bool init(Sensor sensorAttribute)
     {
         Camera myCamera = (Camera)mFieldInfo.GetValue(mParent);
+
+        if (myCamera == null)
+        {
+            return false;
+        }
+
         mName = sensorAttribute.sensorName;
         bool grayscale = sensorAttribute.grayscale;
         SensorCompressionType compression = sensorAttribute.compressionType;
@@ -148,6 +163,8 @@ public class CameraSensorInfo : SensorInfo
         }
 
         mCameraSensor = new CameraSensor(myCamera, width, height, grayscale, mName, compression);
+
+        return true;
     }
 
     public override ObservationSpec setObservationSpec()

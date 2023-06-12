@@ -103,6 +103,11 @@ public class EnvironmentManager : MonoBehaviour
     {
         mIsInitialized = false;
 
+        if (debugMode && mEnvironments.ContainsKey(1))
+        {
+            mEnvironments[1].CheckInitialized();
+        }
+
         CheckSideChannel();
     }
 

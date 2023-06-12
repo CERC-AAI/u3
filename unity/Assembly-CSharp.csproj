@@ -73,6 +73,7 @@
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\5- Adding velocities and impulses\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\SensorInfo.cs" />
     <Compile Include="Assets\StarterAssets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\U3DKinematicObject.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\U3DPlayer.cs" />
     <Compile Include="Assets\Source\Other\Player3D.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
@@ -80,10 +81,13 @@
     <Compile Include="Assets\Source\Scripts\ButtonGame\ButtonGame.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\KinematicCharacterMotor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\16- FramePerfect Rotation\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\U3DEnvironment.cs" />
     <Compile Include="Assets\KinematicCharacterController\ExampleCharacter\Scripts\ExampleCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Door.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualButton.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\LineEnvironment.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PhysicsObject.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\U3PhysicsMover.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\KeyGame.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\BuildManager.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\2- Basic Movement and Gravity\Scripts\MyCharacterController.cs" />
@@ -115,10 +119,12 @@
     <Compile Include="Assets\Source\EnvironmentEngine\ActionInfo.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\KinematicCharacterSystem.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\c- Wall Jumping\MyPlayer.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\U3CharacterSystem.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\12- NoClip state\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\ICharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\CueCard.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\PhysicsMover.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\Elevator.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Key.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\CanvasInputs\UICanvasControllerInput.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\StressTestManager.cs" />
@@ -127,6 +133,7 @@
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\6- Crouching\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\LineSlider.cs" />
     <Compile Include="Assets\Source\Other\MakeCube.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\U3CharacterMotor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\16- FramePerfect Rotation\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\14- Climbing Ladders\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\OvalSlider.cs" />

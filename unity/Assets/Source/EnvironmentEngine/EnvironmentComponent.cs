@@ -140,14 +140,14 @@ public class EnvironmentComponent : MonoBehaviour
     {
         if (!mInitialized || force)
         {
+            CheckAll();
+
             Initialize();
         }
     }
 
     virtual protected void Initialize()
     {
-        CheckAll();
-
         if (mInitialized)
         {
             Debug.LogError("Object (" + name + ") initialized twice.");
@@ -393,8 +393,10 @@ public class EnvironmentComponent : MonoBehaviour
 
                     if (sensorInfo != null && sensorInfo.GetType().BaseType == typeof(SensorInfo))
                     {
-                        sensorInfo.setBaseValues(fieldInfo, this, sensorAttribute);
-                        sensorList.Add(sensorInfo);
+                        if (sensorInfo.setBaseValues(fieldInfo, this, sensorAttribute))
+                        {
+                            sensorList.Add(sensorInfo);
+                        }
                     }
                     else
                     {
