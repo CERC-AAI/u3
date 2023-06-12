@@ -34,8 +34,10 @@ public class GravityGun : EnvironmentComponent
     public override void StoreUserInputs()
     {
         getLeftMouseButton = GetInputPressedThisUpdate("Grab");
-        getRightMouseButton = Input.GetMouseButtonDown(1);
-        mousePosition = Input.mousePosition;
+        getRightMouseButton = GetInputPressedThisUpdate("Drop");
+        // TODO: just set to zero?
+        // mousePosition is middle of screen
+        mousePosition = new Vector2(Screen.width / 2, Screen.height / 2);
     }
 
     public override void OnFixedUpdate(float fixedDeltaTime)

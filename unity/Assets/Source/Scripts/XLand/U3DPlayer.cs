@@ -54,18 +54,14 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     //[Action]
     public float mouseLookAxisUp;
-   // [Action]
+    // [Action]
     public float mouseLookAxisRight;
     //[Action]
     public float scrollInput;
-    //[Action]
-    public bool getLeftMouseButtonInput;
-    //[Action]
-    public bool getRightMouseButtonInput;
 
     //[Action]
     public float MoveAxisForward;
-   // [Action]
+    // [Action]
     public float MoveAxisRight;
     [Action]
     public bool JumpDown;
@@ -115,6 +111,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     public Transform MeshRoot;
     public Transform CameraFollowPoint;
     public float CrouchedCapsuleHeight = 1f;
+    public float mouseSensitivty = 0.2f;
 
     public CharacterState CurrentCharacterState { get; private set; }
 
@@ -156,10 +153,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     public override void OnUpdate(float deltaTime)
     {
-        if (getLeftMouseButtonInput)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        Cursor.lockState = CursorLockMode.Locked;
 
         HandleCharacterInput();
     }
@@ -193,12 +187,6 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
         // Apply inputs to the camera
         CharacterCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
-
-        // Handle toggling zoom level
-        if (getRightMouseButtonInput)
-        {
-            CharacterCamera.TargetDistance = (CharacterCamera.TargetDistance == 0f) ? CharacterCamera.DefaultDistance : 0f;
-        }
     }
 
     private void HandleCharacterInput()
@@ -222,17 +210,21 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         // wrap input functionalitty to queue these events for us
         // Add a bunch of functions e.g. GetKeyDown, but wrap them in some sort of structure saved in the environment component
 
-        mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
-        mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);
-        scrollInput = -Input.GetAxis(MouseScrollInput);
-        getLeftMouseButtonInput = Input.GetMouseButtonDown(0);
-        getRightMouseButtonInput = Input.GetMouseButtonDown(1);
+        Vector2 look = mParentObject.GetInputSystem().actions["Look"].ReadValue<Vector2>() * mouseSensitivty;
+        Vector2 move = mParentObject.GetInputSystem().actions["Move"].ReadValue<Vector2>();
+        Vector2 scrollWheel = mParentObject.GetInputSystem().actions["ScrollWheel"].ReadValue<Vector2>();
 
-        MoveAxisForward = Input.GetAxisRaw(VerticalInput);
-        MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
+        mouseLookAxisUp = look.y;
+        mouseLookAxisRight = look.x;
+
+        scrollInput = -scrollWheel.y;
+
+        MoveAxisForward = move.y;
+        MoveAxisRight = move.x;
         JumpDown = GetInputPressedThisUpdate("Jump");
-        CrouchDown = Input.GetKeyDown(KeyCode.C);
-        CrouchUp = !Input.GetKeyDown(KeyCode.C);
+
+        CrouchDown = GetInputPressedThisUpdate("Crouch");
+        CrouchUp = !GetInputPressedThisUpdate("Crouch");
     }
 
     /// <summary>

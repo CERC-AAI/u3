@@ -1866,7 +1866,7 @@ namespace KinematicCharacterController
                         else if (!hitBodyIsDynamic)
                         {
                             PhysicsMover physicsMover = bodyHit.Rigidbody.GetComponent<PhysicsMover>();
-                            if(physicsMover)
+                            if (physicsMover)
                             {
                                 hitBodyVelocity = physicsMover.Velocity;
                             }
@@ -2118,7 +2118,7 @@ namespace KinematicCharacterController
             Vector3 characterUp = characterRotation * _cachedWorldUp;
             Vector3 verticalCharToHit = Vector3.Project((hitPoint - characterPosition), characterUp);
             Vector3 horizontalCharToHitDirection = Vector3.ProjectOnPlane((hitPoint - characterPosition), characterUp).normalized;
-            Vector3 stepCheckStartPos = (hitPoint - verticalCharToHit) + (characterUp * MaxStepHeight) + (horizontalCharToHitDirection * CollisionOffset * 3f); 
+            Vector3 stepCheckStartPos = (hitPoint - verticalCharToHit) + (characterUp * MaxStepHeight) + (horizontalCharToHitDirection * CollisionOffset * 3f);
 
             // Do outer step check with capsule cast on hit point
             nbStepHits = CharacterCollisionsSweep(
@@ -2291,7 +2291,7 @@ namespace KinematicCharacterController
             {
                 linearVelocity = interactiveRigidbody.velocity;
                 angularVelocity = interactiveRigidbody.angularVelocity;
-                if(interactiveRigidbody.isKinematic)
+                if (interactiveRigidbody.isKinematic)
                 {
                     PhysicsMover physicsMover = interactiveRigidbody.GetComponent<PhysicsMover>();
                     if (physicsMover)
