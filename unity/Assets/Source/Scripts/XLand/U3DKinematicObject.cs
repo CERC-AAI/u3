@@ -6,10 +6,12 @@ using System;
 using UnityEngine.Playables;
 
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(U3PhysicsMover))]
+//[RequireComponent(typeof(U3PhysicsMover))]
+//[RequireComponent(typeof(PhysicsMover))]
 public class U3DKinematicObject : EnvironmentComponent, IMoverController
 {
     public U3PhysicsMover Mover;
+    //public PhysicsMover Mover;
 
     public float Speed = 1f;
     public PlayableDirector Director;
@@ -35,6 +37,7 @@ public class U3DKinematicObject : EnvironmentComponent, IMoverController
         if (Mover == null)
         {
             Mover = GetComponentInChildren<U3PhysicsMover>();
+            //Mover = GetComponentInChildren<PhysicsMover>();
         }
 
         if (Mover == null)
@@ -55,7 +58,7 @@ public class U3DKinematicObject : EnvironmentComponent, IMoverController
         Quaternion _rotationBeforeAnim = _transform.rotation;
 
         // Update animation
-        EvaluateAtTime(Time.time * Speed);
+        EvaluateAtTime(GetEngine().GetTime() * Speed);
 
         // Set our platform's goal pose to the animation's
         goalPosition = _transform.position;

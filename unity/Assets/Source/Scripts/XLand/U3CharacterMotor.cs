@@ -388,9 +388,6 @@ public class U3CharacterMotor : EnvironmentComponent
     {
         base.Initialize();
 
-        Debug.Log(GetEngine());
-        Debug.Log(GetEngine().GetKinematicCharacterSystem());
-
 
         GetEngine().GetKinematicCharacterSystem().RegisterCharacterMotor(this);
 
@@ -399,6 +396,7 @@ public class U3CharacterMotor : EnvironmentComponent
     private void OnDisable()
     {
         GetEngine().GetKinematicCharacterSystem().UnregisterCharacterMotor(this);
+        //U3CharacterSystem.UnregisterCharacterMotor(this);
     }
 
     private void Reset()
@@ -1060,6 +1058,8 @@ public class U3CharacterMotor : EnvironmentComponent
         }
 
         CharacterController.AfterCharacterUpdate(deltaTime);
+
+        Debug.Log("Character p2");
     }
 
     /// <summary>
@@ -1726,7 +1726,7 @@ public class U3CharacterMotor : EnvironmentComponent
                     }
                     else if (!hitBodyIsDynamic)
                     {
-                        PhysicsMover physicsMover = bodyHit.Rigidbody.GetComponent<PhysicsMover>();
+                        U3PhysicsMover physicsMover = bodyHit.Rigidbody.GetComponent<U3PhysicsMover>();
                         if(physicsMover)
                         {
                             hitBodyVelocity = physicsMover.Velocity;
@@ -2154,7 +2154,7 @@ public class U3CharacterMotor : EnvironmentComponent
             angularVelocity = interactiveRigidbody.angularVelocity;
             if(interactiveRigidbody.isKinematic)
             {
-                PhysicsMover physicsMover = interactiveRigidbody.GetComponent<PhysicsMover>();
+                U3PhysicsMover physicsMover = interactiveRigidbody.GetComponent<U3PhysicsMover>();
                 if (physicsMover)
                 {
                     linearVelocity = physicsMover.Velocity;
@@ -2188,7 +2188,7 @@ public class U3CharacterMotor : EnvironmentComponent
         Rigidbody colliderAttachedRigidbody = onCollider.attachedRigidbody;
         if (colliderAttachedRigidbody)
         {
-            if (colliderAttachedRigidbody.gameObject.GetComponent<PhysicsMover>())
+            if (colliderAttachedRigidbody.gameObject.GetComponent<U3PhysicsMover>())
             {
                 return colliderAttachedRigidbody;
             }

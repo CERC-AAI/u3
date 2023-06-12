@@ -140,6 +140,28 @@ public class U3PhysicsMover : EnvironmentComponent
     {
         base.Initialize();
 
+        GetEngine().GetKinematicCharacterSystem().RegisterPhysicsMover(this);
+
+        //U3CharacterSystem.EnsureCreation();
+        //U3CharacterSystem.RegisterPhysicsMover(this);
+
+    }
+
+    /*private void OnEnable()
+    {
+        U3CharacterSystem.EnsureCreation();
+        U3CharacterSystem.RegisterPhysicsMover(this);
+    }*/
+
+    private void OnDisable()
+    {
+        GetEngine().GetKinematicCharacterSystem().UnregisterPhysicsMover(this);
+
+        //U3CharacterSystem.UnregisterPhysicsMover(this);
+    }
+
+    private void Awake()
+    {
         Transform = this.transform;
         ValidateData();
 
@@ -149,14 +171,6 @@ public class U3PhysicsMover : EnvironmentComponent
         InitialSimulationRotation = Rigidbody.rotation;
         LatestInterpolationPosition = Transform.position;
         LatestInterpolationRotation = Transform.rotation;
-
-        GetEngine().GetKinematicCharacterSystem().RegisterPhysicsMover(this);
-
-    }
-
-    private void OnDisable()
-    {
-        GetEngine().GetKinematicCharacterSystem().UnregisterPhysicsMover(this);
     }
 
     /// <summary>
@@ -233,7 +247,7 @@ public class U3PhysicsMover : EnvironmentComponent
         if (deltaTime > 0f)
         {
             Velocity = (TransientPosition - InitialSimulationPosition) / deltaTime;
-                                
+
             Quaternion rotationFromCurrentToGoal = TransientRotation * (Quaternion.Inverse(InitialSimulationRotation));
             AngularVelocity = (Mathf.Deg2Rad * rotationFromCurrentToGoal.eulerAngles) / deltaTime;
         }

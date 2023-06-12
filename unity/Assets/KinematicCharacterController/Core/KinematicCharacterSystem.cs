@@ -287,6 +287,9 @@ namespace KinematicCharacterController
                 mover.LatestInterpolationPosition = newPos;
                 mover.LatestInterpolationRotation = newRot;
             }
+
+            Debug.Log("CustomInterpolationUpdate");
+
         }
     }
 }

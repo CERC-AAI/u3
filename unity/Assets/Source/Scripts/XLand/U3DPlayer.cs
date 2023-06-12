@@ -73,6 +73,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     [Header("References")]
     public U3DCamera CharacterCamera;
     public U3CharacterMotor Motor;
+    //public KinematicCharacterMotor Motor;
 
     [Sensor(width = 256, height = 256)]
     public Camera Camera;
@@ -161,6 +162,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         if (Motor == null)
         {
             Motor = GetComponentInChildren<U3CharacterMotor>();
+            //Motor = GetComponentInChildren<KinematicCharacterMotor>();
         }
 
         if (Motor == null)

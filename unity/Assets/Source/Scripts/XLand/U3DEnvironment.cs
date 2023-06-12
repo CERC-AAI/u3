@@ -31,19 +31,22 @@ public class U3DEnvironment : EnvironmentEngine
 
     protected override void OnFinalUpdate(float deltaTime)
     {
-        mKinematicCharacterSystem.OnLateUpdate(deltaTime);
+        mKinematicCharacterSystem.OnLateUpdate();
 
         base.OnFinalUpdate(deltaTime);
     }
 
 
-    /*private void LateUpdate()
+    private void LateUpdate()
     {
-        mKinematicCharacterSystem.OnLateUpdate(Time.deltaTime);
-    }*/
+        //mKinematicCharacterSystem.OnLateUpdate();
+    }
 
     public override void OnObjectFixedUpdate(float fixedDeltaTime)
+    //void FixedUpdate()
     {
+        //float fixedDeltaTime  = Time.fixedDeltaTime;
+
         mKinematicCharacterSystem.OnFixedUpdate(fixedDeltaTime);
 
         base.OnObjectFixedUpdate(fixedDeltaTime);

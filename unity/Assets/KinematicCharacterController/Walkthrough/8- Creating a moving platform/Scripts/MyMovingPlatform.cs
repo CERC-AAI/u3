@@ -19,6 +19,8 @@ namespace KinematicCharacterController.Walkthrough.MovingPlatform
 
         public PlayableDirector Director;
 
+        public float Speed = 1.0f;
+
         private Transform _transform;
 
         private void Start()
@@ -36,7 +38,7 @@ namespace KinematicCharacterController.Walkthrough.MovingPlatform
             Quaternion _rotationBeforeAnim = _transform.rotation;
 
             // Update animation
-            EvaluateAtTime(Time.time);
+            EvaluateAtTime(Time.time * Speed);
 
             // Set our platform's goal pose to the animation's
             goalPosition = _transform.position;
@@ -50,8 +52,12 @@ namespace KinematicCharacterController.Walkthrough.MovingPlatform
 
         public void EvaluateAtTime(double time)
         {
-            Director.time = time % Director.duration;
-            Director.Evaluate();
+            //Director.time = time % Director.duration;
+            //Director.Evaluate();
+
+            Vector3 position = transform.position;
+            position.y = -Mathf.Cos((float)time / 10 * 2 * Mathf.PI) * 2 + 2;
+            transform.position = position;
 
             Debug.Log("Move elevator");
         }
