@@ -1,7 +1,10 @@
 # u3
-Unified Unity Universe
-A farmework for rapid development of RL environments in Unity.
+## About this project
 
-We also include the Open-XLand implementation of: https://arxiv.org/abs/2107.12808
+- The United Unity Universe (U3) is a framework developed for building and iterating on reinforcement learning environments in Unity 3D, utilizing both Unity and Python. Informed by the DeepMind paper, "[Using Unity to Help Solve Intelligence](https://arxiv.org/abs/2011.09294)," the design choices of U3 are influenced by the conventions presented therein. With a target audience of machine learning researchers, U3 offers interfaces to facilitate the efficient integration of diverse code for the purpose of implementing new environments and designing experiments to test the boundaries of an agent's capabilities. U3 also includes pre-defined environments such as GridWorld and OpenXLand, and further encourages researchers to contribute their own custom environments or modifications to the existing codebase.
+
+The first goal for the project is to recapitulate XLand and Ada. This step will serve as a benchmark for making sure everything is running smoothly. Further, having a working version of Ada will allow us to test its capabilities. Specifically, I am interested in using the Ada model as a foundational model in novel tasks, and testing its zero or few shot capabilities. For example, can Ada adapt to a reskinned environment (just changing textures/models)? Can it adapt to a new set of rules/objects? Can it be used as a foundational model on new rules/objects? Can it then adapt to more complex tasks that require a combination of rules (Like using an object to build a bridge across a gap)? Finally, can Ada be used as a foundational model for a completely different environment as long as the basic controller is the same (new tasks, new visuals, new rewards)? 
+
+More details: https://docs.google.com/document/d/1iQD3saJDTD4fPgFONWtWWoQOIJ4glgURXhtg5951-VQ/edit
 
 The project is split into Unity and Python sides. Unity deals with the code to set up RL environments within the Unity game engine itself. Python deals with wrappers for interfacing with the environment during training. This entails a PettingZoo wrapper and extra API calls that enable U3 specific functionality (such as probing environment complexity).
