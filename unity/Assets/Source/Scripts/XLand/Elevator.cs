@@ -11,7 +11,7 @@ public class Elevator : U3DKinematicObject
         position.y = -Mathf.Cos((float)time / 10 * 2 * Mathf.PI) * 2 + 2;
         transform.position = position;
 
-        Debug.Log("Move elevator");
+        //Debug.Log("Move elevator");
 
         base.EvaluateAtTime(time);
     }

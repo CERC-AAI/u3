@@ -1059,7 +1059,7 @@ public class U3CharacterMotor : EnvironmentComponent
 
         CharacterController.AfterCharacterUpdate(deltaTime);
 
-        Debug.Log("Character p2");
+        //Debug.Log("Character p2");
     }
 
     /// <summary>

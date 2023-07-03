@@ -281,7 +281,7 @@ public class U3CharacterSystem : MonoBehaviour
             mover.LatestInterpolationRotation = newRot;
         }
 
-        Debug.Log("CustomInterpolationUpdate");
+        //Debug.Log("CustomInterpolationUpdate");
 
     }
 }

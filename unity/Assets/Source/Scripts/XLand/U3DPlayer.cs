@@ -694,4 +694,11 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     public void OnDiscreteCollisionDetected(Collider hitCollider)
     {
     }
+
+    public override bool ShouldRequestDecision(long fixedUdpateNumber)
+    {
+        return (fixedUdpateNumber + 1) % (GetObjectID()+1) == 0;
+
+        return base.ShouldRequestDecision(fixedUdpateNumber);
+    }
 }
