@@ -29,6 +29,21 @@ logger = logging_util.get_logger(__name__)
 GymStepResult = Tuple[np.ndarray, float, bool, Dict]
 
 
+class U3Agent:
+    def __init__(self, unique_id):
+        self.unique_id = unique_id
+        self.last_observation = None
+        self.last_reward = None
+        self.terminated = False
+        self.last_decision_step = None
+
+    def update_step(self, observation, reward, terminated, decision_step):
+        self.last_observation = observation
+        self.last_reward = reward
+        self.terminated = terminated
+        self.last_decision_step = decision_step
+
+
 class UnityToPettingzooWrapper(ParallelEnv):
     """
     Provides Gym wrapper for Unity Learning Environments.
@@ -64,11 +79,9 @@ class UnityToPettingzooWrapper(ParallelEnv):
         # TODO: two functions: one to convert from behavior_spec to string, and one to convert from the string to behavior_spec
         # self.possible_agents = list(self._env.behavior_specs.keys())
         self.possible_agents = []
-        for behavior_spec in self._env._env_state.keys():
-            for agent_id in self._env._env_state[behavior_spec][0].agent_id:
-                self.possible_agents.append(
-                    str(behavior_spec) + "_" + str(agent_id)
-                )
+        self.agents = []
+        self.agent_infos = {}
+        self.current_step = 0
 
         self.visual_obs = None
 
@@ -255,6 +268,7 @@ class UnityToPettingzooWrapper(ParallelEnv):
         self._env.reset()
         self.agents = self.possible_agents[:]
         self.num_moves = 0
+        self.current_step = 0
         observations = {agent: None for agent in self.agents}
         infos = {agent: {} for agent in self.agents}
 
@@ -295,66 +309,92 @@ class UnityToPettingzooWrapper(ParallelEnv):
                 "receive 'done = True'."
             )
 
-        if not actions:
+        """if not actions:
             self.agents = []
-            return {}, {}, {}, {}, {}
+            return {}, {}, {}, {}, {}"""
+
+        # TODO: fix self.name to deal with multiple agents
+        for unique_id in self.agents:
+            agent_actions = actions[unique_id]
+
+            # TODO: fill action_tuple with actions provided by env
+            # always have a discrete continuous tuple, and if the discrete is empty, just have the first element be null
+            # self._env.set_actions  :param action: ActionTuple tuple of continuous and/or discrete action.
+            # Actions are np.arrays with dimensions  (n_agents, continuous_size) and
+            # (n_agents, discrete_size), respectively.        action_tuple = ActionTuple(action)
+            action_tuple = ActionTuple(
+                continuous=agent_actions["continuous"],
+                discrete=agent_actions["discrete"],
+            )
+
+            self.set_action_for_agent_unique_id(unique_id, action_tuple)
+
+        self._env.step()
+
+        # TODO: change to work for multiple agents
+        self.agents = []
+
+        for behavior_spec in self._env._env_state.keys():
+            for agent_id in self._env._env_state[behavior_spec][0].agent_id:
+                agent_unique_id = str(behavior_spec) + "_" + str(agent_id)
+                if not agent_unique_id in self.possible_agents:
+                    self.possible_agents.append(agent_unique_id)
+                    self.agent_infos[agent_unique_id] = U3Agent(agent_unique_id)
+                self.agents.append(agent_unique_id)
 
         # Are flatteners relevant? (probably not)
         # if self._flattener is not None:
         #     # Translate action into list
         #     action = self._flattener.lookup_action(action)
 
-        # TODO: change to work for multiple agents
-        self.agents = self.possible_agents[:]
+        observations = {unique_id: {} for unique_id in self.possible_agents}
+        rewards = {unique_id: {} for unique_id in self.possible_agents}
+        terminations = {unique_id: {} for unique_id in self.possible_agents}
+        infos = {unique_id: {} for unique_id in self.possible_agents}
 
-        observations = {unique_id: {} for unique_id in self.agents}
-        rewards = {unique_id: {} for unique_id in self.agents}
-        terminations = {unique_id: {} for unique_id in self.agents}
-        infos = {unique_id: {} for unique_id in self.agents}
-
-        # TODO: fill action_tuple with actions provided by env
-        # always have a discrete continuous tuple, and if the discrete is empty, just have the first element be null
-        # self._env.set_actions  :param action: ActionTuple tuple of continuous and/or discrete action.
-        # Actions are np.arrays with dimensions  (n_agents, continuous_size) and
-        # (n_agents, discrete_size), respectively.        action_tuple = ActionTuple(action)
-
-        # TODO: fix self.name to deal with multiple agents
-        for unique_id in self.agents:
-            agent_actions = actions[unique_id]
-            action_tuple = ActionTuple(
-                continuous=agent_actions["continuous"],
-                discrete=agent_actions["discrete"],
-            )
-            self.set_action_for_agent_unique_id(unique_id, action_tuple)
-
-        self._env.step()
-
-        for unique_id in self.agents:
+        for unique_id in self.possible_agents:
             (
                 behavior_name,
                 agent_id,
             ) = self.unique_id_to_behavior_name_and_agent_id(unique_id)
 
-            decision_step, terminal_step = self._env.get_steps(behavior_name)
-            # get the obs corresponding to agent_id by using agent_id_to_index
-            # TODO: modify this to handle multiple agents
-            # self._check_agents(max(len(decision_step), len(terminal_step)))
-
-            if len(terminal_step) != 0:
-                # The agent is done
-                self.game_over = True
-                (
-                    observations[unique_id],
-                    rewards[unique_id],
-                    terminations[unique_id],
-                ) = self._single_step(terminal_step, agent_id)
-                # TODO: return inside a for loop will exit the loop, so this will only return the first agent's info
+            if not unique_id in self.agents:
+                observations[unique_id] = None
+                rewards[unique_id] = None
+                terminations[unique_id] = None
             else:
-                (
+                decision_step, terminal_step = self._env.get_steps(
+                    behavior_name
+                )
+                # get the obs corresponding to agent_id by using agent_id_to_index
+                # TODO: modify this to handle multiple agents
+                # self._check_agents(max(len(decision_step), len(terminal_step)))
+
+                if len(terminal_step) != 0:
+                    # The agent is done
+                    self.game_over = True
+                    (
+                        observations[unique_id],
+                        rewards[unique_id],
+                        terminations[unique_id],
+                    ) = self._single_step(terminal_step, agent_id)
+                    # TODO: return inside a for loop will exit the loop, so this will only return the first agent's info
+                else:
+                    (
+                        observations[unique_id],
+                        rewards[unique_id],
+                        terminations[unique_id],
+                    ) = self._single_step(decision_step, agent_id)
+
+                self.agent_infos[unique_id].update_step(
                     observations[unique_id],
                     rewards[unique_id],
                     terminations[unique_id],
-                ) = self._single_step(decision_step, agent_id)
+                    self.current_step,
+                )
+
+        self.current_step += 1
+
         return (observations, rewards, terminations, {}, infos)
 
     # TODO: pick up here

@@ -59,7 +59,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         {
             if (!mEnvironmentObjects.Contains(allObjects[i]))
             {
-                mEnvironmentObjects.Add(allObjects[i]);
+                AddObject(allObjects[i]);
+                //mEnvironmentObjects.Add(allObjects[i]);
             }
         }
 
@@ -499,6 +500,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     public void AddObject(EnvironmentObject newObject)
     {
+        Debug.Log($"Add object: {newObject} -> {mNextID}");
+
         if (!mEnvironmentObjects.Contains(newObject))
         {
             mEnvironmentObjects.Add(newObject);

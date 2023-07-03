@@ -15,35 +15,29 @@ for t in range(100):
     env.render()
 
     agents = env.possible_agents
+
     # Choose a random action from the action space
     # TODO: every step, passed an array of behaviorspecs and an array of agents
     # TODO: one action space per agent
     # action = env.action_space.sample()
     actions = {
-        agents[0]: {
+        agent: {
             "discrete": env.action_space.sample()[0].reshape(1, 3),
             "continuous": env.action_space.sample()[1].reshape(1, 5),
-        },
-        agents[1]: {
-            "discrete": env.action_space.sample()[0].reshape(1, 3),
-            "continuous": env.action_space.sample()[1].reshape(1, 5),
-        },
-        agents[2]: {
-            "discrete": env.action_space.sample()[0].reshape(1, 3),
-            "continuous": env.action_space.sample()[1].reshape(1, 5),
-        },
+        }
+        for agent in agents
     }
 
     # Perform the chosen action
     observation, reward, done, truncation, info = env.step(actions)
 
     # Check if the episode is done (the pole has fallen)
-    if done[agents[0]]:
+    """if len(agents) > 0 and done[agents[0]]:
         print("Episode finished after {} timesteps".format(t + 1))
-        break
+        break"""
 
     for agent in agents:
-        if t % 10 == 0:
+        if not observation[agent] is None:
             image = cv2.cvtColor(observation[agent], cv2.COLOR_RGB2BGR)
             frame_name = agent.replace("?", "_")
             frame_name = frame_name.replace(" ", "_")
