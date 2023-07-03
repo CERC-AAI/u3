@@ -21,16 +21,16 @@ for t in range(100):
     # action = env.action_space.sample()
     actions = {
         agents[0]: {
-            "discrete": np.array(env.action_space.sample()).reshape(1, 1),
-            "continuous": None,
+            "discrete": env.action_space.sample()[0].reshape(1, 3),
+            "continuous": env.action_space.sample()[1].reshape(1, 5),
         },
         agents[1]: {
-            "discrete": np.array(env.action_space.sample()).reshape(1, 1),
-            "continuous": None,
+            "discrete": env.action_space.sample()[0].reshape(1, 3),
+            "continuous": env.action_space.sample()[1].reshape(1, 5),
         },
         agents[2]: {
-            "discrete": np.array(env.action_space.sample()).reshape(1, 1),
-            "continuous": None,
+            "discrete": env.action_space.sample()[0].reshape(1, 3),
+            "continuous": env.action_space.sample()[1].reshape(1, 5),
         },
     }
 
@@ -43,10 +43,11 @@ for t in range(100):
         break
 
     for agent in agents:
-        image = cv2.cvtColor(observation[agent], cv2.COLOR_RGB2BGR)
-        frame_name = agent.replace("?", "_")
-        frame_name = frame_name.replace(" ", "_")
-        cv2.imwrite(f"python/Images/{frame_name}-frame{t}.png", image)
-        print(actions)
+        if t % 10 == 0:
+            image = cv2.cvtColor(observation[agent], cv2.COLOR_RGB2BGR)
+            frame_name = agent.replace("?", "_")
+            frame_name = frame_name.replace(" ", "_")
+            cv2.imwrite(f"python/Images/{frame_name}-frame{t}.png", image)
+    print(actions)
 
 env.close()
