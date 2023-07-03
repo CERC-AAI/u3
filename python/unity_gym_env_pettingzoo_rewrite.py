@@ -28,19 +28,21 @@ class UnityGymException(error.Error):
 logger = logging_util.get_logger(__name__)
 GymStepResult = Tuple[np.ndarray, float, bool, Dict]
 
+
 class U3Agent:
     def __init__(self, unique_id):
         self.unique_id = unique_id
         self.last_observation = None
         self.last_reward = None
         self.terminated = False
-        self.last_decision_step = None 
+        self.last_decision_step = None
 
-    def update_step(self, observation, reward, terminated, decision_step):        
+    def update_step(self, observation, reward, terminated, decision_step):
         self.last_observation = observation
         self.last_reward = reward
         self.terminated = terminated
-        self.last_decision_step = decision_step 
+        self.last_decision_step = decision_step
+
 
 class UnityToPettingzooWrapper(ParallelEnv):
     """
@@ -136,64 +138,56 @@ class UnityToPettingzooWrapper(ParallelEnv):
         # TODO: Rewrite setting of action space for pettingzoo
         # Set action spaces
         # action_spec has a counter for each discrete and continuous action
-        if (
-            self.group_spec.action_spec.is_discrete()
-            and not self.group_spec.action_spec.is_continuous()
-        ):
-            self.action_size = self.group_spec.action_spec.discrete_size
-            branches = self.group_spec.action_spec.discrete_branches
-            if self.group_spec.action_spec.discrete_size == 1:
-                self._action_space = spaces.Discrete(branches[0])
-            else:
-                if flatten_branched:
-                    self._flattener = ActionFlattener(branches)
-                    self._action_space = self._flattener.action_space
-                else:
-                    self._action_space = spaces.MultiDiscrete(branches)
+        # if (
+        #     self.group_spec.action_spec.discrete_size > 0
+        #     and self.group_spec.action_spec.continuous_size == 0
+        # ):
+        #     branches = self.group_spec.action_spec.discrete_branches
+        #     if self.group_spec.action_spec.discrete_size == 1:
+        #         self._action_space = spaces.Discrete(branches[0])
+        #     else:
+        #         if flatten_branched:
+        #             self._flattener = ActionFlattener(branches)
+        #             self._action_space = self._flattener.action_space
+        #         else:
+        #             self._action_space = spaces.MultiDiscrete(branches)
 
-        elif (
-            self.group_spec.action_spec.is_continuous()
-            and not self.group_spec.action_spec.is_discrete()
-        ):
-            if flatten_branched:
-                logger.warning(
-                    "The environment has a non-discrete action space. It will "
-                    "not be flattened."
-                )
+        # elif (
+        #     self.group_spec.action_spec.continuous_size > 0
+        #     and self.group_spec.action_spec.discrete_size == 0
+        # ):
+        #     if flatten_branched:
+        #         logger.warning(
+        #             "The environment has a non-discrete action space. It will "
+        #             "not be flattened."
+        #         )
 
-            self.action_size = self.group_spec.action_spec.continuous_size
-            high = np.array([1] * self.group_spec.action_spec.continuous_size)
-            self._action_space = spaces.Box(-high, high, dtype=np.float32)
+        #     high = np.array([1] * self.group_spec.action_spec.continuous_size)
+        #     self._action_space = spaces.Box(-high, high, dtype=np.float32)
 
-        elif (
-            self.group_spec.action_spec.is_discrete()
-            and self.group_spec.action_spec.is_continuous()
-        ):
-            discrete_action_space = None
-            continuous_action_space = None
-            discrete_action_size = self.group_spec.action_spec.discrete_size
-            discrete_branches = self.group_spec.action_spec.discrete_branches
-            continuous_action_size = self.group_spec.action_spec.continuous_size
-            if discrete_action_size == 1:
-                self._action_space = spaces.Discrete(discrete_branches[0])
-            else:
-                if flatten_branched:
-                    self._flattener = ActionFlattener(discrete_branches)
-                    discrete_action_space = self._flattener.action_space
-                else:
-                    discrete_action_space = spaces.MultiDiscrete(branches)
-            continuous_action_size = self.group_spec.action_spec.continuous_size
-            high = np.array([1] * continuous_action_size)
-            continuous_action_space = spaces.Box(-high, high, dtype=np.float32)
-            self._action_space = spaces.Tuple(
-                (discrete_action_space, continuous_action_space)
-            )
-            pass
-
+        # elif (
+        #     self.group_spec.action_spec.discrete_size > 0
+        #     and self.group_spec.action_spec.continuous_size > 0
+        # ):
+        discrete_action_size = self.group_spec.action_spec.discrete_size
+        discrete_branches = self.group_spec.action_spec.discrete_branches
+        if discrete_action_size == 1:
+            self._action_space = spaces.Discrete(discrete_branches[0])
         else:
-            raise UnityGymException(
-                "Please make sure that group_spec.action_spec.is_discrete() or group_spec.action_spec.is_continuous() return"
-            )
+            discrete_action_space = spaces.MultiDiscrete(discrete_branches)
+
+        continuous_action_size = self.group_spec.action_spec.continuous_size
+        high = np.array([1] * continuous_action_size)
+        continuous_action_space = spaces.Box(-high, high, dtype=np.float32)
+
+        self._action_space = spaces.Tuple(
+            (discrete_action_space, continuous_action_space)
+        )
+
+        # else:
+        #     raise UnityGymException(
+        #         "Please make sure that group_spec.action_spec.is_discrete() or group_spec.action_spec.is_continuous() return"
+        #     )
 
         if action_space_seed is not None:
             self._action_space.seed(action_space_seed)
@@ -315,10 +309,9 @@ class UnityToPettingzooWrapper(ParallelEnv):
                 "receive 'done = True'."
             )
 
-        '''if not actions:
+        """if not actions:
             self.agents = []
-            return {}, {}, {}, {}, {}'''
-              
+            return {}, {}, {}, {}, {}"""
 
         # TODO: fix self.name to deal with multiple agents
         for unique_id in self.agents:
@@ -333,7 +326,7 @@ class UnityToPettingzooWrapper(ParallelEnv):
                 continuous=agent_actions["continuous"],
                 discrete=agent_actions["discrete"],
             )
-            
+
             self.set_action_for_agent_unique_id(unique_id, action_tuple)
 
         self._env.step()
@@ -347,7 +340,7 @@ class UnityToPettingzooWrapper(ParallelEnv):
                 if not agent_unique_id in self.possible_agents:
                     self.possible_agents.append(agent_unique_id)
                     self.agent_infos[agent_unique_id] = U3Agent(agent_unique_id)
-                self.agents.append(agent_unique_id)        
+                self.agents.append(agent_unique_id)
 
         # Are flatteners relevant? (probably not)
         # if self._flattener is not None:
@@ -370,7 +363,9 @@ class UnityToPettingzooWrapper(ParallelEnv):
                 rewards[unique_id] = None
                 terminations[unique_id] = None
             else:
-                decision_step, terminal_step = self._env.get_steps(behavior_name)
+                decision_step, terminal_step = self._env.get_steps(
+                    behavior_name
+                )
                 # get the obs corresponding to agent_id by using agent_id_to_index
                 # TODO: modify this to handle multiple agents
                 # self._check_agents(max(len(decision_step), len(terminal_step)))
@@ -391,10 +386,15 @@ class UnityToPettingzooWrapper(ParallelEnv):
                         terminations[unique_id],
                     ) = self._single_step(decision_step, agent_id)
 
-                self.agent_infos[unique_id].update_step(observations[unique_id], rewards[unique_id], terminations[unique_id], self.current_step)
-                    
+                self.agent_infos[unique_id].update_step(
+                    observations[unique_id],
+                    rewards[unique_id],
+                    terminations[unique_id],
+                    self.current_step,
+                )
+
         self.current_step += 1
-        
+
         return (observations, rewards, terminations, {}, infos)
 
     # TODO: pick up here
