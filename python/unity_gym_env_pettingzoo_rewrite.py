@@ -171,8 +171,9 @@ class UnityToPettingzooWrapper(ParallelEnv):
         # ):
         discrete_action_size = self.group_spec.action_spec.discrete_size
         discrete_branches = self.group_spec.action_spec.discrete_branches
+        discrete_action_space = None
         if discrete_action_size == 1:
-            self._action_space = spaces.Discrete(discrete_branches[0])
+            discrete_action_space = spaces.Discrete(discrete_branches[0])
         else:
             discrete_action_space = spaces.MultiDiscrete(discrete_branches)
 
