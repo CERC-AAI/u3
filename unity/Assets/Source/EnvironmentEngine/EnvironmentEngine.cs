@@ -70,7 +70,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     virtual public void InitializeEnvironment(JSONObject loadParams)
     {
 
-        CheckInitialized(); 
+        CheckInitialized();
         for (int i = 0; i < mEnvironmentObjects.Count; i++)
         {
             mEnvironmentObjects[i].CheckInitialized();
@@ -114,7 +114,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     {
         mIsRunning = false;
 
-        OnRunEnded(); 
+        OnRunEnded();
         for (int i = 0; i < mEnvironmentObjects.Count; i++)
         {
             mEnvironmentObjects[i].RunEnded();
@@ -500,7 +500,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     public void AddObject(EnvironmentObject newObject)
     {
-        Debug.Log($"Add object: {newObject} -> {mNextID}");
+        // Debug.Log($"Add object: {newObject} -> {mNextID}");
 
         if (!mEnvironmentObjects.Contains(newObject))
         {
