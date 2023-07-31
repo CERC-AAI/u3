@@ -22,8 +22,12 @@ for t in range(100):
     # action = env.action_space.sample()
     actions = {
         agent: {
-            "discrete": env.action_space.sample()[0].reshape(1, 3),
-            "continuous": env.action_space.sample()[1].reshape(1, 5),
+            "discrete": env.action_space.sample()[0].reshape(
+                1, env.group_spec.action_spec.discrete_size
+            ),
+            "continuous": env.action_space.sample()[1].reshape(
+                1, env.group_spec.action_spec.continuous_size
+            ),
         }
         for agent in agents
     }
@@ -41,6 +45,7 @@ for t in range(100):
             image = cv2.cvtColor(observation[agent], cv2.COLOR_RGB2BGR)
             frame_name = agent.replace("?", "_")
             frame_name = frame_name.replace(" ", "_")
+            frame_name = frame_name.replace("=", "_")
             cv2.imwrite(f"python/Images/{frame_name}-frame{t}.png", image)
     print(actions)
 

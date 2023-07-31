@@ -52,22 +52,22 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 {
     [Header("Inputs")]
 
-    //[Action]
+    [Action]
     public float mouseLookAxisUp;
-    // [Action]
+    [Action]
     public float mouseLookAxisRight;
-    //[Action]
+    [Action]
     public float scrollInput;
 
-    //[Action]
+    [Action]
     public float MoveAxisForward;
-    // [Action]
+    [Action]
     public float MoveAxisRight;
     [Action]
     public bool JumpDown;
-    //[Action]
+    [Action]
     public bool CrouchDown;
-    //[Action]
+    [Action]
     public bool CrouchUp;
 
     [Header("References")]
@@ -180,7 +180,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     {
         Cursor.lockState = CursorLockMode.Locked;
 
-        
+
     }
 
     public override void OnLateUpdate(float deltaTime)
@@ -393,7 +393,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
-    /// This is where you tell your character what its rotation should be right now. 
+    /// This is where you tell your character what its rotation should be right now.
     /// This is the ONLY place where you should set the character's rotation
     /// </summary>
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
@@ -448,7 +448,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
-    /// This is where you tell your character what its velocity should be right now. 
+    /// This is where you tell your character what its velocity should be right now.
     /// This is the ONLY place where you can set the character's velocity
     /// </summary>
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
@@ -546,7 +546,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
                                     break;
                             }
 
-                            // Makes the character skip ground probing/snapping on its next update. 
+                            // Makes the character skip ground probing/snapping on its next update.
                             // If this line weren't here, the character would remain snapped to the ground when trying to jump. Try commenting this line out and see.
                             Motor.ForceUnground();
 
