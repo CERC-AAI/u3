@@ -47,10 +47,13 @@ public class MetaTile : IMetaTileProbability
 
             if (environment[envX, envY, envZ] != null)
             {
+                // Debug.Log("environment[envX, envY, envZ] :" + environment[envX, envY, envZ]);
                 return false;  // the metatile would overwrite a tile
             }
 
-            // TODO: check neighbor tiles for adjacency conflicts
+            // Check if the faces of the tile are compatible with the neighboring tiles according to the matching matrix
+            return tile.CanPlaceTile(environment, new Vector3Int(envX, envY, envZ));
+
         }
 
         return true;  // no conflicts were found
