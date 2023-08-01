@@ -35,7 +35,7 @@ public class TileEditor : Editor
             serializedProperty.Next(true);
             serializedProperty.Next(true);
 
-            isOpen = EditorGUILayout.Foldout(isOpen, "Edge IDs");
+            isOpen = EditorGUILayout.Foldout(isOpen, "Face IDs");
 
             if (isOpen)
             {
