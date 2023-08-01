@@ -1,6 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using System;
 using UnityEngine;
-using System.Collections.Generic;
 
 public class MetaTileEnvironment : MonoBehaviour
 {
@@ -32,6 +33,7 @@ public class MetaTileEnvironment : MonoBehaviour
             if (resultType == MetaTilePool.RESULTTYPE.FAILURE)
             {
                 timeoutCounter++;
+                Debug.Log("timeoutCounter++");
             }
             else
             {
@@ -43,15 +45,17 @@ public class MetaTileEnvironment : MonoBehaviour
             if (timeoutCounter > 100)
             {
                 Debug.Log("Timeout");
+                for (int i = 0; i < placedMetaTiles.Count; i++)
+                {
+                    placedMetaTiles[i].DepositPayload(placedPositions[i]);
+                    // count the number of placed metatiles
+                    Debug.Log("placedMetaTiles.Count: " + placedMetaTiles.Count);
+                }
                 break;
             }
         }
 
-        if (timeoutCounter > 1000)
-        {
-            Debug.Log("Timeout");
-        }
-        else
+        if (timeoutCounter <= 1000 && resultType == MetaTilePool.RESULTTYPE.COMPLETE)
         {
             Debug.Log("Complete");
 

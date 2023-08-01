@@ -52,53 +52,54 @@ public class MetaTile : IMetaTileProbability
 
             if (GetTile(environment, environmentPosition) != null)
             {
+                // Debug.Log("environment[envX, envY, envZ] :" + environment[envX, envY, envZ]);
                 return false;  // the metatile would overwrite a tile
             }
 
             // TODO: check neighbor tiles for adjacency conflicts
-            foreach (Tile.EDGETYPE edgeType in Enum.GetValues(typeof(Tile.EDGETYPE)))
+            foreach (Tile.FACETYPE faceType in Enum.GetValues(typeof(Tile.FACETYPE)))
             {
                 Vector3Int offsetVector = Vector3Int.zero;
-                Tile.EDGETYPE compareEdge = Tile.EDGETYPE.BOTTOM;
+                Tile.FACETYPE compareEdge = Tile.FACETYPE.BOTTOM;
                 //TODO: deal with rotations
-                switch (edgeType)
+                switch (faceType)
                 {
-                    case Tile.EDGETYPE.TOP:
+                    case Tile.FACETYPE.TOP:
                         offsetVector = new Vector3Int(0, 1, 0);
-                        compareEdge = Tile.EDGETYPE.BOTTOM;
+                        compareEdge = Tile.FACETYPE.BOTTOM;
                         break;
 
-                    case Tile.EDGETYPE.BOTTOM:
+                    case Tile.FACETYPE.BOTTOM:
                         offsetVector = new Vector3Int(0, -1, 0);
-                        compareEdge = Tile.EDGETYPE.TOP;
+                        compareEdge = Tile.FACETYPE.TOP;
                         break;
 
-                    case Tile.EDGETYPE.LEFT:
+                    case Tile.FACETYPE.LEFT:
                         offsetVector = new Vector3Int(-1, 0, 0);
-                        compareEdge = Tile.EDGETYPE.RIGHT;
+                        compareEdge = Tile.FACETYPE.RIGHT;
                         break;
 
-                    case Tile.EDGETYPE.RIGHT:
+                    case Tile.FACETYPE.RIGHT:
                         offsetVector = new Vector3Int(1, 0, 0);
-                        compareEdge = Tile.EDGETYPE.LEFT;
+                        compareEdge = Tile.FACETYPE.LEFT;
                         break;
 
-                    case Tile.EDGETYPE.FRONT:
+                    case Tile.FACETYPE.FRONT:
                         offsetVector = new Vector3Int(0, 0, -1);
-                        compareEdge = Tile.EDGETYPE.BACK;
+                        compareEdge = Tile.FACETYPE.BACK;
                         break;
 
-                    case Tile.EDGETYPE.BACK:
+                    case Tile.FACETYPE.BACK:
                         offsetVector = new Vector3Int(0, 0, 1);
-                        compareEdge = Tile.EDGETYPE.FRONT;
+                        compareEdge = Tile.FACETYPE.FRONT;
                         break;
                 }
 
-                
+
                 Tile tempTile = GetTile(environment, environmentPosition + offsetVector);
                 if (tempTile != null && !HasTile(position + offsetVector)) //Ignore internal connections
                 {
-                    if (!CanConnect(tile.edgeIDs[(int)edgeType], tempTile.edgeIDs[(int)compareEdge]))
+                    if (!CanConnect(tile.faceIDs[(int)faceType], tempTile.faceIDs[(int)compareEdge]))
                     {
                         return false; // Had conflict on top
                     }
@@ -142,7 +143,7 @@ public class MetaTile : IMetaTileProbability
         foreach (Tile tile in tiles)
         {
             Vector3Int thisPosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
-            
+
             if (thisPosition == position)
             {
                 return true;

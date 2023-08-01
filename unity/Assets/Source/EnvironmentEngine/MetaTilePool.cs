@@ -93,10 +93,11 @@ public class MetaTilePool : IMetaTileProbability
         while (attempt < maxAttempts)
         {
             // Select a random empty position
-            Vector3Int position = SelectRandomEmptyPosition(environment);
+            Vector3Int placementPosition = SelectRandomEmptyPosition(environment);
+            // Debug.Log("placementPosition: " + placementPosition);
 
             // If there are no empty positions, return
-            if (position.x < 0) return RESULTTYPE.COMPLETE;
+            if (placementPosition.x < 0) return RESULTTYPE.COMPLETE;
 
             // Select a metatile
             MetaTile metaTile = GetMetaTile();
@@ -106,35 +107,54 @@ public class MetaTilePool : IMetaTileProbability
             // Try all rotations
             for (int xRotation = 0; xRotation < 4; xRotation++)
             {
-                if (metaTile.rotationDirections.x == 0 && xRotation > 0) continue;
+                if (metaTile.rotationDirections.x == 0 && xRotation > 0)
+                {
+                    Debug.Log("GetAndPlaceMetaTile() can't rotate in x direction");
+                    continue;
+                }
+
 
                 for (int yRotation = 0; yRotation < 4; yRotation++)
                 {
-                    if (metaTile.rotationDirections.y == 0 && yRotation > 0) continue;
-
+                    if (metaTile.rotationDirections.y == 0 && yRotation > 0)
+                    {
+                        Debug.Log("GetAndPlaceMetaTile() can't rotate in y direction");
+                        continue;
+                    }
                     for (int zRotation = 0; zRotation < 4; zRotation++)
                     {
-                        if (metaTile.rotationDirections.z == 0 && zRotation > 0) continue;
-
+                        if (metaTile.rotationDirections.z == 0 && zRotation > 0)
+                        {
+                            Debug.Log("GetAndPlaceMetaTile() can't rotate in z direction");
+                            continue;
+                        }
                         // Rotate the metatile
                         metaTile.transform.rotation = Quaternion.Euler(90 * xRotation, 90 * yRotation, 90 * zRotation);
+                        // TODO: modify the order of the tile's faceTypes array to match the rotation
+
 
                         // Try to place the metatile
-                        if (metaTile.CanPlace(environment, position.x, position.y, position.z))
+                        bool canPlace = metaTile.CanPlace(environment, placementPosition.x, placementPosition.y, placementPosition.z);
+                        Debug.Log("GetAndPlaceMetaTile() canPlace(): " + canPlace);
+                        if (canPlace)
                         {
                             // The metatile can be placed, so place it
-                            metaTile.PlaceMetaTile(environment, position.x, position.y, position.z);
+                            metaTile.PlaceMetaTile(environment, placementPosition.x, placementPosition.y, placementPosition.z);
                             placedMetaTile = metaTile;
-                            placedPosition = position;
+                            placedPosition = placementPosition;
+                            Debug.Log("SUCCESS: GetAndPlaceMetaTile()");
                             return RESULTTYPE.SUCCESS;
+
                         }
                     }
                 }
             }
 
             attempt++;
+            Debug.Log("GetAndPlaceMetaTile() attempt++");
         }
 
+        Debug.Log("FAILURE: GetAndPlaceMetaTile()");
         return RESULTTYPE.FAILURE;
 
     }

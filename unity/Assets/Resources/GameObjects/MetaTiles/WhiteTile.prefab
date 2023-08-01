@@ -42,8 +42,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   edgeIDs: 010000000200000000000000000000000000000000000000
 --- !u!1 &6552369819736916210
 GameObject:
@@ -121,12 +121,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6ccdb70b07f7a847b03eeae7ec5ad17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   tiles:
   - {fileID: 2499566853283043604}
   payload: {fileID: 371776409249493707}
-  tags: 
+  tags:
   rotationDirections: {x: 0, y: 0, z: 0}
   pallete: {fileID: -6947243484448938200, guid: 7f13d731f1a5a1f41849192bbea3d8bd,
     type: 3}
