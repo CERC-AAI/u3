@@ -1,0 +1,160 @@
+fileFormatVersion: 2
+guid: 5224d7fea934c3e4db4b3aaecd20ec54
+timeCreated: 1535534812
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Pipe_0,5_1
+    100004: Pipe_0,5_2
+    100006: Pipe_1_1
+    100008: Pipe_1_2
+    100010: Pipe_2_1
+    100012: Pipe_2_2
+    100014: Pipe_3way
+    100016: Pipe_4way
+    100018: Pipe_90
+    100020: Pipe_Connector
+    100022: Pipe_Corner_1
+    100024: Pipe_Corner_2
+    100026: Pipe_end
+    100028: Pipe_spiral_Left
+    100030: Pipe_spiral_Right
+    100032: Pipe_spiral_Right-Left
+    400000: //RootNode
+    400002: Pipe_0,5_1
+    400004: Pipe_0,5_2
+    400006: Pipe_1_1
+    400008: Pipe_1_2
+    400010: Pipe_2_1
+    400012: Pipe_2_2
+    400014: Pipe_3way
+    400016: Pipe_4way
+    400018: Pipe_90
+    400020: Pipe_Connector
+    400022: Pipe_Corner_1
+    400024: Pipe_Corner_2
+    400026: Pipe_end
+    400028: Pipe_spiral_Left
+    400030: Pipe_spiral_Right
+    400032: Pipe_spiral_Right-Left
+    2300000: Pipe_0,5_1
+    2300002: Pipe_0,5_2
+    2300004: Pipe_1_1
+    2300006: Pipe_1_2
+    2300008: Pipe_2_1
+    2300010: Pipe_2_2
+    2300012: Pipe_3way
+    2300014: Pipe_4way
+    2300016: Pipe_90
+    2300018: Pipe_Connector
+    2300020: Pipe_Corner_1
+    2300022: Pipe_Corner_2
+    2300024: Pipe_end
+    2300026: Pipe_spiral_Left
+    2300028: Pipe_spiral_Right
+    2300030: Pipe_spiral_Right-Left
+    3300000: Pipe_0,5_1
+    3300002: Pipe_0,5_2
+    3300004: Pipe_1_1
+    3300006: Pipe_1_2
+    3300008: Pipe_2_1
+    3300010: Pipe_2_2
+    3300012: Pipe_3way
+    3300014: Pipe_4way
+    3300016: Pipe_90
+    3300018: Pipe_Connector
+    3300020: Pipe_Corner_1
+    3300022: Pipe_Corner_2
+    3300024: Pipe_end
+    3300026: Pipe_spiral_Left
+    3300028: Pipe_spiral_Right
+    3300030: Pipe_spiral_Right-Left
+    4300000: Pipe_end
+    4300002: Pipe_3way
+    4300004: Pipe_4way
+    4300006: Pipe_Connector
+    4300008: Pipe_Corner_2
+    4300010: Pipe_Corner_1
+    4300012: Pipe_90
+    4300014: Pipe_1_2
+    4300016: Pipe_1_1
+    4300018: Pipe_2_2
+    4300020: Pipe_2_1
+    4300022: Pipe_0,5_2
+    4300024: Pipe_0,5_1
+    4300026: Pipe_spiral_Left
+    4300028: Pipe_spiral_Right-Left
+    4300030: Pipe_spiral_Right
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186974
+  packageName: Pipe constructor
+  packageVersion: 1.0
+  assetPath: Assets/Pipe constructor/3d/Pipe.fbx
+  uploadId: 413746

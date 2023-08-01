@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bfd484995714a2241a4dbe09afdc2cef
+timeCreated: 1535534922
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186974
+  packageName: Pipe constructor
+  packageVersion: 1.0
+  assetPath: Assets/Pipe constructor/prefabs/Pipe_4way.prefab
+  uploadId: 413746

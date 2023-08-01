@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 981406a4922e41540962d890ca530717
+timeCreated: 1535534935
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186974
+  packageName: Pipe constructor
+  packageVersion: 1.0
+  assetPath: Assets/Pipe constructor/prefabs/Pipe_spiral_Right.prefab
+  uploadId: 413746

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4a7ed7c1c66a53247b8cee72af84b173
+timeCreated: 1535534811
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186974
+  packageName: Pipe constructor
+  packageVersion: 1.0
+  assetPath: Assets/Pipe constructor/Materials/Pipe_D.mat
+  uploadId: 413746

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ade723ce01af27f4184b6850c60f4cbc
+timeCreated: 1535534930
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186974
+  packageName: Pipe constructor
+  packageVersion: 1.0
+  assetPath: Assets/Pipe constructor/prefabs/Pipe_Corner_2.prefab
+  uploadId: 413746

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9af35e07c30aa034aabf0fcb0b44f239
+timeCreated: 1535534920
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186974
+  packageName: Pipe constructor
+  packageVersion: 1.0
+  assetPath: Assets/Pipe constructor/prefabs/Pipe_3way.prefab
+  uploadId: 413746

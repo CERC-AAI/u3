@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4f0247688049bc04bb2eae2c407f514b
+timeCreated: 1535534924
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186974
+  packageName: Pipe constructor
+  packageVersion: 1.0
+  assetPath: Assets/Pipe constructor/prefabs/Pipe_90.prefab
+  uploadId: 413746

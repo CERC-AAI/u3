@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b0eb6fcbbee273d43813a21d26531015
+timeCreated: 1535534937
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186974
+  packageName: Pipe constructor
+  packageVersion: 1.0
+  assetPath: Assets/Pipe constructor/prefabs/Pipe_spiral_Right-Left.prefab
+  uploadId: 413746
