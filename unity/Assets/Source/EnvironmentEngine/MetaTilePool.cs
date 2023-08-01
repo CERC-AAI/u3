@@ -85,7 +85,7 @@ public class MetaTilePool : IMetaTileProbability
     public RESULTTYPE GetAndPlaceMetaTile(Tile[,,] environment, out MetaTile placedMetaTile, out Vector3Int placedPosition)
     {
 
-        const int maxAttempts = 1000;
+        const int maxAttempts = 100;
         int attempt = 0;
         placedMetaTile = null;
         placedPosition = Vector3Int.zero;
@@ -100,7 +100,7 @@ public class MetaTilePool : IMetaTileProbability
 
             // Select a metatile
             MetaTile metaTile = GetMetaTile();
-            Debug.Log("metatile name: " + metaTile.name);
+            //Debug.Log("metatile name: " + metaTile.name);
             // Try all rotations
             // add flags so that you can lock rotations (e.g. don't want archway to be upside down, can be defined in metatile itself)
             // Try all rotations

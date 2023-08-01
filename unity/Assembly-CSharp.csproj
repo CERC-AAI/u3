@@ -78,6 +78,7 @@
     <Compile Include="Assets\Source\Other\Player3D.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Exit.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\MetaTileEnvironment.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\ButtonGame.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\KinematicCharacterMotor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\16- FramePerfect Rotation\Scripts\MyCharacterController.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\c- Wall Jumping\MyCharacterController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\KCCSettings.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyPlayer.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\TileFacePaletteEditor.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\TargettingCursor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\ExampleAIController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\7- Orienting towards arbitrary up direction\Scripts\MyCharacterController.cs" />
@@ -151,6 +153,7 @@
     <Compile Include="Assets\Source\Scripts\ButtonGame\HealthOrb.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\13- Swimming state\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\4- Landing and leaving ground\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\TileEditor.cs" />
     <Compile Include="Assets\FreeSelectionOutline\Scripts\SelectionOutlineController.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\HealthBar.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\a- Simple Jumping\MyCharacterController.cs" />
@@ -158,7 +161,9 @@
     <Compile Include="Assets\KinematicCharacterController\Core\ReadOnlyAttribute.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\1- Player Camera Character Setup\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentAgent.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\Tile.cs" />
     <Compile Include="Assets\FreeSelectionOutline\Scripts\DebugFunction.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\MetaTilePool.cs" />
     <Compile Include="Assets\Source\Other\Spawn.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\IMoverController.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\Utilities\MobileDisableAutoSwitchControls.cs" />
@@ -169,9 +174,11 @@
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentSensor.cs" />
     <Compile Include="Assets\Source\Other\BinarizeData.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\b- Double Jumping\MyCharacterController.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\MetaTile.cs" />
     <Compile Include="Assets\Libraries\JSON\JSONObject.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\11- Charging state\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\ExampleCharacter\Scripts\ExampleCharacterCamera.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\TileFacePalette.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\15- Root motion example\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\Floor.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\SpriteGraphicsObject.cs" />
