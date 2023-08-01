@@ -19,7 +19,7 @@ public class TileEditor : Editor
 
         List<int> edgeIDs = new List<int>();
 
-        SerializedProperty serializedProperty = serializedObject.FindProperty("edgeIDs").Copy();
+        SerializedProperty serializedProperty = serializedObject.FindProperty("faceIDs").Copy();
 
         if (serializedProperty.isArray && selectedTile.GetMetaTile() != null)
         {
