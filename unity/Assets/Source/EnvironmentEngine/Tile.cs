@@ -9,7 +9,7 @@ public class Tile : MonoBehaviour
     // TODO: rename to face?
     public enum FACETYPE { TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK };
     [HideInInspector]
-    public int[] edgeIDs = new int[6]; // 6 edges for a cube
+    public int[] faceIDs = new int[6]; // 6 edges for a cube
     MetaTile mParentMetaTile;
 
 
@@ -38,7 +38,7 @@ public class Tile : MonoBehaviour
                 continue;
             }
 
-            if (!matchingMatrix[edgeIDs[i]].Contains(neighborFaces[i]))
+            if (!matchingMatrix[faceIDs[i]].Contains(neighborFaces[i]))
             {
                 return false;
             }
@@ -85,12 +85,12 @@ public class Tile : MonoBehaviour
         neighbors[5] = GetNeighbor(environment, x, y, z + 1);
 
         int[] neighborFaces = new int[6];
-        neighborFaces[0] = neighbors[0] == null ? -1 : neighbors[0].edgeIDs[1];
-        neighborFaces[1] = neighbors[1] == null ? -1 : neighbors[1].edgeIDs[0];
-        neighborFaces[2] = neighbors[2] == null ? -1 : neighbors[2].edgeIDs[3];
-        neighborFaces[3] = neighbors[3] == null ? -1 : neighbors[3].edgeIDs[2];
-        neighborFaces[4] = neighbors[4] == null ? -1 : neighbors[4].edgeIDs[5];
-        neighborFaces[5] = neighbors[5] == null ? -1 : neighbors[5].edgeIDs[4];
+        neighborFaces[0] = neighbors[0] == null ? -1 : neighbors[0].faceIDs[1];
+        neighborFaces[1] = neighbors[1] == null ? -1 : neighbors[1].faceIDs[0];
+        neighborFaces[2] = neighbors[2] == null ? -1 : neighbors[2].faceIDs[3];
+        neighborFaces[3] = neighbors[3] == null ? -1 : neighbors[3].faceIDs[2];
+        neighborFaces[4] = neighbors[4] == null ? -1 : neighbors[4].faceIDs[5];
+        neighborFaces[5] = neighbors[5] == null ? -1 : neighbors[5].faceIDs[4];
 
         return neighborFaces;
     }
@@ -123,7 +123,7 @@ public class Tile : MonoBehaviour
             Vector3 position = Vector3.zero;
             Vector3 size = Vector3.zero;
 
-            int faceID = edgeIDs[(int)i];
+            int faceID = faceIDs[(int)i];
             TileFace faceData = parentMetaTile.pallete.tileFaces[faceID];
             switch (i)
             {

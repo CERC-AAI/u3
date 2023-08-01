@@ -57,12 +57,12 @@ public class MetaTile : IMetaTileProbability
             }
 
             // TODO: check neighbor tiles for adjacency conflicts
-            foreach (Tile.FACETYPE edgeType in Enum.GetValues(typeof(Tile.FACETYPE)))
+            foreach (Tile.FACETYPE faceType in Enum.GetValues(typeof(Tile.FACETYPE)))
             {
                 Vector3Int offsetVector = Vector3Int.zero;
                 Tile.FACETYPE compareEdge = Tile.FACETYPE.BOTTOM;
                 //TODO: deal with rotations
-                switch (edgeType)
+                switch (faceType)
                 {
                     case Tile.FACETYPE.TOP:
                         offsetVector = new Vector3Int(0, 1, 0);
@@ -99,7 +99,7 @@ public class MetaTile : IMetaTileProbability
                 Tile tempTile = GetTile(environment, environmentPosition + offsetVector);
                 if (tempTile != null && !HasTile(position + offsetVector)) //Ignore internal connections
                 {
-                    if (!CanConnect(tile.edgeIDs[(int)edgeType], tempTile.edgeIDs[(int)compareEdge]))
+                    if (!CanConnect(tile.faceIDs[(int)faceType], tempTile.faceIDs[(int)compareEdge]))
                     {
                         return false; // Had conflict on top
                     }

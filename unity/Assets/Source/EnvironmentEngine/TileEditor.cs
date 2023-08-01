@@ -39,20 +39,20 @@ public class TileEditor : Editor
 
             if (isOpen)
             {
-                for (int i = 0; i < selectedTile.edgeIDs.Length; i++)
+                for (int i = 0; i < selectedTile.faceIDs.Length; i++)
                 {
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.PrefixLabel($"{((Tile.FACETYPE)i).ToString()}: ");
-                    int index = EditorGUILayout.Popup(selectedTile.edgeIDs[i], faceOptions);
+                    int index = EditorGUILayout.Popup(selectedTile.faceIDs[i], faceOptions);
                     EditorGUILayout.Space(20);
                     Rect colorRect = GUILayoutUtility.GetLastRect();
                     colorRect.width -= 2;
                     colorRect.height -= 2;
-                    EditorGUI.DrawRect(colorRect, faces[selectedTile.edgeIDs[i]].color);
+                    EditorGUI.DrawRect(colorRect, faces[selectedTile.faceIDs[i]].color);
                     EditorGUILayout.EndHorizontal();
 
                     serializedProperty.intValue = (int)index;
-                    if (i < selectedTile.edgeIDs.Length)
+                    if (i < selectedTile.faceIDs.Length)
                     {
                         serializedProperty.Next(false);
                     }
