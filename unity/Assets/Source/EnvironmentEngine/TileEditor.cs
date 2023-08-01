@@ -42,7 +42,7 @@ public class TileEditor : Editor
                 for (int i = 0; i < selectedTile.edgeIDs.Length; i++)
                 {
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.PrefixLabel($"{((Tile.EDGETYPE)i).ToString()}: ");
+                    EditorGUILayout.PrefixLabel($"{((Tile.FACETYPE)i).ToString()}: ");
                     int index = EditorGUILayout.Popup(selectedTile.edgeIDs[i], faceOptions);
                     EditorGUILayout.Space(20);
                     Rect colorRect = GUILayoutUtility.GetLastRect();
