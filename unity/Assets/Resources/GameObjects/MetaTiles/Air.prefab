@@ -42,9 +42,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  faceTypes: 020000000200000002000000020000000200000002000000
+  m_Name:
+  m_EditorClassIdentifier:
+  edgeIDs: 000000000000000000000000000000000000000000000000
 --- !u!1 &4953736298549603606
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 6861995534644777487}
   - component: {fileID: 100174510953274016}
   m_Layer: 0
-  m_Name: Empty prefab
+  m_Name: Air
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -140,7 +140,7 @@ Transform:
   - {fileID: 371776409249493707}
   - {fileID: 9164566216550528723}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &100174510953274016
 MonoBehaviour:
@@ -152,10 +152,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6ccdb70b07f7a847b03eeae7ec5ad17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   tiles:
   - {fileID: 4897082361660504531}
   payload: {fileID: 371776409249493707}
-  tags: 
-  rotationDirections: {x: 1, y: 1, z: 1}
+  tags:
+  rotationDirections: {x: 0, y: 0, z: 0}
+  pallete: {fileID: -6947243484448938200, guid: 7f13d731f1a5a1f41849192bbea3d8bd,
+    type: 3}

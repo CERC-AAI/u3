@@ -16,6 +16,8 @@ public class MetaTile : IMetaTileProbability
     public List<int> tags; // list of tags
     public Vector3Int rotationDirections;  // allowed rotation directions (0 = rotation not allowed, 1 = rotation allowed)
 
+    public TileFacePalette pallete;
+
     public List<int> GetTags()
     {
         return tags;
@@ -27,6 +29,11 @@ public class MetaTile : IMetaTileProbability
         return this;
     }
 
+    public bool CanConnect(int faceType1, int faceType2)
+    {
+        return pallete.CanConnect(faceType1, faceType2);
+    }
+
     public bool CanPlace(Tile[,,] environment, int startX, int startY, int startZ)
     {
 
@@ -34,34 +41,90 @@ public class MetaTile : IMetaTileProbability
         {
             Vector3Int position = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
 
-            int envX = startX + position.x;
-            int envY = startY + position.y;
-            int envZ = startZ + position.z;
+            Vector3Int environmentPosition = new Vector3Int(startX, startY, startZ) + position;
 
-            if (envX < 0 || envX >= environment.GetLength(0) ||
-                envY < 0 || envY >= environment.GetLength(1) ||
-                envZ < 0 || envZ >= environment.GetLength(2))
+            if (environmentPosition.x < 0 || environmentPosition.x >= environment.GetLength(0) ||
+                environmentPosition.y < 0 || environmentPosition.y >= environment.GetLength(1) ||
+                environmentPosition.z < 0 || environmentPosition.z >= environment.GetLength(2))
             {
                 return false;  // the metatile is out of bounds
             }
 
-            if (environment[envX, envY, envZ] != null)
+            if (GetTile(environment, environmentPosition) != null)
             {
                 // Debug.Log("environment[envX, envY, envZ] :" + environment[envX, envY, envZ]);
                 return false;  // the metatile would overwrite a tile
             }
 
-            // Check if the faces of the tile are compatible with the neighboring tiles according to the matching matrix
-            return tile.CanPlaceTile(environment, new Vector3Int(envX, envY, envZ));
+            // TODO: check neighbor tiles for adjacency conflicts
+            foreach (Tile.FACETYPE edgeType in Enum.GetValues(typeof(Tile.FACETYPE)))
+            {
+                Vector3Int offsetVector = Vector3Int.zero;
+                Tile.FACETYPE compareEdge = Tile.FACETYPE.BOTTOM;
+                //TODO: deal with rotations
+                switch (edgeType)
+                {
+                    case Tile.FACETYPE.TOP:
+                        offsetVector = new Vector3Int(0, 1, 0);
+                        compareEdge = Tile.FACETYPE.BOTTOM;
+                        break;
 
+                    case Tile.FACETYPE.BOTTOM:
+                        offsetVector = new Vector3Int(0, -1, 0);
+                        compareEdge = Tile.FACETYPE.TOP;
+                        break;
+
+                    case Tile.FACETYPE.LEFT:
+                        offsetVector = new Vector3Int(-1, 0, 0);
+                        compareEdge = Tile.FACETYPE.RIGHT;
+                        break;
+
+                    case Tile.FACETYPE.RIGHT:
+                        offsetVector = new Vector3Int(1, 0, 0);
+                        compareEdge = Tile.FACETYPE.LEFT;
+                        break;
+
+                    case Tile.FACETYPE.FRONT:
+                        offsetVector = new Vector3Int(0, 0, -1);
+                        compareEdge = Tile.FACETYPE.BACK;
+                        break;
+
+                    case Tile.FACETYPE.BACK:
+                        offsetVector = new Vector3Int(0, 0, 1);
+                        compareEdge = Tile.FACETYPE.FRONT;
+                        break;
+                }
+
+
+                Tile tempTile = GetTile(environment, environmentPosition + offsetVector);
+                if (tempTile != null && !HasTile(position + offsetVector)) //Ignore internal connections
+                {
+                    if (!CanConnect(tile.edgeIDs[(int)edgeType], tempTile.edgeIDs[(int)compareEdge]))
+                    {
+                        return false; // Had conflict on top
+                    }
+                }
+            }
         }
 
         return true;  // no conflicts were found
     }
 
+    public Tile GetTile(Tile[,,] environment, Vector3Int position)
+    {
+        if (position.x < 0 || position.x >= environment.GetLength(0) ||
+            position.y < 0 || position.y >= environment.GetLength(1) ||
+            position.z < 0 || position.z >= environment.GetLength(2))
+        {
+            return null;  // the tile is out of bounds
+        }
+
+        return environment[position.x, position.y, position.z];
+    }
+
     public void PlaceMetaTile(Tile[,,] environment, int startX, int startY, int startZ)
     {
-        Debug.Log("placing metatile " + this.name);
+        //Debug.Log("placing metatile " + this.name);
 
         foreach (Tile tile in tiles)
         {
@@ -73,6 +136,21 @@ public class MetaTile : IMetaTileProbability
 
             environment[envX, envY, envZ] = tile;
         }
+    }
+
+    public bool HasTile(Vector3Int position)
+    {
+        foreach (Tile tile in tiles)
+        {
+            Vector3Int thisPosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+
+            if (thisPosition == position)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void DepositPayload(Vector3Int position)

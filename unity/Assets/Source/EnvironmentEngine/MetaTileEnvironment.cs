@@ -25,6 +25,11 @@ public class MetaTileEnvironment : MonoBehaviour
         {
             resultType = metatilepool.GetAndPlaceMetaTile(environment, out placedMetaTile, out Vector3Int placedPosition);
 
+            if (resultType == MetaTilePool.RESULTTYPE.COMPLETE)
+            {
+                break;
+            }
+
             if (resultType == MetaTilePool.RESULTTYPE.FAILURE)
             {
                 timeoutCounter++;
@@ -37,7 +42,7 @@ public class MetaTileEnvironment : MonoBehaviour
                 placedPositions.Add(placedPosition);
             }
 
-            if (timeoutCounter > 1000)
+            if (timeoutCounter > 100)
             {
                 Debug.Log("Timeout");
                 for (int i = 0; i < placedMetaTiles.Count; i++)

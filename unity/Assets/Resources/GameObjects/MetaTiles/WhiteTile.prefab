@@ -42,9 +42,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  faceTypes: 000000000000000000000000010000000000000000000000
+  m_Name:
+  m_EditorClassIdentifier:
+  edgeIDs: 010000000200000000000000000000000000000000000000
 --- !u!1 &6552369819736916210
 GameObject:
   m_ObjectHideFlags: 0
@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 6861995534644777487}
   - component: {fileID: 100174510953274016}
   m_Layer: 0
-  m_Name: Prefab 1
+  m_Name: WhiteTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -109,7 +109,7 @@ Transform:
   - {fileID: 371776409249493707}
   - {fileID: 7533335944709823483}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &100174510953274016
 MonoBehaviour:
@@ -121,13 +121,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6ccdb70b07f7a847b03eeae7ec5ad17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   tiles:
   - {fileID: 2499566853283043604}
   payload: {fileID: 371776409249493707}
-  tags: 
+  tags:
   rotationDirections: {x: 0, y: 0, z: 0}
+  pallete: {fileID: -6947243484448938200, guid: 7f13d731f1a5a1f41849192bbea3d8bd,
+    type: 3}
 --- !u!1 &7552926363554527522
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,6 +223,11 @@ PrefabInstance:
     - target: {fileID: 5587600109266502039, guid: c5840afe24c3fcb4e8011b52b41f9a48,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6435912815505237354, guid: c5840afe24c3fcb4e8011b52b41f9a48,
+        type: 3}
+      propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8403981301128959601, guid: c5840afe24c3fcb4e8011b52b41f9a48,
