@@ -23,8 +23,17 @@ public class MetaTilePool : IMetaTileProbability
         return tags;
     }
 
-    public override MetaTile GetMetaTile()
+
+
+    // TODO: filter the list of metatiles by the possible faces in filterFaces
+    // the metatile must contain at least one tile with a face in filterFaces
+    // if this tile has a face in filterFaces, then check the other faces of the tile against the other faces in possibleFaces
+
+
+
+    public override MetaTile GetMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
     {
+
         // Calculate the total weight from the dictionary
         float totalWeight = 0f;
         foreach (MetaTileProbability metatileprobability in metatileProbabilities)
@@ -40,7 +49,7 @@ public class MetaTilePool : IMetaTileProbability
         {
             if (randomWeight < metatileProbabilities[i].weight)
             {
-                return metatileProbabilities[i].metaTileProbability.GetMetaTile();
+                return metatileProbabilities[i].metaTileProbability.GetMetaTile(position, environment, faces, matchingMatrix);
             }
             randomWeight -= metatileProbabilities[i].weight;
 
@@ -51,113 +60,84 @@ public class MetaTilePool : IMetaTileProbability
         return null;
     }
 
-    public static Vector3Int SelectRandomEmptyPosition(Tile[,,] environment)
-    {
-        List<Vector3Int> emptyPositions = new List<Vector3Int>();
-
-        // Find all empty positions
-        for (int x = 0; x < environment.GetLength(0); x++)
-        {
-            for (int y = 0; y < environment.GetLength(1); y++)
-            {
-                for (int z = 0; z < environment.GetLength(2); z++)
-                {
-                    if (environment[x, y, z] == null)
-                    {
-                        emptyPositions.Add(new Vector3Int(x, y, z));
-                    }
-                }
-            }
-        }
-
-        // If there are no empty positions, return an invalid position
-        if (emptyPositions.Count == 0)
-        {
-            return new Vector3Int(-1, -1, -1);
-        }
-
-        // Select a random empty position
-        return emptyPositions[UnityEngine.Random.Range(0, emptyPositions.Count)];
-    }
 
 
+    //     public RESULTTYPE GetAndPlaceMetaTile(Tile[,,] environment, int[,,,] faces, int[,,] environmentEntropies, Dictionary<int, List<int>> matchingMatrix, out MetaTile placedMetaTile, out Vector3Int placedPosition)
+    // {
 
-    public RESULTTYPE GetAndPlaceMetaTile(Tile[,,] environment, out MetaTile placedMetaTile, out Vector3Int placedPosition)
-    {
+    //     const int maxAttempts = 100;
+    //     int attempt = 0;
+    //     placedMetaTile = null;
+    //     placedPosition = Vector3Int.zero;
 
-        const int maxAttempts = 100;
-        int attempt = 0;
-        placedMetaTile = null;
-        placedPosition = Vector3Int.zero;
+    //     while (attempt < maxAttempts)
+    //     {
+    //         // Select a low entropy position
+    //         Vector3Int placementPosition = SelectLowestEntropyPosition(environment, faces, environmentEntropies, matchingMatrix);
+    //         // Debug.Log("placementPosition: " + placementPosition);
 
-        while (attempt < maxAttempts)
-        {
-            // Select a random empty position
-            Vector3Int placementPosition = SelectRandomEmptyPosition(environment);
-            // Debug.Log("placementPosition: " + placementPosition);
+    //         // If there are no empty positions, return
+    //         if (placementPosition.x < 0) return RESULTTYPE.COMPLETE;
 
-            // If there are no empty positions, return
-            if (placementPosition.x < 0) return RESULTTYPE.COMPLETE;
-
-            // Select a metatile
-            MetaTile metaTile = GetMetaTile();
-            //Debug.Log("metatile name: " + metaTile.name);
-            // Try all rotations
-            // add flags so that you can lock rotations (e.g. don't want archway to be upside down, can be defined in metatile itself)
-            // Try all rotations
-            for (int xRotation = 0; xRotation < 4; xRotation++)
-            {
-                if (metaTile.rotationDirections.x == 0 && xRotation > 0)
-                {
-                    Debug.Log("GetAndPlaceMetaTile() can't rotate in x direction");
-                    continue;
-                }
-
-
-                for (int yRotation = 0; yRotation < 4; yRotation++)
-                {
-                    if (metaTile.rotationDirections.y == 0 && yRotation > 0)
-                    {
-                        Debug.Log("GetAndPlaceMetaTile() can't rotate in y direction");
-                        continue;
-                    }
-                    for (int zRotation = 0; zRotation < 4; zRotation++)
-                    {
-                        if (metaTile.rotationDirections.z == 0 && zRotation > 0)
-                        {
-                            Debug.Log("GetAndPlaceMetaTile() can't rotate in z direction");
-                            continue;
-                        }
-                        // Rotate the metatile
-                        metaTile.transform.rotation = Quaternion.Euler(90 * xRotation, 90 * yRotation, 90 * zRotation);
-                        // TODO: modify the order of the tile's faceTypes array to match the rotation
+    //         // Select a metatile
+    //         MetaTile metaTile = GetMetaTile();
+    //         //Debug.Log("metatile name: " + metaTile.name);
+    //         // Try all rotations
+    //         // add flags so that you can lock rotations (e.g. don't want archway to be upside down, can be defined in metatile itself)
+    //         // Try all rotations
+    //         for (int xRotation = 0; xRotation < 4; xRotation++)
+    //         {
+    //             if (metaTile.rotationDirections.x == 0 && xRotation > 0)
+    //             {
+    //                 Debug.Log("GetAndPlaceMetaTile() can't rotate in x direction");
+    //                 continue;
+    //             }
 
 
-                        // Try to place the metatile
-                        bool canPlace = metaTile.CanPlace(environment, placementPosition.x, placementPosition.y, placementPosition.z);
-                        Debug.Log("GetAndPlaceMetaTile() canPlace(): " + canPlace);
-                        if (canPlace)
-                        {
-                            // The metatile can be placed, so place it
-                            metaTile.PlaceMetaTile(environment, placementPosition.x, placementPosition.y, placementPosition.z);
-                            placedMetaTile = metaTile;
-                            placedPosition = placementPosition;
-                            Debug.Log("SUCCESS: GetAndPlaceMetaTile()");
-                            return RESULTTYPE.SUCCESS;
+    //             for (int yRotation = 0; yRotation < 4; yRotation++)
+    //             {
+    //                 if (metaTile.rotationDirections.y == 0 && yRotation > 0)
+    //                 {
+    //                     Debug.Log("GetAndPlaceMetaTile() can't rotate in y direction");
+    //                     continue;
+    //                 }
+    //                 for (int zRotation = 0; zRotation < 4; zRotation++)
+    //                 {
+    //                     if (metaTile.rotationDirections.z == 0 && zRotation > 0)
+    //                     {
+    //                         Debug.Log("GetAndPlaceMetaTile() can't rotate in z direction");
+    //                         continue;
+    //                     }
+    //                     // Rotate the metatile
+    //                     metaTile.transform.rotation = Quaternion.Euler(90 * xRotation, 90 * yRotation, 90 * zRotation);
+    //                     // TODO: modify the order of the tile's faceTypes array to match the rotation
 
-                        }
-                    }
-                }
-            }
 
-            attempt++;
-            Debug.Log("GetAndPlaceMetaTile() attempt++");
-        }
+    //                     // Try to place the metatile
+    //                     bool canPlace = metaTile.CanPlace(environment, placementPosition.x, placementPosition.y, placementPosition.z);
+    //                     Debug.Log("GetAndPlaceMetaTile() canPlace(): " + canPlace);
+    //                     if (canPlace)
+    //                     {
+    //                         // The metatile can be placed, so place it
+    //                         metaTile.PlaceMetaTile(environment, placementPosition.x, placementPosition.y, placementPosition.z);
+    //                         placedMetaTile = metaTile;
+    //                         placedPosition = placementPosition;
+    //                         Debug.Log("SUCCESS: GetAndPlaceMetaTile()");
+    //                         return RESULTTYPE.SUCCESS;
 
-        Debug.Log("FAILURE: GetAndPlaceMetaTile()");
-        return RESULTTYPE.FAILURE;
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-    }
+    //         attempt++;
+    //         Debug.Log("GetAndPlaceMetaTile() attempt++");
+    //     }
+
+    //     Debug.Log("FAILURE: GetAndPlaceMetaTile()");
+    //     return RESULTTYPE.FAILURE;
+
+    // }
 }
 
 [Serializable]
@@ -173,7 +153,7 @@ public class IMetaTileProbability : MonoBehaviour
     {
         return null;
     }
-    public virtual MetaTile GetMetaTile()
+    public virtual MetaTile GetMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
     {
         return null;
     }
