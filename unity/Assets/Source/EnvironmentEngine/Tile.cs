@@ -7,8 +7,10 @@ using UnityEditor;
 public class Tile : MonoBehaviour
 {
     // TODO: rename to face?
+    // TODO: reorder?
     public enum FACETYPE { TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK };
     [HideInInspector]
+    // TODO: are we not using faceIDs anymore?
     public int[] faceIDs = new int[6]; // 6 edges for a cube
     MetaTile mParentMetaTile;
 

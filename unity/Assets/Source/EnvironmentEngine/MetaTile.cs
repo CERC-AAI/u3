@@ -23,10 +23,17 @@ public class MetaTile : IMetaTileProbability
         return tags;
     }
 
-    public override MetaTile GetMetaTile()
+    public override MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
     {
         // TODO: do we need to instantiate a game object here?
         return this;
+    }
+
+    public override List<MetaTile> GetMetaTiles()
+    {
+        List<MetaTile> metaTiles = new List<MetaTile>();
+        metaTiles.Add(this);
+        return metaTiles;
     }
 
     public bool CanConnect(int faceType1, int faceType2)
@@ -120,22 +127,6 @@ public class MetaTile : IMetaTileProbability
         }
 
         return environment[position.x, position.y, position.z];
-    }
-
-    public void PlaceMetaTile(Tile[,,] environment, int startX, int startY, int startZ)
-    {
-        //Debug.Log("placing metatile " + this.name);
-
-        foreach (Tile tile in tiles)
-        {
-            Vector3Int position = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
-
-            int envX = startX + position.x;
-            int envY = startY + position.y;
-            int envZ = startZ + position.z;
-
-            environment[envX, envY, envZ] = tile;
-        }
     }
 
     public bool HasTile(Vector3Int position)
