@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3212678736133289013
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4420925817579601130}
+  - component: {fileID: 2721922502780412005}
+  m_Layer: 0
+  m_Name: PipeMetaTilePool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4420925817579601130
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3212678736133289013}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2721922502780412005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3212678736133289013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac82d13eff340cb41b855dfa56d88bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tags: 
+  metatileProbabilities:
+  - metaTileProbability: {fileID: 8013033377143349393, guid: 20fc7283ba6c2a14bb2ed16a94453384,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 8013033377143349393, guid: 067360c44e1791141aecc618c8201eaf,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 8013033377143349393, guid: 2bd79cf736516f94aaacc56f7f8e447c,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 8013033377143349393, guid: 24a84c489e443934889a064ebf55138b,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 8013033377143349393, guid: 5d91fb0ef0773ed42ae2b4fb9cc616a4,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 8013033377143349393, guid: 4d9b1d4f6eaeebf448f2030ee1108a61,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 8013033377143349393, guid: 48faea42ddf41e64283b1c03f18d4611,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 8013033377143349393, guid: 01674276477ad5849bea17cb95c6286f,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 8013033377143349393, guid: c333ead635e6ca149bade23645afb8f5,
+      type: 3}
+    weight: 1
