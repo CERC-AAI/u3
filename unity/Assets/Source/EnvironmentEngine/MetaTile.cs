@@ -23,7 +23,7 @@ public class MetaTile : IMetaTileProbability
         return tags;
     }
 
-    public override MetaTile GetMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
+    public override MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
     {
         // TODO: do we need to instantiate a game object here?
         return this;

@@ -229,7 +229,7 @@ public class MetaTileEnvironment : MonoBehaviour
         // TODO: fix this to exhaustively grab all possible metatiles
         foreach (MetaTileProbability metatileprobability in metatilepool.metatileProbabilities)
         {
-            metatiles.Add(metatileprobability.metaTileProbability.GetMetaTile(placementPosition, environment, faces, matchingMatrix));
+            metatiles.Add(metatileprobability.metaTileProbability.DrawMetaTile(placementPosition, environment, faces, matchingMatrix));
         }
 
 
