@@ -29,6 +29,13 @@ public class MetaTile : IMetaTileProbability
         return this;
     }
 
+    public override List<MetaTile> GetMetaTiles()
+    {
+        List<MetaTile> metaTiles = new List<MetaTile>();
+        metaTiles.Add(this);
+        return metaTiles;
+    }
+
     public bool CanConnect(int faceType1, int faceType2)
     {
         return pallete.CanConnect(faceType1, faceType2);

@@ -29,7 +29,16 @@ public class MetaTilePool : IMetaTileProbability
     // the metatile must contain at least one tile with a face in filterFaces
     // if this tile has a face in filterFaces, then check the other faces of the tile against the other faces in possibleFaces
 
-
+    public override List<MetaTile> GetMetaTiles()
+    {
+        List<MetaTile> metaTiles = new List<MetaTile>();
+        for (int i = 0; i < metatileProbabilities.Count; i++)
+        {
+            // get the metatiles from each metatile probability
+            metaTiles.AddRange(metatileProbabilities[i].metaTileProbability.GetMetaTiles());
+        }
+        return metaTiles;
+    }
 
     public override MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
     {
@@ -154,6 +163,11 @@ public class IMetaTileProbability : MonoBehaviour
         return null;
     }
     public virtual MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
+    {
+        return null;
+    }
+
+    public virtual List<MetaTile> GetMetaTiles()
     {
         return null;
     }

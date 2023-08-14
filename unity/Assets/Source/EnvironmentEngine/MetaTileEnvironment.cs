@@ -92,10 +92,12 @@ public class MetaTileEnvironment : MonoBehaviour
             // If there are no empty positions, return an invalid position
             if (emptyPositions.Count == 0)
             {
+                Debug.Log("SelectPlacementPosition() no empty positions");
                 return new Vector3Int(-1, -1, -1);
             }
 
             // Select a random empty position
+            Debug.Log("SelectPlacementPosition() emptyPositions.Count: " + emptyPositions.Count);
             return emptyPositions[UnityEngine.Random.Range(0, emptyPositions.Count)];
         }
         else
@@ -108,8 +110,10 @@ public class MetaTileEnvironment : MonoBehaviour
             // find the index of the minimum entropy value in the wavefrontEntropies list
             int minEntropyIndex = wavefrontEntropies.IndexOf(minEntropy);
 
+            Vector3Int placementPosition = wavefrontPositions[minEntropyIndex];
             // select the position with the minimum entropy value
-            return wavefrontPositions[minEntropyIndex];
+            Debug.Log("SelectPlacementPosition() placementPosition: " + placementPosition);
+            return placementPosition;
         }
 
     }
@@ -219,24 +223,50 @@ public class MetaTileEnvironment : MonoBehaviour
         return filteredMetatiles;
     }
 
-    public MetaTile GetMetaTile(Vector3Int placementPosition, MetaTilePool metatilepool)
+    public MetaTile DrawMetaTile(Vector3Int placementPosition, MetaTilePool metatilepool)
     {
 
 
         // Create a list of all legal metatiles from the pool
         List<MetaTile> metatiles = new List<MetaTile>();
 
-        // TODO: fix this to exhaustively grab all possible metatiles
+        Debug.Log("Metatile Count before adding: " + metatiles.Count);
+
         foreach (MetaTileProbability metatileprobability in metatilepool.metatileProbabilities)
         {
             metatiles.Add(metatileprobability.metaTileProbability.DrawMetaTile(placementPosition, environment, faces, matchingMatrix));
         }
 
+        Debug.Log("Metatile Count after adding: " + metatiles.Count);
 
         List<MetaTile> filteredMetatiles = CustomFiltering(placementPosition, metatiles);
 
+        Debug.Log("Metatile Count after filtering: " + filteredMetatiles.Count);
+
         // select a random metatile from the filtered list
         return filteredMetatiles[UnityEngine.Random.Range(0, filteredMetatiles.Count)];
+    }
+
+    public MetaTile GetMetaTile(Vector3Int placementPosition, MetaTilePool metatilepool)
+    {
+        // Create a list of all legal metatiles from the pool
+        List<MetaTile> metatiles = new List<MetaTile>();
+        Debug.Log("Metatile Count before adding: " + metatiles.Count);
+
+        // TODO: fix this to exhaustively grab all possible metatiles
+        foreach (MetaTileProbability metatileprobability in metatilepool.metatileProbabilities)
+        {
+            metatiles.AddRange(metatileprobability.metaTileProbability.GetMetaTiles());
+        }
+
+        Debug.Log("Metatile Count after adding: " + metatiles.Count);
+
+        List<MetaTile> filteredMetatiles = CustomFiltering(placementPosition, metatiles);
+
+        Debug.Log("Metatile Count after filtering: " + filteredMetatiles.Count);
+
+        // select a random metatile from the filtered list
+        return filteredMetatiles[UnityEngine.Random.Range(0, metatiles.Count)];
     }
 
     public bool CanPlaceMetaTile(Vector3Int placementPosition, MetaTile metatile)
@@ -427,6 +457,7 @@ public class MetaTileEnvironment : MonoBehaviour
             }
 
             // Select a candidate metatile
+            // candidateMetatile = DrawMetaTile(placementPosition, metatilepool);
             candidateMetatile = GetMetaTile(placementPosition, metatilepool);
 
             // Try to find a place to put the metatile
@@ -438,13 +469,13 @@ public class MetaTileEnvironment : MonoBehaviour
                 timeoutCounter = 0;
                 placedMetaTiles.Add(candidateMetatile);
                 placedPositions.Add(placementPosition);
-                Debug.Log("placedMetaTiles.Add(candidateMetatile);");
+                Debug.Log("MetaTilePool.RESULTTYPE.SUCCESS, placedMetaTiles.Add(candidateMetatile);, placedMetatiles.Count = " + placedMetaTiles.Count);
             }
             else
             {
                 resultType = MetaTilePool.RESULTTYPE.FAILURE;
                 timeoutCounter++;
-                Debug.Log("timeoutCounter++");
+                Debug.Log("MetaTilePool.RESULTTYPE.FAILURE, timeoutCounter++");
             }
 
             if (timeoutCounter > 100)
