@@ -44,7 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac82d13eff340cb41b855dfa56d88bd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parent: {fileID: 0}
   tags: 
+  palette: {fileID: -6947243484448938200, guid: 7f13d731f1a5a1f41849192bbea3d8bd,
+    type: 3}
   metatileProbabilities:
   - metaTileProbability: {fileID: 100174510953274016, guid: f0f3cbb83efd3de45a65738d6270ea2c,
       type: 3}

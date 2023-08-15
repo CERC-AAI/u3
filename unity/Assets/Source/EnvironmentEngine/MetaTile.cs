@@ -16,14 +16,12 @@ public class MetaTile : IMetaTileProbability
     public List<int> tags; // list of tags
     public Vector3Int rotationDirections;  // allowed rotation directions (0 = rotation not allowed, 1 = rotation allowed)
 
-    public TileFacePalette pallete;
-
     public List<int> GetTags()
     {
         return tags;
     }
 
-    public override MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
+    public override MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, TileFacePalette palette)
     {
         // TODO: do we need to instantiate a game object here?
         return this;
@@ -36,9 +34,20 @@ public class MetaTile : IMetaTileProbability
         return metaTiles;
     }
 
+    public TileFacePalette GetPalette()
+    {
+        if (parent != null)
+        {
+            return parent.palette;
+        }
+
+        Debug.LogError("Meta tile had no parent.");
+        return Resources.Load<TileFacePalette>(TileFacePaletteEditor.defaultPalettePath);
+    }
+
     public bool CanConnect(int faceType1, int faceType2)
     {
-        return pallete.CanConnect(faceType1, faceType2);
+        return GetPalette().CanConnect(faceType1, faceType2);
     }
 
     public bool CanPlace(Tile[,,] environment, int startX, int startY, int startZ)

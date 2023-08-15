@@ -9,13 +9,13 @@ public class MetaTileEnvironment : MonoBehaviour
 {
 
     public static int mWidth = 10;
-    private static Dictionary<int, List<int>> matchingMatrix = new Dictionary<int, List<int>>()
+    /*private static Dictionary<int, List<int>> matchingMatrix = new Dictionary<int, List<int>>()
     {
         {0, new List<int> {0,1,2}},
         { 1, new List<int> { 0 } }, // 0 = bedrock connects to bedrock
         { 2, new List<int> { 2} }, // 1 = surface connects to air
         { 3, new List<int> { 1, 2} }, // 2 = air connects to bedrock, floor and air
-    };
+    };*/
 
     public Tile[,,] environment = new Tile[mWidth, mWidth, mWidth];
 
@@ -39,31 +39,35 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public List<float> wavefrontEntropies = new();
 
+    public bool DEBUG = false;
 
-    public List<int> MapPositionToFaces(int[,,,] faces, Vector3Int position)
+
+    /*public List<int> MapPositionToFaces(int[,,,] faces, Vector3Int position)
     {
         List<int> faceList = new List<int>();
 
         // add faces from the x direction
         // TODO: use the enum TOP, BOTTOM, etc.
         // Unity uses a lefthanded coordinate system
-        int xFace1 = faces[0, position.x, position.y, position.z];
-        int xFace2 = faces[0, position.x + 1, position.y, position.z];
-        int yFace1 = faces[1, position.x, position.y, position.z];
-        int yFace2 = faces[1, position.x, position.y + 1, position.z];
-        int zFace1 = faces[2, position.x, position.y, position.z];
-        int zFace2 = faces[2, position.x, position.y, position.z + 1];
+        int yFace2 = faces[1, position.x, position.y + 1, position.z]; //Top
+        int yFace1 = faces[1, position.x, position.y, position.z]; //Bottom
+
+        int xFace1 = faces[0, position.x, position.y, position.z]; //Left
+        int xFace2 = faces[0, position.x + 1, position.y, position.z]; //Right
+
+        int zFace1 = faces[2, position.x, position.y, position.z]; //Front 
+        int zFace2 = faces[2, position.x, position.y, position.z + 1]; //Back
 
         // create a list of lists of faces
+        faceList.Add(yFace2);
+        faceList.Add(yFace1);
         faceList.Add(xFace1);
         faceList.Add(xFace2);
-        faceList.Add(yFace1);
-        faceList.Add(yFace2);
         faceList.Add(zFace1);
         faceList.Add(zFace2);
 
         return faceList;
-    }
+    }*/
 
     public Vector3Int SelectPlacementPosition()
     {
@@ -102,6 +106,12 @@ public class MetaTileEnvironment : MonoBehaviour
         }
         else
         {
+            if (wavefrontPositions.Count == 0)
+            {
+                Debug.Log("SelectPlacementPosition() no wavefront positions");
+                return new Vector3Int(-1, -1, -1);
+            }
+
             // select the lowest entropy position
             // Finds the position with the minimum entropy value in the wavefrontPositions list
             // find the minimum entropy value in the wavefrontEntropies list
@@ -130,40 +140,97 @@ public class MetaTileEnvironment : MonoBehaviour
         return environment[position.x, position.y, position.z];
     }
 
-    public List<List<int>> GetPossibleFaces(Vector3Int position)
+    public List<int> GetFaceList(Vector3Int position)
     {
         List<int> faceList = new List<int>();
 
         // add faces from the x direction
-        int xFace1 = faces[0, position.x, position.y, position.z];
-        int xFace2 = faces[0, position.x + 1, position.y, position.z];
-        int yFace1 = faces[1, position.x, position.y, position.z];
-        int yFace2 = faces[1, position.x, position.y + 1, position.z];
-        int zFace1 = faces[2, position.x, position.y, position.z];
-        int zFace2 = faces[2, position.x, position.y, position.z + 1];
+        int left = faces[0, position.x, position.y, position.z];
+        int right = faces[0, position.x + 1, position.y, position.z];
+        int bottom = faces[1, position.x, position.y, position.z];
+        int top = faces[1, position.x, position.y + 1, position.z];
+        int front = faces[2, position.x, position.y, position.z];
+        int back = faces[2, position.x, position.y, position.z + 1];
 
         // create a list of lists of faces
-        faceList.Add(xFace1);
-        faceList.Add(xFace2);
-        faceList.Add(yFace1);
-        faceList.Add(yFace2);
-        faceList.Add(zFace1);
-        faceList.Add(zFace2);
+        faceList.Add(top);
+        faceList.Add(bottom);
+        faceList.Add(left);
+        faceList.Add(right);
+        faceList.Add(front);
+        faceList.Add(back);
 
-        // replace null faces with -1
-        for (int i = 0; i < faceList.Count; i++)
+        if (DEBUG)
         {
-            if (faceList[i] == null)
-            {
-                faceList[i] = -1;
-            }
+            Debug.Log("Get placed faces:");
+            Debug.Log($"    Top: {faceList[(int)Tile.FACETYPE.TOP]}");
+            Debug.Log($"    Bottom: {faceList[(int)Tile.FACETYPE.BOTTOM]}");
+            Debug.Log($"    Left: {faceList[(int)Tile.FACETYPE.LEFT]}");
+            Debug.Log($"    Right: {faceList[(int)Tile.FACETYPE.RIGHT]}");
+            Debug.Log($"    Front: {faceList[(int)Tile.FACETYPE.FRONT]}");
+            Debug.Log($"    Back: {faceList[(int)Tile.FACETYPE.BACK]}");
         }
+
+        return faceList;
+    }
+
+    public void SetFaceList(Vector3Int position, List<int> faceList)
+    {
+        faces[1, position.x, position.y + 1, position.z] = faceList[(int)Tile.FACETYPE.TOP];
+        faces[1, position.x, position.y, position.z] = faceList[(int)Tile.FACETYPE.BOTTOM];
+        faces[0, position.x, position.y, position.z] = faceList[(int)Tile.FACETYPE.LEFT];
+        faces[0, position.x + 1, position.y, position.z] = faceList[(int)Tile.FACETYPE.RIGHT];
+        faces[2, position.x, position.y, position.z] = faceList[(int)Tile.FACETYPE.FRONT];
+        faces[2, position.x, position.y, position.z + 1] = faceList[(int)Tile.FACETYPE.BACK];
+
+        if (DEBUG)
+        {
+            Debug.Log("Placed faces:");
+            Debug.Log($"    Top: {faceList[(int)Tile.FACETYPE.TOP]}");
+            Debug.Log($"    Bottom: {faceList[(int)Tile.FACETYPE.BOTTOM]}");
+            Debug.Log($"    Left: {faceList[(int)Tile.FACETYPE.LEFT]}");
+            Debug.Log($"    Right: {faceList[(int)Tile.FACETYPE.RIGHT]}");
+            Debug.Log($"    Front: {faceList[(int)Tile.FACETYPE.FRONT]}");
+            Debug.Log($"    Back: {faceList[(int)Tile.FACETYPE.BACK]}");
+        }
+
+    }
+
+    public List<Vector3Int> GetAdjacentPositions(Vector3Int Position)
+    {
+        List<Vector3Int> adjacentPositions = new List<Vector3Int>();
+        adjacentPositions.Add(new Vector3Int(Position.x - 1, Position.y, Position.z));
+        adjacentPositions.Add(new Vector3Int(Position.x + 1, Position.y, Position.z));
+        adjacentPositions.Add(new Vector3Int(Position.x, Position.y - 1, Position.z));
+        adjacentPositions.Add(new Vector3Int(Position.x, Position.y + 1, Position.z));
+        adjacentPositions.Add(new Vector3Int(Position.x, Position.y, Position.z - 1));
+        adjacentPositions.Add(new Vector3Int(Position.x, Position.y, Position.z + 1));
+
+        // remove any illegal positions
+        adjacentPositions.RemoveAll(position => position.x < 0 || position.x >= environment.GetLength(0) ||
+            position.y < 0 || position.y >= environment.GetLength(1) ||
+            position.z < 0 || position.z >= environment.GetLength(2));
+
+        return adjacentPositions;
+    }
+
+    public List<List<int>> GetPossibleFaces(Vector3Int position)
+    {
+        List<int> faceList = GetFaceList(position);
 
         // return the list of faces permitted for each face at the position according to the matching matrix
         List<List<int>> possibleFaces = new List<List<int>>();
         foreach (int face in faceList)
         {
-            possibleFaces.Add(matchingMatrix[face]);
+            //Untouched
+            if (face == -1)
+            {
+                possibleFaces.Add(Enumerable.Range(0, metatilepool.palette.tileFaces.Count).ToList());
+            }
+            else
+            {
+                possibleFaces.Add(metatilepool.palette.GetPossibleConnections(face));
+            }
         }
 
         return possibleFaces;
@@ -179,13 +246,15 @@ public class MetaTileEnvironment : MonoBehaviour
         List<int> filterFaces = new List<int>();
         int filterFaceIdx = 0;
         int shortestListLength = int.MaxValue;
-        foreach (List<int> faceList in possibleFaces)
+        // FIX ME
+        //foreach (List<int> faceList in possibleFaces)
+        for (int i = 0; i < possibleFaces.Count; i++)
         {
-            if (faceList.Count < shortestListLength)
+            if (possibleFaces[i].Count < shortestListLength)
             {
-                shortestListLength = faceList.Count;
-                filterFaces = faceList;
-                filterFaceIdx = possibleFaces.IndexOf(faceList);
+                shortestListLength = possibleFaces[i].Count;
+                filterFaces = possibleFaces[i];
+                filterFaceIdx = i;
             }
         }
 
@@ -198,7 +267,9 @@ public class MetaTileEnvironment : MonoBehaviour
             foreach (Tile tile in metatile.tiles)
             {
                 Vector3Int tilePosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
-                List<int> tileFaces = MapPositionToFaces(faces, placementPosition + tilePosition);
+                //FIX ME
+                //List<int> tileFaces = GetFaceList(placementPosition + tilePosition);
+                List<int> tileFaces = new List<int>(tile.faceIDs);
                 if (filterFaces.Contains(tileFaces[filterFaceIdx]))
                 {
                     // check the other faces of the tile against the other faces in possibleFaces
@@ -230,18 +301,27 @@ public class MetaTileEnvironment : MonoBehaviour
         // Create a list of all legal metatiles from the pool
         List<MetaTile> metatiles = new List<MetaTile>();
 
-        Debug.Log("Metatile Count before adding: " + metatiles.Count);
+        if (DEBUG)
+        {
+            Debug.Log("Metatile Count before adding: " + metatiles.Count);
+        }
 
         foreach (MetaTileProbability metatileprobability in metatilepool.metatileProbabilities)
         {
-            metatiles.Add(metatileprobability.metaTileProbability.DrawMetaTile(placementPosition, environment, faces, matchingMatrix));
+            metatiles.Add(metatileprobability.metaTileProbability.DrawMetaTile(placementPosition, environment, faces, metatilepool.palette));
         }
 
-        Debug.Log("Metatile Count after adding: " + metatiles.Count);
+        if (DEBUG)
+        {
+            Debug.Log("Metatile Count after adding: " + metatiles.Count);
+        }
 
         List<MetaTile> filteredMetatiles = CustomFiltering(placementPosition, metatiles);
 
-        Debug.Log("Metatile Count after filtering: " + filteredMetatiles.Count);
+        if (DEBUG)
+        {
+            Debug.Log("Metatile Count after filtering: " + filteredMetatiles.Count);
+        }
 
         // select a random metatile from the filtered list
         return filteredMetatiles[UnityEngine.Random.Range(0, filteredMetatiles.Count)];
@@ -251,7 +331,11 @@ public class MetaTileEnvironment : MonoBehaviour
     {
         // Create a list of all legal metatiles from the pool
         List<MetaTile> metatiles = new List<MetaTile>();
-        Debug.Log("Metatile Count before adding: " + metatiles.Count);
+
+        if (DEBUG)
+        {
+            Debug.Log("Metatile Count before adding: " + metatiles.Count);
+        }
 
         // TODO: fix this to exhaustively grab all possible metatiles
         foreach (MetaTileProbability metatileprobability in metatilepool.metatileProbabilities)
@@ -259,14 +343,27 @@ public class MetaTileEnvironment : MonoBehaviour
             metatiles.AddRange(metatileprobability.metaTileProbability.GetMetaTiles());
         }
 
-        Debug.Log("Metatile Count after adding: " + metatiles.Count);
+        if (DEBUG)
+        {
+            Debug.Log("Metatile Count after adding: " + metatiles.Count);
+        }
 
         List<MetaTile> filteredMetatiles = CustomFiltering(placementPosition, metatiles);
 
-        Debug.Log("Metatile Count after filtering: " + filteredMetatiles.Count);
+        if (DEBUG)
+        {
+            Debug.Log("Metatile Count after filtering: " + filteredMetatiles.Count);
+        }
 
-        // select a random metatile from the filtered list
-        return filteredMetatiles[UnityEngine.Random.Range(0, metatiles.Count)];
+        if (filteredMetatiles.Count > 0)
+        {
+            // select a random metatile from the filtered list
+            return filteredMetatiles[UnityEngine.Random.Range(0, filteredMetatiles.Count)];
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public bool CanPlaceMetaTile(Vector3Int placementPosition, MetaTile metatile)
@@ -293,11 +390,19 @@ public class MetaTileEnvironment : MonoBehaviour
 
             // TODO: check neighbor tiles for adjacency conflicts
             List<List<int>> possibleFaces = GetPossibleFaces(environmentPosition);
-            List<int> tileFaces = MapPositionToFaces(faces, environmentPosition);
-            foreach (int face in tileFaces)
+            List<int> tileFaces = new List<int>(tile.faceIDs);
+            /*foreach (int face in tileFaces)
             {
                 // if the face is not in the list of possible faces at the index of the face in tileFaces, return false
                 if (!possibleFaces[tileFaces.IndexOf(face)].Contains(face))
+                {
+                    return false;
+                }
+            }*/
+            for (int i = 0; i < tileFaces.Count; i++)
+            {
+                // if the face is not in the list of possible faces at the index of the face in tileFaces, return false
+                if (!possibleFaces[i].Contains(tileFaces[i]))
                 {
                     return false;
                 }
@@ -307,24 +412,6 @@ public class MetaTileEnvironment : MonoBehaviour
 
         return true;  // no conflicts were found
 
-    }
-
-    public List<Vector3Int> GetAdjacentPositions(Vector3Int Position)
-    {
-        List<Vector3Int> adjacentPositions = new List<Vector3Int>();
-        adjacentPositions.Add(new Vector3Int(Position.x - 1, Position.y, Position.z));
-        adjacentPositions.Add(new Vector3Int(Position.x + 1, Position.y, Position.z));
-        adjacentPositions.Add(new Vector3Int(Position.x, Position.y - 1, Position.z));
-        adjacentPositions.Add(new Vector3Int(Position.x, Position.y + 1, Position.z));
-        adjacentPositions.Add(new Vector3Int(Position.x, Position.y, Position.z - 1));
-        adjacentPositions.Add(new Vector3Int(Position.x, Position.y, Position.z + 1));
-
-        // remove any illegal positions
-        adjacentPositions.RemoveAll(position => position.x < 0 || position.x >= environment.GetLength(0) ||
-            position.y < 0 || position.y >= environment.GetLength(1) ||
-            position.z < 0 || position.z >= environment.GetLength(2));
-
-        return adjacentPositions;
     }
 
     public void PlaceMetaTile(Vector3Int placementPosition, MetaTile metatile)
@@ -343,12 +430,8 @@ public class MetaTileEnvironment : MonoBehaviour
 
             // update the faces
             // TODO: replace with TOP, BOTTOM, etc. enum
-            faces[0, envX, envY, envZ] = tile.faceIDs[0];
-            faces[0, envX + 1, envY, envZ] = tile.faceIDs[1];
-            faces[1, envX, envY, envZ] = tile.faceIDs[2];
-            faces[1, envX, envY + 1, envZ] = tile.faceIDs[3];
-            faces[2, envX, envY, envZ] = tile.faceIDs[4];
-            faces[2, envX, envY, envZ + 1] = tile.faceIDs[5];
+            //Debug.Log($"Tile face {tile.faceIDs[0]}");
+            SetFaceList(placementPosition, new List<int>(tile.faceIDs));
 
             if (tileState[envX, envY, envZ] == TileState.Placed)
             {
@@ -400,11 +483,12 @@ public class MetaTileEnvironment : MonoBehaviour
     {
         // calculate the entropies of the tiles in the wavefront
 
-        foreach (Vector3Int position in wavefrontPositions)
+        //This is potentially very slow
+        //foreach (Vector3Int position in wavefrontPositions)
+        for (int i = 0; i < wavefrontPositions.Count; i++)
         {
             // get the index of the position in the wavefrontPositions list
-            int wavefrontIndex = wavefrontPositions.IndexOf(position);
-            wavefrontEntropies[wavefrontIndex] = CalculateEntropy(position);
+            wavefrontEntropies[i] = CalculateEntropy(wavefrontPositions[i]);
         }
     }
 
@@ -419,20 +503,20 @@ public class MetaTileEnvironment : MonoBehaviour
         // Dilation of tile checks and translation?
 
         // Get the faces for each position
-        List<int> faceList = MapPositionToFaces(faces, position);
+        List<int> faceList = GetFaceList(position);
 
         // Calculate the entropy
-        int entropy = 0;
+        int entropy = metatilepool.palette.tileFaces.Count;
         for (int i = 0; i < faceList.Count; i++)
         {
-            entropy += matchingMatrix[faceList[i]].Count;
+            entropy = Mathf.Min(entropy, metatilepool.palette.GetPossibleConnections(faceList[i]).Count);
         }
 
         return entropy;
     }
 
 
-    public void GenerateEnvironment(MetaTilePool metatilepool)
+    public IEnumerator GenerateEnvironment(MetaTilePool metatilepool)
     {
 
         // set up the attempt loop around the metatile pool
@@ -461,7 +545,7 @@ public class MetaTileEnvironment : MonoBehaviour
             candidateMetatile = GetMetaTile(placementPosition, metatilepool);
 
             // Try to find a place to put the metatile
-            if (CanPlaceMetaTile(placementPosition, candidateMetatile))
+            if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, candidateMetatile))
             {
                 PlaceMetaTile(placementPosition, candidateMetatile);
                 CollapseWaveFunction();
@@ -470,6 +554,14 @@ public class MetaTileEnvironment : MonoBehaviour
                 placedMetaTiles.Add(candidateMetatile);
                 placedPositions.Add(placementPosition);
                 Debug.Log("MetaTilePool.RESULTTYPE.SUCCESS, placedMetaTiles.Add(candidateMetatile);, placedMetatiles.Count = " + placedMetaTiles.Count);
+
+                if (DEBUG)
+                {
+                    candidateMetatile.DepositPayload(placementPosition);
+                    Debug.Break();
+
+                    yield return null;
+                }
             }
             else
             {
@@ -500,10 +592,44 @@ public class MetaTileEnvironment : MonoBehaviour
                 placedMetaTiles[i].DepositPayload(placedPositions[i]);
             }
         }
+
+        yield return null;
     }
 
     public void Awake()
     {
-        GenerateEnvironment(metatilepool);
+        DEBUG = false;
+
+        //Initialize face array
+        for (int i = 0; i < faces.GetLength(0); i++)
+        {
+            for (int j = 0; j < faces.GetLength(1); j++)
+            {
+                for (int k = 0; k < faces.GetLength(2); k++)
+                {
+                    for (int l = 0; l < faces.GetLength(3); l++)
+                    {
+                        faces[i, j, k, l] = -1;
+                    }
+                }
+            }
+        }
+        //Intitalize tile arrays
+        for (int i = 0; i < tileState.GetLength(0); i++)
+        {
+            for (int j = 0; j < tileState.GetLength(1); j++)
+            {
+                for (int k = 0; k < tileState.GetLength(2); k++)
+                {
+                    tileState[i, j, k] = TileState.NotPlaced;
+                    environmentEntropies[i, j, k] = 0;
+                    environment[i, j, k] = null;
+                }
+            }
+        }
+
+        //Making this a coroutine enbales step by step debugging. This is not fast, and should be changed back at some point.
+        StartCoroutine(GenerateEnvironment(metatilepool));
+        //GenerateEnvironment(metatilepool);
     }
 }

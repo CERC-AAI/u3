@@ -23,7 +23,7 @@ public class TileEditor : Editor
 
         if (serializedProperty.isArray && selectedTile.GetMetaTile() != null)
         {
-            List<TileFace> faces = selectedTile.GetMetaTile().pallete.tileFaces;
+            List<TileFace> faces = selectedTile.GetMetaTile().GetPalette().tileFaces;
 
             string[] faceOptions = new string[faces.Count];
             for (int i = 0; i < faces.Count; i++)

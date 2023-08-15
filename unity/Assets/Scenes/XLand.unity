@@ -8349,10 +8349,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   voxelSize: 1
-  metatilepool: {fileID: 2721922502780412005, guid: eea1d9fca23e8ff48b734b563b2febb7,
+  metatilepool: {fileID: 4368192324598907990, guid: f49107dc9e4fa6e4382dac87214619eb,
     type: 3}
   placedMetaTiles: []
   placedPositions: []
+  wavefrontPositions: []
+  wavefrontEntropies: []
 --- !u!4 &2033542608
 Transform:
   m_ObjectHideFlags: 0
