@@ -102,11 +102,7 @@ public class Tile : MonoBehaviour
     {
         MetaTile parentMetaTile = GetComponentInParent<MetaTile>();
 
-        if (parentMetaTile.pallete == null)
-        {
-            parentMetaTile.pallete = Resources.Load<TileFacePalette>(TileFacePaletteEditor.defaultPalettePath);
-        }
-        float voxelSize = parentMetaTile.pallete.voxelSize;
+        float voxelSize = parentMetaTile.GetPalette().voxelSize;
         voxelSize = voxelSize * 1.01f;
 
         Gizmos.color = new Color(1, 1, 1, 0.25f);
@@ -126,7 +122,7 @@ public class Tile : MonoBehaviour
             Vector3 size = Vector3.zero;
 
             int faceID = faceIDs[(int)i];
-            TileFace faceData = parentMetaTile.pallete.tileFaces[faceID];
+            TileFace faceData = parentMetaTile.GetPalette().tileFaces[faceID];
             switch (i)
             {
                 case FACETYPE.TOP:

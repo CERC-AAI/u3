@@ -804,6 +804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ccdb70b07f7a847b03eeae7ec5ad17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parent: {fileID: 2721922502780412005, guid: eea1d9fca23e8ff48b734b563b2febb7, type: 3}
   tiles:
   - {fileID: 8887524634482644440}
   - {fileID: 3013216732051808425}
@@ -827,8 +828,6 @@ MonoBehaviour:
   payload: {fileID: 5719564469284369926}
   tags: 
   rotationDirections: {x: 0, y: 0, z: 0}
-  pallete: {fileID: -6947243484448938200, guid: 9d193c5491fbf734fa3353b676a06dba,
-    type: 3}
 --- !u!1 &7290355049124028334
 GameObject:
   m_ObjectHideFlags: 0

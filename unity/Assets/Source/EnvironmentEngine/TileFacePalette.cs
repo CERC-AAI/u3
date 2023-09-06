@@ -47,4 +47,31 @@ public class TileFacePalette : MonoBehaviour
 
         return false;
     }
+
+    public List<int> GetPossibleConnections(int tileFace)
+    {
+        List<int> faceList = new List<int>();
+
+        for (int i = 0; i < matchingMatrix.Count; i++)
+        {
+            if (matchingMatrix[i].mA == tileFace)
+            {
+                if (!faceList.Contains(matchingMatrix[i].mB))
+                {
+                    faceList.Add(matchingMatrix[i].mB);
+                }
+            }
+            else if (matchingMatrix[i].mB == tileFace)
+            {
+                if (!faceList.Contains(matchingMatrix[i].mA))
+                {
+                    faceList.Add(matchingMatrix[i].mA);
+                }
+            }
+        }
+
+        //Debug.Log($"Face {tileFace} -> {string.Join(", ", faceList)}");
+
+        return faceList;
+    }
 }

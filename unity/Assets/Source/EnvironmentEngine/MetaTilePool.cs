@@ -10,6 +10,8 @@ public class MetaTilePool : IMetaTileProbability
 {
     public List<int> tags; // list of tags
 
+    public TileFacePalette palette;
+
     public enum RESULTTYPE
     {
         SUCCESS,
@@ -40,7 +42,7 @@ public class MetaTilePool : IMetaTileProbability
         return metaTiles;
     }
 
-    public override MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
+    public override MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, TileFacePalette palette)
     {
 
         // Calculate the total weight from the dictionary
@@ -58,7 +60,7 @@ public class MetaTilePool : IMetaTileProbability
         {
             if (randomWeight < metatileProbabilities[i].weight)
             {
-                return metatileProbabilities[i].metaTileProbability.DrawMetaTile(position, environment, faces, matchingMatrix);
+                return metatileProbabilities[i].metaTileProbability.DrawMetaTile(position, environment, faces, palette);
             }
             randomWeight -= metatileProbabilities[i].weight;
 
@@ -158,11 +160,13 @@ public struct MetaTileProbability
 
 public class IMetaTileProbability : MonoBehaviour
 {
+    public MetaTilePool parent;
+
     public virtual List<int> GetTags()
     {
         return null;
     }
-    public virtual MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, Dictionary<int, List<int>> matchingMatrix)
+    public virtual MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, TileFacePalette palette)
     {
         return null;
     }
