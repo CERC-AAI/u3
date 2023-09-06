@@ -55,7 +55,7 @@ public class MetaTileEnvironment : MonoBehaviour
         int xFace1 = faces[0, position.x, position.y, position.z]; //Left
         int xFace2 = faces[0, position.x + 1, position.y, position.z]; //Right
 
-        int zFace1 = faces[2, position.x, position.y, position.z]; //Front 
+        int zFace1 = faces[2, position.x, position.y, position.z]; //Front
         int zFace2 = faces[2, position.x, position.y, position.z + 1]; //Back
 
         // create a list of lists of faces
@@ -112,18 +112,14 @@ public class MetaTileEnvironment : MonoBehaviour
                 return new Vector3Int(-1, -1, -1);
             }
 
-            // select the lowest entropy position
-            // Finds the position with the minimum entropy value in the wavefrontPositions list
-            // find the minimum entropy value in the wavefrontEntropies list
-            float minEntropy = wavefrontEntropies.Min();
+            float minEntropyValue = wavefrontEntropies.Min();
 
-            // find the index of the minimum entropy value in the wavefrontEntropies list
-            int minEntropyIndex = wavefrontEntropies.IndexOf(minEntropy);
+            int minEntropyIndex = wavefrontEntropies.IndexOf(minEntropyValue);
 
-            Vector3Int placementPosition = wavefrontPositions[minEntropyIndex];
+            Vector3Int minEntropyPosition = wavefrontPositions[minEntropyIndex];
             // select the position with the minimum entropy value
-            Debug.Log("SelectPlacementPosition() placementPosition: " + placementPosition);
-            return placementPosition;
+            Debug.Log("SelectPlacementPosition() placementPosition: " + minEntropyPosition);
+            return minEntropyPosition;
         }
 
     }
@@ -494,11 +490,6 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public int CalculateEntropy(Vector3Int position)
     {
-        // Gets the stored entropy value of a position
-        // Calculate the entropy of a position
-        // Entropy is the total number of faces that can be placed around a position
-        // The lower the entropy, the more constrained the position is
-        // The higher the entropy, the more freedom there is to place a face at that position
         // Do full translation/rotation tests and cache adjacent tile legality
         // Dilation of tile checks and translation?
 
@@ -515,6 +506,227 @@ public class MetaTileEnvironment : MonoBehaviour
         return entropy;
     }
 
+
+    public bool ValidateOrientation(Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
+    {
+        // assert that there is only one of (top, bottom) and (left, right) and (front, back) in the orientations
+        // TODO: not all of these checks are necessary. Which ones can be removed?
+
+        if (topOrientation == Tile.FACETYPE.TOP || topOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            if (frontOrientation == Tile.FACETYPE.TOP || frontOrientation == Tile.FACETYPE.BOTTOM || rightOrientation == Tile.FACETYPE.TOP || rightOrientation == Tile.FACETYPE.BOTTOM)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: topOrientation == Tile.FACETYPE.TOP || topOrientation == Tile.FACETYPE.BOTTOM");
+            }
+        }
+
+        if (topOrientation == Tile.FACETYPE.LEFT || topOrientation == Tile.FACETYPE.RIGHT)
+        {
+            if (frontOrientation == Tile.FACETYPE.LEFT || frontOrientation == Tile.FACETYPE.RIGHT || rightOrientation == Tile.FACETYPE.LEFT || rightOrientation == Tile.FACETYPE.RIGHT)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: topOrientation == Tile.FACETYPE.LEFT || topOrientation == Tile.FACETYPE.RIGHT");
+            }
+        }
+
+        if (topOrientation == Tile.FACETYPE.FRONT || topOrientation == Tile.FACETYPE.BACK)
+        {
+            if (frontOrientation == Tile.FACETYPE.FRONT || frontOrientation == Tile.FACETYPE.BACK || rightOrientation == Tile.FACETYPE.FRONT || rightOrientation == Tile.FACETYPE.BACK)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: topOrientation == Tile.FACETYPE.FRONT || topOrientation == Tile.FACETYPE.BACK");
+            }
+        }
+
+        if (frontOrientation == Tile.FACETYPE.TOP || frontOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            if (topOrientation == Tile.FACETYPE.TOP || topOrientation == Tile.FACETYPE.BOTTOM || rightOrientation == Tile.FACETYPE.TOP || rightOrientation == Tile.FACETYPE.BOTTOM)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: frontOrientation == Tile.FACETYPE.TOP || frontOrientation == Tile.FACETYPE.BOTTOM");
+            }
+        }
+
+        if (frontOrientation == Tile.FACETYPE.LEFT || frontOrientation == Tile.FACETYPE.RIGHT)
+        {
+            if (topOrientation == Tile.FACETYPE.LEFT || topOrientation == Tile.FACETYPE.RIGHT || rightOrientation == Tile.FACETYPE.LEFT || rightOrientation == Tile.FACETYPE.RIGHT)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: frontOrientation == Tile.FACETYPE.LEFT || frontOrientation == Tile.FACETYPE.RIGHT");
+            }
+        }
+
+        if (frontOrientation == Tile.FACETYPE.FRONT || frontOrientation == Tile.FACETYPE.BACK)
+        {
+            if (topOrientation == Tile.FACETYPE.FRONT || topOrientation == Tile.FACETYPE.BACK || rightOrientation == Tile.FACETYPE.FRONT || rightOrientation == Tile.FACETYPE.BACK)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: frontOrientation == Tile.FACETYPE.FRONT || frontOrientation == Tile.FACETYPE.BACK");
+            }
+        }
+
+        if (rightOrientation == Tile.FACETYPE.TOP || rightOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            if (topOrientation == Tile.FACETYPE.TOP || topOrientation == Tile.FACETYPE.BOTTOM || frontOrientation == Tile.FACETYPE.TOP || frontOrientation == Tile.FACETYPE.BOTTOM)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: rightOrientation == Tile.FACETYPE.TOP || rightOrientation == Tile.FACETYPE.BOTTOM");
+            }
+        }
+
+        if (rightOrientation == Tile.FACETYPE.LEFT || rightOrientation == Tile.FACETYPE.RIGHT)
+        {
+            if (topOrientation == Tile.FACETYPE.LEFT || topOrientation == Tile.FACETYPE.RIGHT || frontOrientation == Tile.FACETYPE.LEFT || frontOrientation == Tile.FACETYPE.RIGHT)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: rightOrientation == Tile.FACETYPE.LEFT || rightOrientation == Tile.FACETYPE.RIGHT");
+            }
+        }
+
+        if (rightOrientation == Tile.FACETYPE.FRONT || rightOrientation == Tile.FACETYPE.BACK)
+        {
+            if (topOrientation == Tile.FACETYPE.FRONT || topOrientation == Tile.FACETYPE.BACK || frontOrientation == Tile.FACETYPE.FRONT || frontOrientation == Tile.FACETYPE.BACK)
+            {
+                // throw an error and stop the program
+                throw new Exception("InvalidOrientationError: rightOrientation == Tile.FACETYPE.FRONT || rightOrientation == Tile.FACETYPE.BACK");
+            }
+        }
+
+        return true;
+    }
+
+    public List<int> RotateFaces(List<int> faceList, Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
+    {
+        // this function permutes the order of facelist to match the rotation of the tile
+
+        int topFace = -1;
+        int bottomFace = -1;
+        int leftFace = -1;
+        int rightFace = -1;
+        int frontFace = -1;
+        int backFace = -1;
+
+        List<int> rotatedFaceList = new List<int>();
+
+
+
+        if (topOrientation == Tile.FACETYPE.TOP)
+        {
+            topFace = faceList[0];
+            bottomFace = faceList[1];
+        }
+
+        if (topOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            topFace = faceList[1];
+            bottomFace = faceList[0];
+        }
+
+        if (topOrientation == Tile.FACETYPE.LEFT)
+        {
+            topFace = faceList[2];
+            bottomFace = faceList[3];
+        }
+
+        if (topOrientation == Tile.FACETYPE.RIGHT)
+        {
+            topFace = faceList[3];
+            bottomFace = faceList[2];
+        }
+
+        if (topOrientation == Tile.FACETYPE.FRONT)
+        {
+            topFace = faceList[4];
+            bottomFace = faceList[5];
+        }
+
+        if (topOrientation == Tile.FACETYPE.BACK)
+        {
+            topFace = faceList[5];
+            bottomFace = faceList[4];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.TOP)
+        {
+            frontFace = faceList[0];
+            backFace = faceList[1];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            frontFace = faceList[1];
+            backFace = faceList[0];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.LEFT)
+        {
+            frontFace = faceList[2];
+            backFace = faceList[3];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.RIGHT)
+        {
+            frontFace = faceList[3];
+            backFace = faceList[2];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.FRONT)
+        {
+            frontFace = faceList[4];
+            backFace = faceList[5];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.BACK)
+        {
+            frontFace = faceList[5];
+            backFace = faceList[4];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.TOP)
+        {
+            leftFace = faceList[0];
+            rightFace = faceList[1];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            leftFace = faceList[1];
+            rightFace = faceList[0];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.LEFT)
+        {
+            leftFace = faceList[2];
+            rightFace = faceList[3];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.RIGHT)
+        {
+            leftFace = faceList[3];
+            rightFace = faceList[2];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.FRONT)
+        {
+            leftFace = faceList[4];
+            rightFace = faceList[5];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.BACK)
+        {
+            leftFace = faceList[5];
+            rightFace = faceList[4];
+        }
+
+        rotatedFaceList = new List<int> { topFace, bottomFace, leftFace, rightFace, frontFace, backFace };
+        if (rotatedFaceList.Contains(-1))
+        {
+            throw new Exception("InvalidOrientationError: newfaceList.Contains(-1)");
+        }
+        return rotatedFaceList;
+
+    }
 
     public IEnumerator GenerateEnvironment(MetaTilePool metatilepool)
     {
