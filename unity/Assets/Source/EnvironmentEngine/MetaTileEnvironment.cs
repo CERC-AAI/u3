@@ -453,11 +453,11 @@ public class MetaTileEnvironment : MonoBehaviour
             UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
             if (flipped)
             {
-                UnityEngine.Vector3 flippedPosition = new(rotatedPosition.x, rotatedPosition.y, rotatedPosition.z * -1);
+                rotatedPosition.z = rotatedPosition.z * -1;
                 (permutation[1], permutation[0]) = (permutation[0], permutation[1]);
             }
             // not sure if you can multiply Vector3Ints by quaternion
-            Vector3Int tilePosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+            Vector3Int tilePosition = new Vector3Int((int)rotatedPosition.x, (int)rotatedPosition.y, (int)rotatedPosition.z);
 
             Vector3Int environmentPosition = placementPosition + tilePosition;
 
@@ -494,13 +494,24 @@ public class MetaTileEnvironment : MonoBehaviour
 
     }
 
-    public void PlaceMetaTile(Vector3Int placementPosition, MetaTile metatile)
+    public void PlaceMetaTile(Vector3Int placementPosition, MetaTile metatile, Orientation orientation, bool flipped)
     {
         //Debug.Log("placing metatile " + this.name);
 
         foreach (Tile tile in metatile.tiles)
         {
-            Vector3Int tilePosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+            List<Tile.FACETYPE> permutation = OrientationToPermutation[orientation];
+
+            // multiply the tile position by a quaternion
+            UnityEngine.Vector3 unRotatedPosition = new(tile.transform.localPosition.x, tile.transform.localPosition.y, tile.transform.localPosition.z);
+            UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
+            if (flipped)
+            {
+                rotatedPosition.z = rotatedPosition.z * -1;
+                (permutation[1], permutation[0]) = (permutation[0], permutation[1]);
+            }
+            // not sure if you can multiply Vector3Ints by quaternion
+            Vector3Int tilePosition = new Vector3Int((int)rotatedPosition.x, (int)rotatedPosition.y, (int)rotatedPosition.z);
 
             int envX = placementPosition.x + tilePosition.x;
             int envY = placementPosition.y + tilePosition.y;
@@ -589,7 +600,6 @@ public class MetaTileEnvironment : MonoBehaviour
 
         return entropy;
     }
-
 
     public bool ValidateOrientation(Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
     {
@@ -862,7 +872,7 @@ public class MetaTileEnvironment : MonoBehaviour
                     // if the metatile can be placed, place it and break out of the loop
                     if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped))
                     {
-                        PlaceMetaTile(placementPosition, candidateMetatile);
+                        PlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped);
                         CollapseWaveFunction();
                         resultType = MetaTilePool.RESULTTYPE.SUCCESS;
                         timeoutCounter = 0;
