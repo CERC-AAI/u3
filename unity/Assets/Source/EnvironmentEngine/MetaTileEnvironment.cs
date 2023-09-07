@@ -1,9 +1,13 @@
+using System.Threading;
+using System.Net.Sockets;
+using System.Globalization;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEditor.Tilemaps;
 
 public class MetaTileEnvironment : MonoBehaviour
 {
@@ -41,33 +45,106 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public bool DEBUG = false;
 
-
-    /*public List<int> MapPositionToFaces(int[,,,] faces, Vector3Int position)
+    public enum Orientation
     {
-        List<int> faceList = new List<int>();
+        UpFront,
+        UpBack,
+        UpLeft,
+        UpRight,
 
-        // add faces from the x direction
-        // TODO: use the enum TOP, BOTTOM, etc.
-        // Unity uses a lefthanded coordinate system
-        int yFace2 = faces[1, position.x, position.y + 1, position.z]; //Top
-        int yFace1 = faces[1, position.x, position.y, position.z]; //Bottom
+        DownFront,
+        DownBack,
+        DownLeft,
+        DownRight,
 
-        int xFace1 = faces[0, position.x, position.y, position.z]; //Left
-        int xFace2 = faces[0, position.x + 1, position.y, position.z]; //Right
+        FrontUp,
+        FrontDown,
+        FrontLeft,
+        FrontRight,
 
-        int zFace1 = faces[2, position.x, position.y, position.z]; //Front 
-        int zFace2 = faces[2, position.x, position.y, position.z + 1]; //Back
+        BackUp,
+        BackDown,
+        BackLeft,
+        BackRight,
 
-        // create a list of lists of faces
-        faceList.Add(yFace2);
-        faceList.Add(yFace1);
-        faceList.Add(xFace1);
-        faceList.Add(xFace2);
-        faceList.Add(zFace1);
-        faceList.Add(zFace2);
+        LeftUp,
+        LeftDown,
+        LeftFront,
+        LeftBack,
 
-        return faceList;
-    }*/
+        RightUp,
+        RightDown,
+        RightFront,
+        RightBack
+    }
+
+    public bool flipped;
+
+    public static Dictionary<Orientation, Quaternion> OrientationToQuaternion = new Dictionary<Orientation, Quaternion>
+    {
+        { Orientation.UpFront, Quaternion.Euler(0, 0, 0) },
+        { Orientation.UpBack, Quaternion.Euler(0, 180, 0) },
+        { Orientation.UpLeft, Quaternion.Euler(0, -90, 0) },
+        { Orientation.UpRight, Quaternion.Euler(0, 90, 0) },
+
+        { Orientation.DownFront, Quaternion.Euler(180, 0, 0) },
+        { Orientation.DownBack, Quaternion.Euler(180, 180, 0) },
+        { Orientation.DownLeft, Quaternion.Euler(180, 90, 0) },
+        { Orientation.DownRight, Quaternion.Euler(180, -90, 0) },
+
+        { Orientation.FrontUp, Quaternion.Euler(-90, 0, 0) },
+        { Orientation.FrontDown, Quaternion.Euler(90, 0, 0) },
+        { Orientation.FrontLeft, Quaternion.Euler(0, 0, -90) },
+        { Orientation.FrontRight, Quaternion.Euler(0, 0, 90) },
+
+        { Orientation.BackUp, Quaternion.Euler(-90, 180, 0) },
+        { Orientation.BackDown, Quaternion.Euler(90, 180, 0) },
+        { Orientation.BackLeft, Quaternion.Euler(0, 180, -90) },
+        { Orientation.BackRight, Quaternion.Euler(0, 180, 90) },
+
+        { Orientation.LeftUp, Quaternion.Euler(-90, -90, 0) },
+        { Orientation.LeftDown, Quaternion.Euler(90, -90, 0) },
+        { Orientation.LeftFront, Quaternion.Euler(0, -90, -90) },
+        { Orientation.LeftBack, Quaternion.Euler(0, -90, 90) },
+
+        { Orientation.RightUp, Quaternion.Euler(-90, 90, 0) },
+        { Orientation.RightDown, Quaternion.Euler(90, 90, 0) },
+        { Orientation.RightFront, Quaternion.Euler(0, 90, -90) },
+        { Orientation.RightBack, Quaternion.Euler(0, 90, 90) },
+    };
+
+    public static readonly Dictionary<Orientation, List<Tile.FACETYPE>> OrientationToPermutation = new Dictionary<Orientation, List<Tile.FACETYPE>>
+    {
+        { Orientation.UpFront, new List<Tile.FACETYPE> { Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK } },
+        { Orientation.UpBack, new List<Tile.FACETYPE> { Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT } },
+        { Orientation.UpLeft, new List<Tile.FACETYPE> { Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT } },
+        { Orientation.UpRight, new List<Tile.FACETYPE> { Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK, Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT } },
+
+        { Orientation.DownFront, new List<Tile.FACETYPE> { Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK } },
+        { Orientation.DownBack, new List<Tile.FACETYPE> { Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT } },
+        { Orientation.DownLeft, new List<Tile.FACETYPE> { Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT } },
+        { Orientation.DownRight, new List<Tile.FACETYPE> { Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT } },
+
+        { Orientation.FrontUp, new List<Tile.FACETYPE> { Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK, Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM } },
+        { Orientation.FrontDown, new List<Tile.FACETYPE> { Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP } },
+        { Orientation.FrontLeft, new List<Tile.FACETYPE> { Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK, Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT } },
+        { Orientation.FrontRight, new List<Tile.FACETYPE> { Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT } },
+
+        { Orientation.BackUp, new List<Tile.FACETYPE> { Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM } },
+        { Orientation.BackDown, new List<Tile.FACETYPE> { Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP } },
+        { Orientation.BackLeft, new List<Tile.FACETYPE> { Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT } },
+        { Orientation.BackRight, new List<Tile.FACETYPE> { Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT, Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT } },
+
+        { Orientation.LeftUp, new List<Tile.FACETYPE> { Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK, Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM } },
+        { Orientation.LeftDown, new List<Tile.FACETYPE> { Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP } },
+        { Orientation.LeftFront, new List<Tile.FACETYPE> { Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK } },
+        { Orientation.LeftBack, new List<Tile.FACETYPE> { Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT } },
+
+        { Orientation.RightUp, new List<Tile.FACETYPE> { Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT, Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM } },
+        { Orientation.RightDown, new List<Tile.FACETYPE> { Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP } },
+        { Orientation.RightFront, new List<Tile.FACETYPE> { Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK } },
+        { Orientation.RightBack, new List<Tile.FACETYPE> { Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT } }
+    };
 
     public Vector3Int SelectPlacementPosition()
     {
@@ -112,18 +189,14 @@ public class MetaTileEnvironment : MonoBehaviour
                 return new Vector3Int(-1, -1, -1);
             }
 
-            // select the lowest entropy position
-            // Finds the position with the minimum entropy value in the wavefrontPositions list
-            // find the minimum entropy value in the wavefrontEntropies list
-            float minEntropy = wavefrontEntropies.Min();
+            float minEntropyValue = wavefrontEntropies.Min();
 
-            // find the index of the minimum entropy value in the wavefrontEntropies list
-            int minEntropyIndex = wavefrontEntropies.IndexOf(minEntropy);
+            int minEntropyIndex = wavefrontEntropies.IndexOf(minEntropyValue);
 
-            Vector3Int placementPosition = wavefrontPositions[minEntropyIndex];
+            Vector3Int minEntropyPosition = wavefrontPositions[minEntropyIndex];
             // select the position with the minimum entropy value
-            Debug.Log("SelectPlacementPosition() placementPosition: " + placementPosition);
-            return placementPosition;
+            Debug.Log("SelectPlacementPosition() placementPosition: " + minEntropyPosition);
+            return minEntropyPosition;
         }
 
     }
@@ -366,12 +439,25 @@ public class MetaTileEnvironment : MonoBehaviour
         }
     }
 
-    public bool CanPlaceMetaTile(Vector3Int placementPosition, MetaTile metatile)
+    public bool CanPlaceMetaTile(Vector3Int placementPosition, MetaTile metatile, Orientation orientation, bool flipped)
     {
         // TODO: add rotations and reflections
         foreach (Tile tile in metatile.tiles)
         {
-            Vector3Int tilePosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+            // from enum to list of integers that corresponds to a permuted list of faces
+
+            List<Tile.FACETYPE> permutation = OrientationToPermutation[orientation];
+
+            // multiply the tile position by a quaternion
+            UnityEngine.Vector3 unRotatedPosition = new(tile.transform.localPosition.x, tile.transform.localPosition.y, tile.transform.localPosition.z);
+            UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
+            if (flipped)
+            {
+                rotatedPosition.z = rotatedPosition.z * -1;
+                (permutation[1], permutation[0]) = (permutation[0], permutation[1]);
+            }
+            // not sure if you can multiply Vector3Ints by quaternion
+            Vector3Int tilePosition = new Vector3Int((int)rotatedPosition.x, (int)rotatedPosition.y, (int)rotatedPosition.z);
 
             Vector3Int environmentPosition = placementPosition + tilePosition;
 
@@ -391,18 +477,12 @@ public class MetaTileEnvironment : MonoBehaviour
             // TODO: check neighbor tiles for adjacency conflicts
             List<List<int>> possibleFaces = GetPossibleFaces(environmentPosition);
             List<int> tileFaces = new List<int>(tile.faceIDs);
-            /*foreach (int face in tileFaces)
-            {
-                // if the face is not in the list of possible faces at the index of the face in tileFaces, return false
-                if (!possibleFaces[tileFaces.IndexOf(face)].Contains(face))
-                {
-                    return false;
-                }
-            }*/
             for (int i = 0; i < tileFaces.Count; i++)
             {
                 // if the face is not in the list of possible faces at the index of the face in tileFaces, return false
-                if (!possibleFaces[i].Contains(tileFaces[i]))
+                // tilefaces[permutation[i]]
+
+                if (!possibleFaces[i].Contains(tileFaces[(int)permutation[i]]))
                 {
                     return false;
                 }
@@ -414,13 +494,24 @@ public class MetaTileEnvironment : MonoBehaviour
 
     }
 
-    public void PlaceMetaTile(Vector3Int placementPosition, MetaTile metatile)
+    public void PlaceMetaTile(Vector3Int placementPosition, MetaTile metatile, Orientation orientation, bool flipped)
     {
         //Debug.Log("placing metatile " + this.name);
 
         foreach (Tile tile in metatile.tiles)
         {
-            Vector3Int tilePosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+            List<Tile.FACETYPE> permutation = OrientationToPermutation[orientation];
+
+            // multiply the tile position by a quaternion
+            UnityEngine.Vector3 unRotatedPosition = new(tile.transform.localPosition.x, tile.transform.localPosition.y, tile.transform.localPosition.z);
+            UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
+            if (flipped)
+            {
+                rotatedPosition.z = rotatedPosition.z * -1;
+                (permutation[1], permutation[0]) = (permutation[0], permutation[1]);
+            }
+            // not sure if you can multiply Vector3Ints by quaternion
+            Vector3Int tilePosition = new Vector3Int((int)rotatedPosition.x, (int)rotatedPosition.y, (int)rotatedPosition.z);
 
             int envX = placementPosition.x + tilePosition.x;
             int envY = placementPosition.y + tilePosition.y;
@@ -494,11 +585,6 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public int CalculateEntropy(Vector3Int position)
     {
-        // Gets the stored entropy value of a position
-        // Calculate the entropy of a position
-        // Entropy is the total number of faces that can be placed around a position
-        // The lower the entropy, the more constrained the position is
-        // The higher the entropy, the more freedom there is to place a face at that position
         // Do full translation/rotation tests and cache adjacent tile legality
         // Dilation of tile checks and translation?
 
@@ -515,6 +601,237 @@ public class MetaTileEnvironment : MonoBehaviour
         return entropy;
     }
 
+    public bool ValidateOrientation(Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
+    {
+        // assert that there is only one of (top, bottom) and (left, right) and (front, back) in the orientations
+        // TODO: not all of these checks are necessary. Which ones can be removed?
+
+        if (topOrientation == Tile.FACETYPE.TOP || topOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            if (frontOrientation == Tile.FACETYPE.TOP || frontOrientation == Tile.FACETYPE.BOTTOM || rightOrientation == Tile.FACETYPE.TOP || rightOrientation == Tile.FACETYPE.BOTTOM)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: topOrientation == Tile.FACETYPE.TOP || topOrientation == Tile.FACETYPE.BOTTOM");
+                return false;
+
+            }
+        }
+
+        if (topOrientation == Tile.FACETYPE.LEFT || topOrientation == Tile.FACETYPE.RIGHT)
+        {
+            if (frontOrientation == Tile.FACETYPE.LEFT || frontOrientation == Tile.FACETYPE.RIGHT || rightOrientation == Tile.FACETYPE.LEFT || rightOrientation == Tile.FACETYPE.RIGHT)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: topOrientation == Tile.FACETYPE.LEFT || topOrientation == Tile.FACETYPE.RIGHT");
+                return false;
+
+            }
+        }
+
+        if (topOrientation == Tile.FACETYPE.FRONT || topOrientation == Tile.FACETYPE.BACK)
+        {
+            if (frontOrientation == Tile.FACETYPE.FRONT || frontOrientation == Tile.FACETYPE.BACK || rightOrientation == Tile.FACETYPE.FRONT || rightOrientation == Tile.FACETYPE.BACK)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: topOrientation == Tile.FACETYPE.FRONT || topOrientation == Tile.FACETYPE.BACK");
+                return false;
+            }
+        }
+
+        if (frontOrientation == Tile.FACETYPE.TOP || frontOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            if (topOrientation == Tile.FACETYPE.TOP || topOrientation == Tile.FACETYPE.BOTTOM || rightOrientation == Tile.FACETYPE.TOP || rightOrientation == Tile.FACETYPE.BOTTOM)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: frontOrientation == Tile.FACETYPE.TOP || frontOrientation == Tile.FACETYPE.BOTTOM");
+                return false;
+            }
+        }
+
+        if (frontOrientation == Tile.FACETYPE.LEFT || frontOrientation == Tile.FACETYPE.RIGHT)
+        {
+            if (topOrientation == Tile.FACETYPE.LEFT || topOrientation == Tile.FACETYPE.RIGHT || rightOrientation == Tile.FACETYPE.LEFT || rightOrientation == Tile.FACETYPE.RIGHT)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: frontOrientation == Tile.FACETYPE.LEFT || frontOrientation == Tile.FACETYPE.RIGHT");
+                return false;
+            }
+        }
+
+        if (frontOrientation == Tile.FACETYPE.FRONT || frontOrientation == Tile.FACETYPE.BACK)
+        {
+            if (topOrientation == Tile.FACETYPE.FRONT || topOrientation == Tile.FACETYPE.BACK || rightOrientation == Tile.FACETYPE.FRONT || rightOrientation == Tile.FACETYPE.BACK)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: frontOrientation == Tile.FACETYPE.FRONT || frontOrientation == Tile.FACETYPE.BACK");
+                return false;
+            }
+        }
+
+        if (rightOrientation == Tile.FACETYPE.TOP || rightOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            if (topOrientation == Tile.FACETYPE.TOP || topOrientation == Tile.FACETYPE.BOTTOM || frontOrientation == Tile.FACETYPE.TOP || frontOrientation == Tile.FACETYPE.BOTTOM)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: rightOrientation == Tile.FACETYPE.TOP || rightOrientation == Tile.FACETYPE.BOTTOM");
+                return false;
+            }
+        }
+
+        if (rightOrientation == Tile.FACETYPE.LEFT || rightOrientation == Tile.FACETYPE.RIGHT)
+        {
+            if (topOrientation == Tile.FACETYPE.LEFT || topOrientation == Tile.FACETYPE.RIGHT || frontOrientation == Tile.FACETYPE.LEFT || frontOrientation == Tile.FACETYPE.RIGHT)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: rightOrientation == Tile.FACETYPE.LEFT || rightOrientation == Tile.FACETYPE.RIGHT");
+                return false;
+            }
+        }
+
+        if (rightOrientation == Tile.FACETYPE.FRONT || rightOrientation == Tile.FACETYPE.BACK)
+        {
+            if (topOrientation == Tile.FACETYPE.FRONT || topOrientation == Tile.FACETYPE.BACK || frontOrientation == Tile.FACETYPE.FRONT || frontOrientation == Tile.FACETYPE.BACK)
+            {
+                // throw an error and stop the program
+                Debug.Log("InvalidOrientationError: rightOrientation == Tile.FACETYPE.FRONT || rightOrientation == Tile.FACETYPE.BACK");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public List<int> RotateFaces(List<int> faceList, Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
+    {
+        // this function permutes the order of facelist to match the rotation of the tile
+
+        int topFace = -1;
+        int bottomFace = -1;
+        int leftFace = -1;
+        int rightFace = -1;
+        int frontFace = -1;
+        int backFace = -1;
+
+        List<int> rotatedFaceList = new List<int>();
+
+
+
+        if (topOrientation == Tile.FACETYPE.TOP)
+        {
+            topFace = faceList[0];
+            bottomFace = faceList[1];
+        }
+
+        if (topOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            topFace = faceList[1];
+            bottomFace = faceList[0];
+        }
+
+        if (topOrientation == Tile.FACETYPE.LEFT)
+        {
+            topFace = faceList[2];
+            bottomFace = faceList[3];
+        }
+
+        if (topOrientation == Tile.FACETYPE.RIGHT)
+        {
+            topFace = faceList[3];
+            bottomFace = faceList[2];
+        }
+
+        if (topOrientation == Tile.FACETYPE.FRONT)
+        {
+            topFace = faceList[4];
+            bottomFace = faceList[5];
+        }
+
+        if (topOrientation == Tile.FACETYPE.BACK)
+        {
+            topFace = faceList[5];
+            bottomFace = faceList[4];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.TOP)
+        {
+            frontFace = faceList[0];
+            backFace = faceList[1];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            frontFace = faceList[1];
+            backFace = faceList[0];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.LEFT)
+        {
+            frontFace = faceList[2];
+            backFace = faceList[3];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.RIGHT)
+        {
+            frontFace = faceList[3];
+            backFace = faceList[2];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.FRONT)
+        {
+            frontFace = faceList[4];
+            backFace = faceList[5];
+        }
+
+        if (frontOrientation == Tile.FACETYPE.BACK)
+        {
+            frontFace = faceList[5];
+            backFace = faceList[4];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.TOP)
+        {
+            leftFace = faceList[0];
+            rightFace = faceList[1];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.BOTTOM)
+        {
+            leftFace = faceList[1];
+            rightFace = faceList[0];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.LEFT)
+        {
+            leftFace = faceList[2];
+            rightFace = faceList[3];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.RIGHT)
+        {
+            leftFace = faceList[3];
+            rightFace = faceList[2];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.FRONT)
+        {
+            leftFace = faceList[4];
+            rightFace = faceList[5];
+        }
+
+        if (rightOrientation == Tile.FACETYPE.BACK)
+        {
+            leftFace = faceList[5];
+            rightFace = faceList[4];
+        }
+
+        rotatedFaceList = new List<int> { topFace, bottomFace, leftFace, rightFace, frontFace, backFace };
+        if (rotatedFaceList.Contains(-1))
+        {
+            throw new Exception("InvalidOrientationError: newfaceList.Contains(-1)");
+        }
+        return rotatedFaceList;
+
+    }
 
     public IEnumerator GenerateEnvironment(MetaTilePool metatilepool)
     {
@@ -545,55 +862,65 @@ public class MetaTileEnvironment : MonoBehaviour
             candidateMetatile = GetMetaTile(placementPosition, metatilepool);
 
             // Try to find a place to put the metatile
-            if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, candidateMetatile))
-            {
-                PlaceMetaTile(placementPosition, candidateMetatile);
-                CollapseWaveFunction();
-                resultType = MetaTilePool.RESULTTYPE.SUCCESS;
-                timeoutCounter = 0;
-                placedMetaTiles.Add(candidateMetatile);
-                placedPositions.Add(placementPosition);
-                Debug.Log("MetaTilePool.RESULTTYPE.SUCCESS, placedMetaTiles.Add(candidateMetatile);, placedMetatiles.Count = " + placedMetaTiles.Count);
+            // iterate through the possible orientations of the metatile
 
-                if (DEBUG)
+            foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
+            {
+                // iterate through the possible flips of the metatile
+                foreach (bool flipped in new bool[] { false, true })
                 {
-                    candidateMetatile.DepositPayload(placementPosition);
-                    Debug.Break();
+                    // if the metatile can be placed, place it and break out of the loop
+                    if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped))
+                    {
+                        PlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped);
+                        CollapseWaveFunction();
+                        resultType = MetaTilePool.RESULTTYPE.SUCCESS;
+                        timeoutCounter = 0;
+                        placedMetaTiles.Add(candidateMetatile);
+                        placedPositions.Add(placementPosition);
+                        Debug.Log("MetaTilePool.RESULTTYPE.SUCCESS, placedMetaTiles.Add(candidateMetatile);, placedMetatiles.Count = " + placedMetaTiles.Count);
 
-                    yield return null;
+                        if (DEBUG)
+                        {
+                            candidateMetatile.DepositPayload(placementPosition);
+                            Debug.Break();
+
+                            yield return null;
+                        }
+                    }
+                    else
+                    {
+                        resultType = MetaTilePool.RESULTTYPE.FAILURE;
+                        timeoutCounter++;
+                        Debug.Log("MetaTilePool.RESULTTYPE.FAILURE, timeoutCounter++");
+                    }
+
+                    if (timeoutCounter > 100)
+                    {
+                        Debug.Log("Timeout");
+                        for (int i = 0; i < placedMetaTiles.Count; i++)
+                        {
+                            placedMetaTiles[i].DepositPayload(placedPositions[i]);
+                            // count the number of placed metatiles
+                            Debug.Log("placedMetaTiles.Count: " + placedMetaTiles.Count);
+                        }
+                        break;
+                    }
                 }
-            }
-            else
-            {
-                resultType = MetaTilePool.RESULTTYPE.FAILURE;
-                timeoutCounter++;
-                Debug.Log("MetaTilePool.RESULTTYPE.FAILURE, timeoutCounter++");
-            }
 
-            if (timeoutCounter > 100)
-            {
-                Debug.Log("Timeout");
-                for (int i = 0; i < placedMetaTiles.Count; i++)
+                if (timeoutCounter <= 100 && resultType == MetaTilePool.RESULTTYPE.COMPLETE)
                 {
-                    placedMetaTiles[i].DepositPayload(placedPositions[i]);
-                    // count the number of placed metatiles
-                    Debug.Log("placedMetaTiles.Count: " + placedMetaTiles.Count);
+                    Debug.Log("Complete");
+
+                    for (int i = 0; i < placedMetaTiles.Count; i++)
+                    {
+                        placedMetaTiles[i].DepositPayload(placedPositions[i]);
+                    }
                 }
-                break;
+
+                yield return null;
             }
         }
-
-        if (timeoutCounter <= 100 && resultType == MetaTilePool.RESULTTYPE.COMPLETE)
-        {
-            Debug.Log("Complete");
-
-            for (int i = 0; i < placedMetaTiles.Count; i++)
-            {
-                placedMetaTiles[i].DepositPayload(placedPositions[i]);
-            }
-        }
-
-        yield return null;
     }
 
     public void Awake()
