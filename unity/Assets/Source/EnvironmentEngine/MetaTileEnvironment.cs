@@ -267,63 +267,6 @@ public class MetaTileEnvironment : MonoBehaviour
         faces[2, position.x, position.y, position.z] = faceList[(int)Tile.FACETYPE.FRONT];
         faces[2, position.x, position.y, position.z + 1] = faceList[(int)Tile.FACETYPE.BACK];
 
-        if (debugTile)
-        {
-            //Draw each face
-            for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
-            {
-                Color color = Color.clear;
-                Vector3 facePosition = Vector3.zero;
-                Vector3 size = Vector3.zero;
-
-                int faceID = faceList[(int)i];
-                TileFace faceData = metatilepool.palette.tileFaces[faceID];
-                switch (i)
-                {
-                    case Tile.FACETYPE.TOP:
-                        color = faceData.color;
-                        facePosition = (Vector3)position + new Vector3(0, voxelSize / 2 * 1.01f, 0);
-                        size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
-                        break;
-
-                    case Tile.FACETYPE.BOTTOM:
-                        color = faceData.color;
-                        facePosition = (Vector3)position - new Vector3(0, voxelSize / 2 * 1.01f, 0);
-                        size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
-                        break;
-
-                    case Tile.FACETYPE.LEFT:
-                        color = faceData.color;
-                        facePosition = (Vector3)position - new Vector3(voxelSize / 2 * 1.01f, 0, 0);
-                        size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
-                        break;
-
-                    case Tile.FACETYPE.RIGHT:
-                        color = faceData.color;
-                        facePosition = (Vector3)position + new Vector3(voxelSize / 2 * 1.01f, 0, 0);
-                        size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
-                        break;
-
-                    case Tile.FACETYPE.FRONT:
-                        color = faceData.color;
-                        facePosition = (Vector3)position - new Vector3(0, 0, voxelSize / 2 * 1.01f);
-                        size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
-                        break;
-
-                    case Tile.FACETYPE.BACK:
-                        color = faceData.color;
-                        facePosition = (Vector3)position + new Vector3(0, 0, voxelSize / 2 * 1.01f);
-                        size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
-                        break;
-                }
-
-                Transform tempObject = GameObject.Instantiate(debugTile);
-                tempObject.GetComponent<Renderer>().material.SetColor("_Color", color);
-                tempObject.position = facePosition;
-                tempObject.localScale = size;
-            }
-        }
-
         /*if (debug)
         {
             Debug.Log($"Placed faces {position}:");
@@ -514,7 +457,7 @@ public class MetaTileEnvironment : MonoBehaviour
         {
             // from enum to list of integers that corresponds to a permuted list of faces
 
-            List<Tile.FACETYPE> permutation = OrientationToPermutation[orientation];
+            List<Tile.FACETYPE> permutation = new List<Tile.FACETYPE>(OrientationToPermutation[orientation]);
 
             // multiply the tile position by a quaternion
             UnityEngine.Vector3 unRotatedPosition = new(tile.transform.localPosition.x, tile.transform.localPosition.y, tile.transform.localPosition.z);
@@ -568,7 +511,7 @@ public class MetaTileEnvironment : MonoBehaviour
 
         foreach (Tile tile in metatile.tiles)
         {
-            List<Tile.FACETYPE> permutation = OrientationToPermutation[orientation];
+            List<Tile.FACETYPE> permutation = new List<Tile.FACETYPE>(OrientationToPermutation[orientation]);
 
             // multiply the tile position by a quaternion
             UnityEngine.Vector3 unRotatedPosition = tile.transform.localPosition;
@@ -593,6 +536,8 @@ public class MetaTileEnvironment : MonoBehaviour
                 tempIDs.Add(tile.faceIDs[(int)permutation[i]]);
             }
 
+            Vector3Int position = new Vector3Int(envX, envY, envZ);
+
             // update the faces
             // TODO: replace with TOP, BOTTOM, etc. enum
             //Debug.Log($"Tile face {tile.faceIDs[0]}");
@@ -600,7 +545,72 @@ public class MetaTileEnvironment : MonoBehaviour
 
             if (DEBUG)
             {
-                Debug.Log($"Placed faces {new Vector3Int(envX, envY, envZ)} - {orientation}:");
+                //Draw each face
+                for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
+                {
+                    Color color = Color.clear;
+                    Vector3 facePosition = Vector3.zero;
+                    Vector3 size = Vector3.zero;
+                    string name = "";
+
+                    int faceID = tempIDs[(int)i];
+                    TileFace faceData = metatilepool.palette.tileFaces[faceID];
+                    switch (i)
+                    {
+                        case Tile.FACETYPE.TOP:
+                            color = faceData.color;
+                            facePosition = (Vector3)position + new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                            size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
+                            name = $"{permutation[(int)i]}";
+                            break;
+
+                        case Tile.FACETYPE.BOTTOM:
+                            color = faceData.color;
+                            facePosition = (Vector3)position - new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                            size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
+                            name = $"{permutation[(int)i]}";
+                            break;
+
+                        case Tile.FACETYPE.LEFT:
+                            color = faceData.color;
+                            facePosition = (Vector3)position - new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                            size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
+                            name = $"{permutation[(int)i]}";
+                            break;
+
+                        case Tile.FACETYPE.RIGHT:
+                            color = faceData.color;
+                            facePosition = (Vector3)position + new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                            size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
+                            name = $"{permutation[(int)i]}";
+                            break;
+
+                        case Tile.FACETYPE.FRONT:
+                            color = faceData.color;
+                            facePosition = (Vector3)position - new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                            size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
+                            name = $"{permutation[(int)i]}";
+                            break;
+
+                        case Tile.FACETYPE.BACK:
+                            color = faceData.color;
+                            facePosition = (Vector3)position + new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                            size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
+                            name = $"{permutation[(int)i]}";
+                            break;
+                    }
+
+                    Transform tempObject = GameObject.Instantiate(debugTile);
+                    tempObject.GetComponent<Renderer>().material.SetColor("_Color", color);
+                    tempObject.position = facePosition;
+                    tempObject.localScale = size;
+                    tempObject.name = $"Tile_{name}_{position}";
+                }
+            }
+
+            if (DEBUG)
+            {
+                Debug.Log($"Placed faces {new Vector3Int(envX, envY, envZ)} - {orientation} - flipped? {flipped}:");
                 Debug.Log($"    Top: {GetFaceName(tempIDs[(int)Tile.FACETYPE.TOP])}");
                 Debug.Log($"    Bottom: {GetFaceName(tempIDs[(int)Tile.FACETYPE.BOTTOM])}");
                 Debug.Log($"    Left: {GetFaceName(tempIDs[(int)Tile.FACETYPE.LEFT])}");
