@@ -32,7 +32,7 @@ public class MetaTileEnvironment : MonoBehaviour
     public MetaTilePool metatilepool;
 
     public List<MetaTile> placedMetaTiles = new List<MetaTile>();
-
+    public List<Quaternion> placedRotations = new List<Quaternion>();
     public List<Vector3Int> placedPositions = new List<Vector3Int>();
 
     public enum TileState { NotPlaced, Wavefront, Placed };
@@ -44,6 +44,7 @@ public class MetaTileEnvironment : MonoBehaviour
     public List<float> wavefrontEntropies = new();
 
     public bool DEBUG = false;
+    public Transform debugTile;
 
     public enum Orientation
     {
@@ -213,7 +214,17 @@ public class MetaTileEnvironment : MonoBehaviour
         return environment[position.x, position.y, position.z];
     }
 
-    public List<int> GetFaceList(Vector3Int position)
+    string GetFaceName(int faceID)
+    {
+        if (faceID == -1)
+        {
+            return "Empty";
+        }
+
+        return metatilepool.palette.tileFaces[faceID].name;
+    }
+
+    public List<int> GetFaceList(Vector3Int position, bool debug = false)
     {
         List<int> faceList = new List<int>();
 
@@ -233,21 +244,21 @@ public class MetaTileEnvironment : MonoBehaviour
         faceList.Add(front);
         faceList.Add(back);
 
-        if (DEBUG)
+        /*if (debug)
         {
-            Debug.Log("Get placed faces:");
-            Debug.Log($"    Top: {faceList[(int)Tile.FACETYPE.TOP]}");
-            Debug.Log($"    Bottom: {faceList[(int)Tile.FACETYPE.BOTTOM]}");
-            Debug.Log($"    Left: {faceList[(int)Tile.FACETYPE.LEFT]}");
-            Debug.Log($"    Right: {faceList[(int)Tile.FACETYPE.RIGHT]}");
-            Debug.Log($"    Front: {faceList[(int)Tile.FACETYPE.FRONT]}");
-            Debug.Log($"    Back: {faceList[(int)Tile.FACETYPE.BACK]}");
-        }
+            Debug.Log($"Get placed faces {position}:");
+            Debug.Log($"    Top: {GetFaceName(faceList[(int)Tile.FACETYPE.TOP])}");
+            Debug.Log($"    Bottom: {GetFaceName(faceList[(int)Tile.FACETYPE.BOTTOM])}");
+            Debug.Log($"    Left: {GetFaceName(faceList[(int)Tile.FACETYPE.LEFT])}");
+            Debug.Log($"    Right: {GetFaceName(faceList[(int)Tile.FACETYPE.RIGHT])}");
+            Debug.Log($"    Front: {GetFaceName(faceList[(int)Tile.FACETYPE.FRONT])}");
+            Debug.Log($"    Back: {GetFaceName(faceList[(int)Tile.FACETYPE.BACK])}");
+        }*/
 
         return faceList;
     }
 
-    public void SetFaceList(Vector3Int position, List<int> faceList)
+    public void SetFaceList(Vector3Int position, List<int> faceList, bool debug = false)
     {
         faces[1, position.x, position.y + 1, position.z] = faceList[(int)Tile.FACETYPE.TOP];
         faces[1, position.x, position.y, position.z] = faceList[(int)Tile.FACETYPE.BOTTOM];
@@ -256,16 +267,73 @@ public class MetaTileEnvironment : MonoBehaviour
         faces[2, position.x, position.y, position.z] = faceList[(int)Tile.FACETYPE.FRONT];
         faces[2, position.x, position.y, position.z + 1] = faceList[(int)Tile.FACETYPE.BACK];
 
-        if (DEBUG)
+        if (debugTile)
         {
-            Debug.Log("Placed faces:");
-            Debug.Log($"    Top: {faceList[(int)Tile.FACETYPE.TOP]}");
-            Debug.Log($"    Bottom: {faceList[(int)Tile.FACETYPE.BOTTOM]}");
-            Debug.Log($"    Left: {faceList[(int)Tile.FACETYPE.LEFT]}");
-            Debug.Log($"    Right: {faceList[(int)Tile.FACETYPE.RIGHT]}");
-            Debug.Log($"    Front: {faceList[(int)Tile.FACETYPE.FRONT]}");
-            Debug.Log($"    Back: {faceList[(int)Tile.FACETYPE.BACK]}");
+            //Draw each face
+            for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
+            {
+                Color color = Color.clear;
+                Vector3 facePosition = Vector3.zero;
+                Vector3 size = Vector3.zero;
+
+                int faceID = faceList[(int)i];
+                TileFace faceData = metatilepool.palette.tileFaces[faceID];
+                switch (i)
+                {
+                    case Tile.FACETYPE.TOP:
+                        color = faceData.color;
+                        facePosition = (Vector3)position + new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                        size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
+                        break;
+
+                    case Tile.FACETYPE.BOTTOM:
+                        color = faceData.color;
+                        facePosition = (Vector3)position - new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                        size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
+                        break;
+
+                    case Tile.FACETYPE.LEFT:
+                        color = faceData.color;
+                        facePosition = (Vector3)position - new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                        size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
+                        break;
+
+                    case Tile.FACETYPE.RIGHT:
+                        color = faceData.color;
+                        facePosition = (Vector3)position + new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                        size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
+                        break;
+
+                    case Tile.FACETYPE.FRONT:
+                        color = faceData.color;
+                        facePosition = (Vector3)position - new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                        size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
+                        break;
+
+                    case Tile.FACETYPE.BACK:
+                        color = faceData.color;
+                        facePosition = (Vector3)position + new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                        size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
+                        break;
+                }
+
+                Transform tempObject = GameObject.Instantiate(debugTile);
+                tempObject.GetComponent<Renderer>().material.SetColor("_Color", color);
+                tempObject.position = facePosition;
+                tempObject.localScale = size;
+            }
         }
+
+        /*if (debug)
+        {
+            Debug.Log($"Placed faces {position}:");
+            Debug.Log($"    Top: {GetFaceName(faceList[(int)Tile.FACETYPE.TOP])}");
+            Debug.Log($"    Bottom: {GetFaceName(faceList[(int)Tile.FACETYPE.BOTTOM])}");
+            Debug.Log($"    Left: {GetFaceName(faceList[(int)Tile.FACETYPE.LEFT])}");
+            Debug.Log($"    Right: {GetFaceName(faceList[(int)Tile.FACETYPE.RIGHT])}");
+            Debug.Log($"    Front: {GetFaceName(faceList[(int)Tile.FACETYPE.FRONT])}");
+            Debug.Log($"    Back: {GetFaceName(faceList[(int)Tile.FACETYPE.BACK])}");
+        }*/
 
     }
 
@@ -289,7 +357,7 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public List<List<int>> GetPossibleFaces(Vector3Int position)
     {
-        List<int> faceList = GetFaceList(position);
+        List<int> faceList = GetFaceList(position, DEBUG);
 
         // return the list of faces permitted for each face at the position according to the matching matrix
         List<List<int>> possibleFaces = new List<List<int>>();
@@ -369,8 +437,6 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public MetaTile DrawMetaTile(Vector3Int placementPosition, MetaTilePool metatilepool)
     {
-
-
         // Create a list of all legal metatiles from the pool
         List<MetaTile> metatiles = new List<MetaTile>();
 
@@ -400,7 +466,7 @@ public class MetaTileEnvironment : MonoBehaviour
         return filteredMetatiles[UnityEngine.Random.Range(0, filteredMetatiles.Count)];
     }
 
-    public MetaTile GetMetaTile(Vector3Int placementPosition, MetaTilePool metatilepool)
+    public List<MetaTile> GetMetaTiles(Vector3Int placementPosition, MetaTilePool metatilepool)
     {
         // Create a list of all legal metatiles from the pool
         List<MetaTile> metatiles = new List<MetaTile>();
@@ -428,7 +494,9 @@ public class MetaTileEnvironment : MonoBehaviour
             Debug.Log("Metatile Count after filtering: " + filteredMetatiles.Count);
         }
 
-        if (filteredMetatiles.Count > 0)
+        return filteredMetatiles;
+
+        /*if (filteredMetatiles.Count > 0)
         {
             // select a random metatile from the filtered list
             return filteredMetatiles[UnityEngine.Random.Range(0, filteredMetatiles.Count)];
@@ -436,7 +504,7 @@ public class MetaTileEnvironment : MonoBehaviour
         else
         {
             return null;
-        }
+        }*/
     }
 
     public bool CanPlaceMetaTile(Vector3Int placementPosition, MetaTile metatile, Orientation orientation, bool flipped)
@@ -450,14 +518,14 @@ public class MetaTileEnvironment : MonoBehaviour
 
             // multiply the tile position by a quaternion
             UnityEngine.Vector3 unRotatedPosition = new(tile.transform.localPosition.x, tile.transform.localPosition.y, tile.transform.localPosition.z);
-            UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
             if (flipped)
             {
-                rotatedPosition.z = rotatedPosition.z * -1;
+                unRotatedPosition.y = unRotatedPosition.y * -1;
                 (permutation[1], permutation[0]) = (permutation[0], permutation[1]);
             }
+            UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
             // not sure if you can multiply Vector3Ints by quaternion
-            Vector3Int tilePosition = new Vector3Int((int)rotatedPosition.x, (int)rotatedPosition.y, (int)rotatedPosition.z);
+            Vector3Int tilePosition = new Vector3Int(Mathf.RoundToInt(rotatedPosition.x), Mathf.RoundToInt(rotatedPosition.y), Mathf.RoundToInt(rotatedPosition.z));
 
             Vector3Int environmentPosition = placementPosition + tilePosition;
 
@@ -503,15 +571,15 @@ public class MetaTileEnvironment : MonoBehaviour
             List<Tile.FACETYPE> permutation = OrientationToPermutation[orientation];
 
             // multiply the tile position by a quaternion
-            UnityEngine.Vector3 unRotatedPosition = new(tile.transform.localPosition.x, tile.transform.localPosition.y, tile.transform.localPosition.z);
-            UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
+            UnityEngine.Vector3 unRotatedPosition = tile.transform.localPosition;
             if (flipped)
             {
-                rotatedPosition.z = rotatedPosition.z * -1;
+                unRotatedPosition.y = unRotatedPosition.y * -1;
                 (permutation[1], permutation[0]) = (permutation[0], permutation[1]);
             }
+            UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
             // not sure if you can multiply Vector3Ints by quaternion
-            Vector3Int tilePosition = new Vector3Int((int)rotatedPosition.x, (int)rotatedPosition.y, (int)rotatedPosition.z);
+            Vector3Int tilePosition = new Vector3Int(Mathf.RoundToInt(rotatedPosition.x), Mathf.RoundToInt(rotatedPosition.y), Mathf.RoundToInt(rotatedPosition.z));
 
             int envX = placementPosition.x + tilePosition.x;
             int envY = placementPosition.y + tilePosition.y;
@@ -519,10 +587,27 @@ public class MetaTileEnvironment : MonoBehaviour
 
             environment[envX, envY, envZ] = tile;
 
+            List<int> tempIDs = new List<int>();
+            for (int i = 0; i < permutation.Count && i < tile.faceIDs.Length; i++)
+            {
+                tempIDs.Add(tile.faceIDs[(int)permutation[i]]);
+            }
+
             // update the faces
             // TODO: replace with TOP, BOTTOM, etc. enum
             //Debug.Log($"Tile face {tile.faceIDs[0]}");
-            SetFaceList(placementPosition, new List<int>(tile.faceIDs));
+            SetFaceList(new Vector3Int(envX, envY, envZ), tempIDs, DEBUG);
+
+            if (DEBUG)
+            {
+                Debug.Log($"Placed faces {new Vector3Int(envX, envY, envZ)} - {orientation}:");
+                Debug.Log($"    Top: {GetFaceName(tempIDs[(int)Tile.FACETYPE.TOP])}");
+                Debug.Log($"    Bottom: {GetFaceName(tempIDs[(int)Tile.FACETYPE.BOTTOM])}");
+                Debug.Log($"    Left: {GetFaceName(tempIDs[(int)Tile.FACETYPE.LEFT])}");
+                Debug.Log($"    Right: {GetFaceName(tempIDs[(int)Tile.FACETYPE.RIGHT])}");
+                Debug.Log($"    Front: {GetFaceName(tempIDs[(int)Tile.FACETYPE.FRONT])}");
+                Debug.Log($"    Back: {GetFaceName(tempIDs[(int)Tile.FACETYPE.BACK])}");
+            }
 
             if (tileState[envX, envY, envZ] == TileState.Placed)
             {
@@ -601,7 +686,7 @@ public class MetaTileEnvironment : MonoBehaviour
         return entropy;
     }
 
-    public bool ValidateOrientation(Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
+    /*public bool ValidateOrientation(Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
     {
         // assert that there is only one of (top, bottom) and (left, right) and (front, back) in the orientations
         // TODO: not all of these checks are necessary. Which ones can be removed?
@@ -831,10 +916,15 @@ public class MetaTileEnvironment : MonoBehaviour
         }
         return rotatedFaceList;
 
-    }
+    }*/
 
     public IEnumerator GenerateEnvironment(MetaTilePool metatilepool)
     {
+        GameObject placementIndicator = null;
+        if (DEBUG)
+        {
+            placementIndicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        }
 
         // set up the attempt loop around the metatile pool
         MetaTilePool.RESULTTYPE resultType = MetaTilePool.RESULTTYPE.SUCCESS;
@@ -854,79 +944,107 @@ public class MetaTileEnvironment : MonoBehaviour
             {
                 Debug.Log("No empty positions, placement is complete.");
                 resultType = MetaTilePool.RESULTTYPE.COMPLETE;
+
+                for (int i = 0; i < placedMetaTiles.Count; i++)
+                {
+                    placedMetaTiles[i].DepositPayload(placedPositions[i], placedRotations[i]);
+                }
+
                 break;
             }
 
-            // Select a candidate metatile
-            // candidateMetatile = DrawMetaTile(placementPosition, metatilepool);
-            candidateMetatile = GetMetaTile(placementPosition, metatilepool);
+            List<MetaTile> filteredMetatiles = GetMetaTiles(placementPosition, metatilepool);
 
-            // Try to find a place to put the metatile
-            // iterate through the possible orientations of the metatile
-
-            foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
+            if (placementIndicator)
             {
-                // iterate through the possible flips of the metatile
-                foreach (bool flipped in new bool[] { false, true })
+                placementIndicator.transform.position = placementPosition;
+            }
+
+            resultType = MetaTilePool.RESULTTYPE.FAILURE;
+            //Loop through all permissable meta tiles and try to place them
+            while (resultType != MetaTilePool.RESULTTYPE.SUCCESS && filteredMetatiles.Count > 0)
+            {
+                // Select a candidate metatile
+                // candidateMetatile = DrawMetaTile(placementPosition, metatilepool);
+                candidateMetatile = filteredMetatiles[UnityEngine.Random.Range(0, filteredMetatiles.Count)];
+
+                // Try to find a place to put the metatile
+                // iterate through the possible orientations of the metatile
+                Orientation[] values = (Orientation[])Enum.GetValues(typeof(Orientation));
+                System.Random random = new System.Random();
+                random.Shuffle(values);
+                foreach (Orientation orientation in values)
                 {
-                    // if the metatile can be placed, place it and break out of the loop
-                    if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped))
+                    if (resultType == MetaTilePool.RESULTTYPE.SUCCESS)
                     {
-                        PlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped);
-                        CollapseWaveFunction();
-                        resultType = MetaTilePool.RESULTTYPE.SUCCESS;
-                        timeoutCounter = 0;
-                        placedMetaTiles.Add(candidateMetatile);
-                        placedPositions.Add(placementPosition);
-                        Debug.Log("MetaTilePool.RESULTTYPE.SUCCESS, placedMetaTiles.Add(candidateMetatile);, placedMetatiles.Count = " + placedMetaTiles.Count);
-
-                        if (DEBUG)
-                        {
-                            candidateMetatile.DepositPayload(placementPosition);
-                            Debug.Break();
-
-                            yield return null;
-                        }
-                    }
-                    else
-                    {
-                        resultType = MetaTilePool.RESULTTYPE.FAILURE;
-                        timeoutCounter++;
-                        Debug.Log("MetaTilePool.RESULTTYPE.FAILURE, timeoutCounter++");
-                    }
-
-                    if (timeoutCounter > 100)
-                    {
-                        Debug.Log("Timeout");
-                        for (int i = 0; i < placedMetaTiles.Count; i++)
-                        {
-                            placedMetaTiles[i].DepositPayload(placedPositions[i]);
-                            // count the number of placed metatiles
-                            Debug.Log("placedMetaTiles.Count: " + placedMetaTiles.Count);
-                        }
                         break;
                     }
-                }
 
-                if (timeoutCounter <= 100 && resultType == MetaTilePool.RESULTTYPE.COMPLETE)
-                {
-                    Debug.Log("Complete");
-
-                    for (int i = 0; i < placedMetaTiles.Count; i++)
+                    // iterate through the possible flips of the metatile
+                    int isFlipped = UnityEngine.Random.Range(0, 2);
+                    for (int i = 0; i <= 1; i++)
                     {
-                        placedMetaTiles[i].DepositPayload(placedPositions[i]);
+                        bool flipped = (i + isFlipped) % 2 == 0;
+
+                        if (resultType == MetaTilePool.RESULTTYPE.SUCCESS)
+                        {
+                            break;
+                        }
+
+                        // if the metatile can be placed, place it and break out of the loop
+                        if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped))
+                        {
+                            PlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped);
+                            CollapseWaveFunction();
+                            resultType = MetaTilePool.RESULTTYPE.SUCCESS;
+                            placedMetaTiles.Add(candidateMetatile);
+                            placedPositions.Add(placementPosition);
+                            placedRotations.Add(OrientationToQuaternion[orientation]);
+                            Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPosition}, orientation={orientation}, Count={placedMetaTiles.Count}");
+
+                            if (DEBUG)
+                            {
+                                candidateMetatile.DepositPayload(placementPosition, OrientationToQuaternion[orientation], false);
+                                Debug.Break();
+
+                                yield return null;
+                            }
+
+                            break;
+                        }
+                        else
+                        {
+                            resultType = MetaTilePool.RESULTTYPE.FAILURE;
+                            timeoutCounter++;
+                            Debug.Log("MetaTilePool.RESULTTYPE.FAILURE, timeoutCounter++");
+                        }
+                    }
+
+                    if (DEBUG)
+                    {
+                        yield return null;
                     }
                 }
 
-                yield return null;
+                filteredMetatiles.Remove(candidateMetatile);
+            }
+
+            if (filteredMetatiles.Count == 0)
+            {
+                Debug.Log("Timeout");
+                resultType = MetaTilePool.RESULTTYPE.FAILURE;
+
+                for (int i = 0; i < placedMetaTiles.Count; i++)
+                {
+                    placedMetaTiles[i].DepositPayload(placedPositions[i], placedRotations[i]);
+                }
+                break;
             }
         }
     }
 
     public void Awake()
     {
-        DEBUG = false;
-
         //Initialize face array
         for (int i = 0; i < faces.GetLength(0); i++)
         {
@@ -958,5 +1076,20 @@ public class MetaTileEnvironment : MonoBehaviour
         //Making this a coroutine enbales step by step debugging. This is not fast, and should be changed back at some point.
         StartCoroutine(GenerateEnvironment(metatilepool));
         //GenerateEnvironment(metatilepool);
+    }
+}
+
+static class RandomExtensions
+{
+    public static void Shuffle<T>(this System.Random rng, T[] array)
+    {
+        int n = array.Length;
+        while (n > 1)
+        {
+            int k = rng.Next(n--);
+            T temp = array[n];
+            array[n] = array[k];
+            array[k] = temp;
+        }
     }
 }

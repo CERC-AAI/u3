@@ -153,12 +153,31 @@ public class MetaTile : IMetaTileProbability
         return false;
     }
 
-    public void DepositPayload(Vector3Int position)
+    public void DepositPayload(Vector3Int position, Quaternion rotation, bool debug = false)
     {
         if (payload != null)
         {
             Transform payloadCopy = Instantiate(payload);
             payloadCopy.transform.position = position;
+            payloadCopy.transform.localRotation = rotation;
+        }
+
+        if (debug)
+        {
+            GameObject tempParent = new GameObject("Tile holder");
+            tempParent.transform.position = position;
+
+            foreach (Tile tile in tiles)
+            {
+                Tile thisTile = Instantiate(tile);
+
+                thisTile.transform.parent = tempParent.transform;
+                thisTile.transform.localPosition = tile.transform.localPosition;
+
+                thisTile.SetParent(this);
+            }
+
+            tempParent.transform.localRotation = rotation;
         }
     }
     private void Awake()

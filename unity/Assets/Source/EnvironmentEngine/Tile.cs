@@ -59,6 +59,11 @@ public class Tile : MonoBehaviour
         mParentMetaTile = GetComponentInParent<MetaTile>();
     }
 
+    public void SetParent(MetaTile parent)
+    {
+        mParentMetaTile = parent;
+    }
+
     // public static Tile GetNeighbor(Tile[,,] environment, int x, int y, int z)
     // {
     //     if (x < 0 || x >= environment.GetLength(0) ||
@@ -100,7 +105,11 @@ public class Tile : MonoBehaviour
     // Draw a semitransparent red cube at the transforms position
     void OnDrawGizmos()
     {
-        MetaTile parentMetaTile = GetComponentInParent<MetaTile>();
+        MetaTile parentMetaTile = mParentMetaTile;
+        if (parentMetaTile == null)
+        {
+            parentMetaTile = GetComponentInParent<MetaTile>();
+        }
 
         float voxelSize = parentMetaTile.GetPalette().voxelSize;
         voxelSize = voxelSize * 1.01f;
@@ -132,8 +141,8 @@ public class Tile : MonoBehaviour
                     }
 
                     color = faceData.color;
-                    position = transform.position + new Vector3(0, voxelSize / 2 * 1.01f, 0);
-                    size = new Vector3(voxelSize / 2, 0, voxelSize / 2);
+                    position = transform.position + transform.rotation * new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                    size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
                     break;
 
                 case FACETYPE.BOTTOM:
@@ -143,8 +152,8 @@ public class Tile : MonoBehaviour
                     }
 
                     color = faceData.color;
-                    position = transform.position - new Vector3(0, voxelSize / 2 * 1.01f, 0);
-                    size = new Vector3(voxelSize / 2, 0, voxelSize / 2);
+                    position = transform.position - transform.rotation * new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                    size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
                     break;
 
                 case FACETYPE.LEFT:
@@ -154,8 +163,8 @@ public class Tile : MonoBehaviour
                     }
 
                     color = faceData.color;
-                    position = transform.position - new Vector3(voxelSize / 2 * 1.01f, 0, 0);
-                    size = new Vector3(0, voxelSize / 2, voxelSize / 2);
+                    position = transform.position - transform.rotation * new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                    size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
                     break;
 
                 case FACETYPE.RIGHT:
@@ -165,8 +174,8 @@ public class Tile : MonoBehaviour
                     }
 
                     color = faceData.color;
-                    position = transform.position + new Vector3(voxelSize / 2 * 1.01f, 0, 0);
-                    size = new Vector3(0, voxelSize / 2, voxelSize / 2);
+                    position = transform.position + transform.rotation * new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                    size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
                     break;
 
                 case FACETYPE.FRONT:
@@ -176,8 +185,8 @@ public class Tile : MonoBehaviour
                     }
 
                     color = faceData.color;
-                    position = transform.position - new Vector3(0, 0, voxelSize / 2 * 1.01f);
-                    size = new Vector3(voxelSize / 2, voxelSize / 2, 0);
+                    position = transform.position - transform.rotation * new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                    size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
                     break;
 
                 case FACETYPE.BACK:
@@ -187,8 +196,8 @@ public class Tile : MonoBehaviour
                     }
 
                     color = faceData.color;
-                    position = transform.position + new Vector3(0, 0, voxelSize / 2 * 1.01f);
-                    size = new Vector3(voxelSize / 2, voxelSize / 2, 0);
+                    position = transform.position + transform.rotation * new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                    size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
                     break;
             }
 
