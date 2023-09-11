@@ -34,6 +34,7 @@ public class MetaTileEnvironment : MonoBehaviour
     public List<MetaTile> placedMetaTiles = new List<MetaTile>();
     public List<Quaternion> placedRotations = new List<Quaternion>();
     public List<Vector3Int> placedPositions = new List<Vector3Int>();
+    public List<bool> placedFlipped = new List<bool>();
 
     public enum TileState { NotPlaced, Wavefront, Placed };
 
@@ -318,9 +319,9 @@ public class MetaTileEnvironment : MonoBehaviour
         return possibleFaces;
     }
 
-    public List<MetaTile> CustomFiltering(Vector3Int placementPosition, List<MetaTile> metatiles)
+    public List<MetaTileProbability> CustomFiltering(Vector3Int placementPosition, List<MetaTileProbability> metatiles)
     {
-        List<MetaTile> filteredMetatiles = new List<MetaTile>();
+        List<MetaTileProbability> filteredMetatiles = new List<MetaTileProbability>();
         // TODO: look into how WFC normally does this
         // TODO: allow metatilePools to weight dynamically (decay weights over time)
         List<List<int>> possibleFaces = GetPossibleFaces(placementPosition);
@@ -344,31 +345,27 @@ public class MetaTileEnvironment : MonoBehaviour
         // the metatile must contain at least one tile with a face in filterFaces
         // if this tile has a face in filterFaces, then check the other faces of the tile against the other faces in possibleFaces
         // this is an example of a pre-filtering pass
-        foreach (MetaTile metatile in metatiles)
+        foreach (MetaTileProbability metatile in metatiles)
         {
-            foreach (Tile tile in metatile.tiles)
+            foreach (Tile tile in metatile.metaTileProbability.GetMetaTiles()[0].tiles)
             {
-                Vector3Int tilePosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+                //Vector3Int tilePosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
                 //FIX ME
                 //List<int> tileFaces = GetFaceList(placementPosition + tilePosition);
                 List<int> tileFaces = new List<int>(tile.faceIDs);
-                if (filterFaces.Contains(tileFaces[filterFaceIdx]))
+                bool tileIsLegal = false;
+                for (int i = 0; i < tileFaces.Count; i++)
                 {
-                    // check the other faces of the tile against the other faces in possibleFaces
-                    bool tileIsLegal = true;
-                    for (int i = 0; i < tileFaces.Count; i++)
+                    if (filterFaces.Contains(tileFaces[i]))
                     {
-                        if (i != filterFaceIdx && !possibleFaces[i].Contains(tileFaces[i]))
-                        {
-                            tileIsLegal = false;
-                            break;
-                        }
-                    }
-                    if (tileIsLegal)
-                    {
-                        filteredMetatiles.Add(metatile);
+                        tileIsLegal = true;
                         break;
                     }
+                }
+                if (tileIsLegal)
+                {
+                    filteredMetatiles.Add(metatile);
+                    break;
                 }
             }
         }
@@ -376,10 +373,10 @@ public class MetaTileEnvironment : MonoBehaviour
         return filteredMetatiles;
     }
 
-    public MetaTile DrawMetaTile(Vector3Int placementPosition, MetaTilePool metatilepool)
+    /*public MetaTile DrawMetaTile(Vector3Int placementPosition, MetaTilePool metatilepool)
     {
         // Create a list of all legal metatiles from the pool
-        List<MetaTile> metatiles = new List<MetaTile>();
+        List<MetaTileProbability> metatiles = new List<MetaTileProbability>();
 
         if (DEBUG)
         {
@@ -405,12 +402,12 @@ public class MetaTileEnvironment : MonoBehaviour
 
         // select a random metatile from the filtered list
         return filteredMetatiles[UnityEngine.Random.Range(0, filteredMetatiles.Count)];
-    }
+    }*/
 
-    public List<MetaTile> GetMetaTiles(Vector3Int placementPosition, MetaTilePool metatilepool)
+    public List<MetaTileProbability> GetMetaTiles(Vector3Int placementPosition, MetaTilePool metatilepool)
     {
         // Create a list of all legal metatiles from the pool
-        List<MetaTile> metatiles = new List<MetaTile>();
+        List<MetaTileProbability> metatiles = new List<MetaTileProbability>();
 
         if (DEBUG)
         {
@@ -420,7 +417,7 @@ public class MetaTileEnvironment : MonoBehaviour
         // TODO: fix this to exhaustively grab all possible metatiles
         foreach (MetaTileProbability metatileprobability in metatilepool.metatileProbabilities)
         {
-            metatiles.AddRange(metatileprobability.metaTileProbability.GetMetaTiles());
+            metatiles.Add(metatileprobability);
         }
 
         if (DEBUG)
@@ -428,7 +425,7 @@ public class MetaTileEnvironment : MonoBehaviour
             Debug.Log("Metatile Count after adding: " + metatiles.Count);
         }
 
-        List<MetaTile> filteredMetatiles = CustomFiltering(placementPosition, metatiles);
+        List<MetaTileProbability> filteredMetatiles = CustomFiltering(placementPosition, metatiles);
 
         if (DEBUG)
         {
@@ -676,7 +673,7 @@ public class MetaTileEnvironment : MonoBehaviour
         }
     }
 
-    public int CalculateEntropy(Vector3Int position)
+    public float CalculateEntropy(Vector3Int position)
     {
         // Do full translation/rotation tests and cache adjacent tile legality
         // Dilation of tile checks and translation?
@@ -685,10 +682,13 @@ public class MetaTileEnvironment : MonoBehaviour
         List<int> faceList = GetFaceList(position);
 
         // Calculate the entropy
-        int entropy = metatilepool.palette.tileFaces.Count;
+        float entropy = metatilepool.palette.tileFaces.Count;
         for (int i = 0; i < faceList.Count; i++)
         {
-            entropy = Mathf.Min(entropy, metatilepool.palette.GetPossibleConnections(faceList[i]).Count);
+            float thisEntropy = faceList[i] == 1 ? 0 : 1; //Is a pipe?
+            //float thisEntropy = metatilepool.palette.GetPossibleConnections(faceList[i]).Count;
+
+            entropy = Mathf.Min(entropy, thisEntropy);
         }
 
         return entropy;
@@ -928,6 +928,11 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public IEnumerator GenerateEnvironment(MetaTilePool metatilepool)
     {
+        placedFlipped.Clear();
+        placedMetaTiles.Clear();
+        placedPositions.Clear();
+        placedRotations.Clear();
+
         GameObject placementIndicator = null;
         if (DEBUG)
         {
@@ -955,13 +960,14 @@ public class MetaTileEnvironment : MonoBehaviour
 
                 for (int i = 0; i < placedMetaTiles.Count; i++)
                 {
-                    placedMetaTiles[i].DepositPayload(placedPositions[i], placedRotations[i]);
+                    placedMetaTiles[i].DepositPayload(placedPositions[i], placedRotations[i], placedFlipped[i]);
                 }
 
                 break;
             }
 
-            List<MetaTile> filteredMetatiles = GetMetaTiles(placementPosition, metatilepool);
+            List<MetaTileProbability> filteredMetatiles = GetMetaTiles(placementPosition, metatilepool);
+            int filteredMetatileCount = filteredMetatiles.Count;
 
             if (placementIndicator)
             {
@@ -974,7 +980,8 @@ public class MetaTileEnvironment : MonoBehaviour
             {
                 // Select a candidate metatile
                 // candidateMetatile = DrawMetaTile(placementPosition, metatilepool);
-                candidateMetatile = filteredMetatiles[UnityEngine.Random.Range(0, filteredMetatiles.Count)];
+                int candidateIndex = UnityEngine.Random.Range(0, filteredMetatiles.Count);
+                candidateMetatile = filteredMetatiles[candidateIndex].metaTileProbability.GetMetaTiles()[0];
 
                 // Try to find a place to put the metatile
                 // iterate through the possible orientations of the metatile
@@ -992,8 +999,8 @@ public class MetaTileEnvironment : MonoBehaviour
                     int isFlipped = UnityEngine.Random.Range(0, 2);
                     for (int i = 0; i <= 1; i++)
                     {
-                        // bool flipped = (i + isFlipped) % 2 == 1;
-                        bool flipped = false;
+                        bool flipped = (i + isFlipped) % 2 == 1;
+                        //bool flipped = false;
 
                         if (resultType == MetaTilePool.RESULTTYPE.SUCCESS)
                         {
@@ -1009,11 +1016,12 @@ public class MetaTileEnvironment : MonoBehaviour
                             placedMetaTiles.Add(candidateMetatile);
                             placedPositions.Add(placementPosition);
                             placedRotations.Add(OrientationToQuaternion[orientation]);
-                            Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPosition}, orientation={orientation}, Count={placedMetaTiles.Count}");
+                            placedFlipped.Add(flipped);
+                            Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPosition}, orientation={orientation}, flipped = {flipped}, Count={placedMetaTiles.Count}");
 
                             if (DEBUG)
                             {
-                                candidateMetatile.DepositPayload(placementPosition, OrientationToQuaternion[orientation], false);
+                                candidateMetatile.DepositPayload(placementPosition, OrientationToQuaternion[orientation], flipped, false);
                                 Debug.Break();
 
                                 yield return null;
@@ -1024,8 +1032,8 @@ public class MetaTileEnvironment : MonoBehaviour
                         else
                         {
                             resultType = MetaTilePool.RESULTTYPE.FAILURE;
-                            timeoutCounter++;
-                            Debug.Log("MetaTilePool.RESULTTYPE.FAILURE, timeoutCounter++");
+                            //timeoutCounter++;
+                            //Debug.Log("MetaTilePool.RESULTTYPE.FAILURE, timeoutCounter++");
                         }
                     }
 
@@ -1035,17 +1043,23 @@ public class MetaTileEnvironment : MonoBehaviour
                     }
                 }
 
-                filteredMetatiles.Remove(candidateMetatile);
+                if (resultType != MetaTilePool.RESULTTYPE.SUCCESS)
+                {
+                    filteredMetatiles.RemoveAt(candidateIndex);
+                }
             }
 
             if (filteredMetatiles.Count == 0)
             {
-                Debug.Log("Timeout");
+                Debug.Log($"No metatile to place at {placementPosition}. Tried {filteredMetatileCount} tiles.");
                 resultType = MetaTilePool.RESULTTYPE.FAILURE;
+
+                placementIndicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                placementIndicator.transform.position = placementPosition;
 
                 for (int i = 0; i < placedMetaTiles.Count; i++)
                 {
-                    placedMetaTiles[i].DepositPayload(placedPositions[i], placedRotations[i]);
+                    placedMetaTiles[i].DepositPayload(placedPositions[i], placedRotations[i], placedFlipped[i]);
                 }
                 break;
             }

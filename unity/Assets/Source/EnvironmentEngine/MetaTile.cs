@@ -153,13 +153,18 @@ public class MetaTile : IMetaTileProbability
         return false;
     }
 
-    public void DepositPayload(Vector3Int position, Quaternion rotation, bool debug = false)
+    public void DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, bool debug = false)
     {
         if (payload != null)
         {
             Transform payloadCopy = Instantiate(payload);
             payloadCopy.transform.position = position;
             payloadCopy.transform.localRotation = rotation;
+
+            if (flipped)
+            {
+                payloadCopy.transform.localScale = new Vector3(1, -1, 1);
+            }
         }
 
         if (debug)

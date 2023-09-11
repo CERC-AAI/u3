@@ -8354,10 +8354,12 @@ MonoBehaviour:
   placedMetaTiles: []
   placedRotations: []
   placedPositions: []
+  placedFlipped: 
   wavefrontPositions: []
   wavefrontEntropies: []
   DEBUG: 1
-  flipped: 0
+  debugTile: {fileID: 8411421930320262341, guid: 854926c658783f947a2964d1b81dbfc1,
+    type: 3}
 --- !u!4 &2033542608
 Transform:
   m_ObjectHideFlags: 0
