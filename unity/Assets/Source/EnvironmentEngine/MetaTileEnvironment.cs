@@ -79,8 +79,6 @@ public class MetaTileEnvironment : MonoBehaviour
         RightBack
     }
 
-    public bool flipped;
-
     public static Dictionary<Orientation, Quaternion> OrientationToQuaternion = new Dictionary<Orientation, Quaternion>
     {
         { Orientation.UpFront, Quaternion.Euler(0, 0, 0) },
@@ -88,30 +86,30 @@ public class MetaTileEnvironment : MonoBehaviour
         { Orientation.UpLeft, Quaternion.Euler(0, -90, 0) },
         { Orientation.UpRight, Quaternion.Euler(0, 90, 0) },
 
-        { Orientation.DownFront, Quaternion.Euler(180, 0, 0) },
-        { Orientation.DownBack, Quaternion.Euler(180, 180, 0) },
-        { Orientation.DownLeft, Quaternion.Euler(180, 90, 0) },
-        { Orientation.DownRight, Quaternion.Euler(180, -90, 0) },
+        { Orientation.DownFront, Quaternion.Euler(180, 180, 0) },
+        { Orientation.DownBack, Quaternion.Euler(180, 0, 0) },
+        { Orientation.DownLeft, Quaternion.Euler(180, -90, 0) },
+        { Orientation.DownRight, Quaternion.Euler(180, 90, 0) },
 
-        { Orientation.FrontUp, Quaternion.Euler(-90, 0, 0) },
+        { Orientation.FrontUp, Quaternion.Euler(90, 180, 0) },
         { Orientation.FrontDown, Quaternion.Euler(90, 0, 0) },
-        { Orientation.FrontLeft, Quaternion.Euler(0, 0, -90) },
-        { Orientation.FrontRight, Quaternion.Euler(0, 0, 90) },
+        { Orientation.FrontLeft, Quaternion.Euler(90, -90, 0) },
+        { Orientation.FrontRight, Quaternion.Euler(90, 90, 0) },
 
-        { Orientation.BackUp, Quaternion.Euler(-90, 180, 0) },
-        { Orientation.BackDown, Quaternion.Euler(90, 180, 0) },
-        { Orientation.BackLeft, Quaternion.Euler(0, 180, -90) },
-        { Orientation.BackRight, Quaternion.Euler(0, 180, 90) },
+        { Orientation.BackUp, Quaternion.Euler(-90, 0, 0) },
+        { Orientation.BackDown, Quaternion.Euler(-90, 180, 0) },
+        { Orientation.BackLeft, Quaternion.Euler(-90, -90, 0) },
+        { Orientation.BackRight, Quaternion.Euler(-90, 90, 0) },
 
-        { Orientation.LeftUp, Quaternion.Euler(-90, -90, 0) },
-        { Orientation.LeftDown, Quaternion.Euler(90, -90, 0) },
-        { Orientation.LeftFront, Quaternion.Euler(0, -90, -90) },
-        { Orientation.LeftBack, Quaternion.Euler(0, -90, 90) },
+        { Orientation.LeftUp, Quaternion.Euler(0, 90, -90) },
+        { Orientation.LeftDown, Quaternion.Euler(0, -90, -90) },
+        { Orientation.LeftFront, Quaternion.Euler(0, 0, -90) },
+        { Orientation.LeftBack, Quaternion.Euler(0, 180, -90) },
 
-        { Orientation.RightUp, Quaternion.Euler(-90, 90, 0) },
-        { Orientation.RightDown, Quaternion.Euler(90, 90, 0) },
-        { Orientation.RightFront, Quaternion.Euler(0, 90, -90) },
-        { Orientation.RightBack, Quaternion.Euler(0, 90, 90) },
+        { Orientation.RightUp, Quaternion.Euler(0,-90,90) },
+        { Orientation.RightDown, Quaternion.Euler(0, 90, 90) },
+        { Orientation.RightFront, Quaternion.Euler(0, 0, 90) },
+        { Orientation.RightBack, Quaternion.Euler(0, 180, 90) },
     };
 
     public static readonly Dictionary<Orientation, List<Tile.FACETYPE>> OrientationToPermutation = new Dictionary<Orientation, List<Tile.FACETYPE>>
@@ -994,7 +992,8 @@ public class MetaTileEnvironment : MonoBehaviour
                     int isFlipped = UnityEngine.Random.Range(0, 2);
                     for (int i = 0; i <= 1; i++)
                     {
-                        bool flipped = (i + isFlipped) % 2 == 0;
+                        // bool flipped = (i + isFlipped) % 2 == 1;
+                        bool flipped = false;
 
                         if (resultType == MetaTilePool.RESULTTYPE.SUCCESS)
                         {
