@@ -181,7 +181,6 @@
     <Compile Include="Assets\Source\EnvironmentEngine\TileFacePalette.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\15- Root motion example\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\Floor.cs" />
-    <Compile Include="Assets\Cylinder.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\SpriteGraphicsObject.cs" />
     <Compile Include="Assets\StarterAssets\FirstPersonController\Scripts\FirstPersonController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\7- Orienting towards arbitrary up direction\Scripts\MyPlayer.cs" />

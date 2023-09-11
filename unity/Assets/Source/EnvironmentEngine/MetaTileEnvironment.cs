@@ -459,7 +459,11 @@ public class MetaTileEnvironment : MonoBehaviour
             if (flipped)
             {
                 unRotatedPosition.y = unRotatedPosition.y * -1;
-                (permutation[1], permutation[0]) = (permutation[0], permutation[1]);
+                //(permutation[1], permutation[0]) = (permutation[0], permutation[1]);
+                int topIndex = permutation.IndexOf(Tile.FACETYPE.TOP);
+                int bottomIndex = permutation.IndexOf(Tile.FACETYPE.BOTTOM);
+                (permutation[bottomIndex], permutation[topIndex]) = (permutation[topIndex], permutation[bottomIndex]);
+
             }
             UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
             // not sure if you can multiply Vector3Ints by quaternion
@@ -513,7 +517,10 @@ public class MetaTileEnvironment : MonoBehaviour
             if (flipped)
             {
                 unRotatedPosition.y = unRotatedPosition.y * -1;
-                (permutation[1], permutation[0]) = (permutation[0], permutation[1]);
+                //(permutation[1], permutation[0]) = (permutation[0], permutation[1]);
+                int topIndex = permutation.IndexOf(Tile.FACETYPE.TOP);
+                int bottomIndex = permutation.IndexOf(Tile.FACETYPE.BOTTOM);
+                (permutation[bottomIndex], permutation[topIndex]) = (permutation[topIndex], permutation[bottomIndex]);
             }
             UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
             // not sure if you can multiply Vector3Ints by quaternion
@@ -999,8 +1006,8 @@ public class MetaTileEnvironment : MonoBehaviour
                     int isFlipped = UnityEngine.Random.Range(0, 2);
                     for (int i = 0; i <= 1; i++)
                     {
-                        bool flipped = (i + isFlipped) % 2 == 1;
-                        //bool flipped = false;
+                        //bool flipped = (i + isFlipped) % 2 == 1;
+                        bool flipped = true;
 
                         if (resultType == MetaTilePool.RESULTTYPE.SUCCESS)
                         {
