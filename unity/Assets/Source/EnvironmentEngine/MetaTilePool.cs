@@ -42,7 +42,7 @@ public class MetaTilePool : IMetaTileProbability
         return metaTiles;
     }
 
-    public override MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, TileFacePalette palette)
+    public override MetaTile DrawMetaTile(Vector3Int position)
     {
 
         // Calculate the total weight from the dictionary
@@ -60,7 +60,7 @@ public class MetaTilePool : IMetaTileProbability
         {
             if (randomWeight < metatileProbabilities[i].weight)
             {
-                return metatileProbabilities[i].metaTileProbability.DrawMetaTile(position, environment, faces, palette);
+                return metatileProbabilities[i].metaTileProbability.DrawMetaTile(position);
             }
             randomWeight -= metatileProbabilities[i].weight;
 
@@ -166,7 +166,7 @@ public class IMetaTileProbability : MonoBehaviour
     {
         return null;
     }
-    public virtual MetaTile DrawMetaTile(Vector3Int position, Tile[,,] environment, int[,,,] faces, TileFacePalette palette)
+    public virtual MetaTile DrawMetaTile(Vector3Int position)
     {
         return null;
     }

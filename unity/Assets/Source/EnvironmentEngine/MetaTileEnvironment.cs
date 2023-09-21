@@ -680,13 +680,19 @@ public class MetaTileEnvironment : MonoBehaviour
         }
     }
 
-    public float CalculateEntropy(Vector3Int position)
+    public float CalculateEntropy(Vector3Int position, int num_sampled_metatiles = 100)
     {
         // Do full translation/rotation tests and cache adjacent tile legality
         // Dilation of tile checks and translation?
 
         // Get the faces for each position
         List<int> faceList = GetFaceList(position);
+
+        List<MetaTile> sampledMetaTiles = new List<MetaTile>();
+        for (int i = 0; i < num_sampled_metatiles; i++)
+        {
+            sampledMetaTiles.Add(metatilepool.DrawMetaTile(position));
+        }
 
         // Calculate the entropy
         float entropy = metatilepool.palette.tileFaces.Count;
