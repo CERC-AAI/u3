@@ -8354,6 +8354,7 @@ MonoBehaviour:
   placedMetaTiles: []
   placedRotations: []
   placedPositions: []
+  placedFlipped: 
   wavefrontPositions: []
   wavefrontEntropies: []
   DEBUG: 1
