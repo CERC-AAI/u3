@@ -21,7 +21,7 @@ public class MetaTile : IMetaTileProbability
         return tags;
     }
 
-    public override MetaTile DrawMetaTile(Vector3Int position)
+    public override MetaTile DrawMetaTile()
     {
         // TODO: do we need to instantiate a game object here?
         return this;

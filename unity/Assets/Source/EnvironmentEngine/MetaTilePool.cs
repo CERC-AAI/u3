@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using NUnit.Framework.Interfaces;
 
 
 // Initialize an empty 3D array of null values 10 by 10 by 10
@@ -25,11 +26,87 @@ public class MetaTilePool : IMetaTileProbability
         return tags;
     }
 
-
+    public List<float> weights;
 
     // TODO: filter the list of metatiles by the possible faces in filterFaces
     // the metatile must contain at least one tile with a face in filterFaces
     // if this tile has a face in filterFaces, then check the other faces of the tile against the other faces in possibleFaces
+    public void GetWeightedMetaTiles(float weight, List<MetaTileProbability> deepCopy)
+    {
+        int depth_count = 0;
+        for (int i = 0; i < metatileProbabilities.Count; i++)
+        {
+            if (metatileProbabilities[i].metaTileProbability is MetaTile)
+            {
+                Debug.Log("is MetaTile");
+                MetaTileProbability metatileprobability = new MetaTileProbability();
+                metatileprobability.metaTileProbability = metatileProbabilities[i].metaTileProbability;
+                metatileprobability.weight = metatileProbabilities[i].weight * weight;
+                deepCopy.Add(metatileprobability);
+            }
+            else if (metatileProbabilities[i].metaTileProbability is MetaTilePool)
+            {
+                depth_count++;
+                if (depth_count > 2)
+                {
+                    throw new Exception("depth count too big, something went wrong");
+                }
+                Debug.Log("is not Metatile, going one level deeper");
+                Debug.Log("Type: " + metatileProbabilities[i].metaTileProbability.GetType());
+                MetaTilePool metatilepool = (MetaTilePool)metatileProbabilities[i].metaTileProbability;
+                Debug.Log("metatilepool: " + metatilepool);
+                metatilepool.GetWeightedMetaTiles(metatileProbabilities[i].weight * weight, deepCopy);
+            }
+
+            else
+            {
+                Debug.Log("is not Metatile or MetatilePool");
+                // throw error
+                throw new ArgumentException("Parameter cannot be null", metatileProbabilities[i].metaTileProbability.GetType().ToString());
+            }
+
+            // if (depth_count > 0)
+            // {
+            //     Debug.Log("depth_count: " + depth_count);
+            // }
+
+            // if (depth_count > 2)
+            // {
+            //     Debug.Log("depth count too big, something went wrong");
+            //     break;
+            // }
+        }
+
+    }
+
+    public static (MetaTile, float) DrawMetaTileWithoutReplacement(List<MetaTileProbability> metatileProbabilities)
+    {
+        float totalWeight = 0f;
+        foreach (MetaTileProbability metatileprobability in metatileProbabilities)
+        {
+            totalWeight += metatileprobability.weight;
+        }
+
+        float randomWeight = UnityEngine.Random.value * totalWeight;
+
+        for (int i = 0; i < metatileProbabilities.Count; i++)
+        {
+            if (randomWeight < metatileProbabilities[i].weight)
+            {
+                MetaTile metatileForRemoval = metatileProbabilities[i].metaTileProbability.DrawMetaTile();
+                float metatileWeight = metatileProbabilities[i].weight;
+                metatileProbabilities.RemoveAt(i);
+                return (metatileForRemoval, metatileWeight);
+            }
+            randomWeight -= metatileProbabilities[i].weight;
+
+        }
+
+        // If no metatile probability was selected (which shouldn't happen if the weights are set up correctly), return null
+        Debug.Log("No metatile probability was selected.");
+        return (null, 0);
+    }
+
 
     public override List<MetaTile> GetMetaTiles()
     {
@@ -42,7 +119,7 @@ public class MetaTilePool : IMetaTileProbability
         return metaTiles;
     }
 
-    public override MetaTile DrawMetaTile(Vector3Int position)
+    public override MetaTile DrawMetaTile()
     {
 
         // Calculate the total weight from the dictionary
@@ -60,7 +137,7 @@ public class MetaTilePool : IMetaTileProbability
         {
             if (randomWeight < metatileProbabilities[i].weight)
             {
-                return metatileProbabilities[i].metaTileProbability.DrawMetaTile(position);
+                return metatileProbabilities[i].metaTileProbability.DrawMetaTile();
             }
             randomWeight -= metatileProbabilities[i].weight;
 
@@ -70,8 +147,6 @@ public class MetaTilePool : IMetaTileProbability
         Debug.Log("No metatile probability was selected.");
         return null;
     }
-
-
 
     //     public RESULTTYPE GetAndPlaceMetaTile(Tile[,,] environment, int[,,,] faces, int[,,] environmentEntropies, Dictionary<int, List<int>> matchingMatrix, out MetaTile placedMetaTile, out Vector3Int placedPosition)
     // {
@@ -166,7 +241,7 @@ public class IMetaTileProbability : MonoBehaviour
     {
         return null;
     }
-    public virtual MetaTile DrawMetaTile(Vector3Int position)
+    public virtual MetaTile DrawMetaTile()
     {
         return null;
     }
