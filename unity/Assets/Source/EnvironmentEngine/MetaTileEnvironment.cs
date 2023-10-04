@@ -445,7 +445,7 @@ public class MetaTileEnvironment : MonoBehaviour
         }*/
     }
 
-    public bool CanPlaceMetaTile(Vector3Int placementPosition, MetaTile metatile, Orientation orientation, bool flipped)
+    public bool CanPlaceMetaTile(Vector3Int placementPosition, Vector3 currentOrigin, MetaTile metatile, Orientation orientation, bool flipped)
     {
         // TODO: add rotations and reflections
         foreach (Tile tile in metatile.tiles)
@@ -465,9 +465,11 @@ public class MetaTileEnvironment : MonoBehaviour
                 (permutation[bottomIndex], permutation[topIndex]) = (permutation[topIndex], permutation[bottomIndex]);
 
             }
-            UnityEngine.Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
+            Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
+
+            Vector3 newRotatedPosition = rotatedPosition - currentOrigin;
             // not sure if you can multiply Vector3Ints by quaternion
-            Vector3Int tilePosition = new Vector3Int(Mathf.RoundToInt(rotatedPosition.x), Mathf.RoundToInt(rotatedPosition.y), Mathf.RoundToInt(rotatedPosition.z));
+            Vector3Int tilePosition = new Vector3Int(Mathf.RoundToInt(newRotatedPosition.x), Mathf.RoundToInt(newRotatedPosition.y), Mathf.RoundToInt(newRotatedPosition.z));
 
             Vector3Int environmentPosition = placementPosition + tilePosition;
 
@@ -667,38 +669,96 @@ public class MetaTileEnvironment : MonoBehaviour
 
     }
 
-    public void CollapseWaveFunction()
+    public void CollapseWaveFunction(int num_sampled_metatiles = 100)
     {
-        // calculate the entropies of the tiles in the wavefront
+        (List<MetaTile> sampledMetaTiles, List<float> sampledMetaTileWeights) = SampleMetaTiles(num_sampled_metatiles);
 
-        //This is potentially very slow
-        //foreach (Vector3Int position in wavefrontPositions)
-        for (int i = 0; i < wavefrontPositions.Count; i++)
+        for (int position = 0; position < wavefrontPositions.Count; position++)
         {
-            // get the index of the position in the wavefrontPositions list
-            wavefrontEntropies[i] = CalculateEntropy(wavefrontPositions[i]);
+            wavefrontEntropies[position] = CalculateEntropy(wavefrontPositions[position], sampledMetaTiles, sampledMetaTileWeights);
         }
     }
 
-    public float CalculateEntropy(Vector3Int position)
+    private (List<MetaTile>, List<float>) SampleMetaTiles(int num_sampled_metatiles)
+    {
+
+        MetaTilePool metatilepoolForSampling = BuildMetaTilePoolDeepCopy();
+
+        List<MetaTile> sampledMetaTiles = new List<MetaTile>();
+        List<float> sampledMetaTileWeights = new List<float>();
+
+        for (int i = 0; i < num_sampled_metatiles; i++)
+        {
+            // draw without replacement
+            (MetaTile sampledMetaTile, float metatileWeight) = MetaTilePool.DrawMetaTileWithoutReplacement(metatilepoolForSampling.metatileProbabilities);
+            if (sampledMetaTile == null)
+            {
+                // if null then stop
+                Debug.Log("CollapseWaveFunction: ran out of metatiles to sample");
+                break;
+            }
+            sampledMetaTiles.Add(sampledMetaTile);
+            sampledMetaTileWeights.Add(metatileWeight);
+        }
+
+        Destroy(metatilepoolForSampling);
+        return (sampledMetaTiles, sampledMetaTileWeights);
+    }
+
+    private MetaTilePool BuildMetaTilePoolDeepCopy()
+    {
+        MetaTilePool metatilepoolForSampling = Instantiate(metatilepool);
+        metatilepoolForSampling.GetWeightedMetaTiles(1, metatilepoolForSampling.metatileProbabilities);
+        return metatilepoolForSampling;
+    }
+
+    public float CalculateEntropy(Vector3Int wavefrontPosition, List<MetaTile> sampledMetaTiles, List<float> sampledMetaTileWeights)
     {
         // Do full translation/rotation tests and cache adjacent tile legality
         // Dilation of tile checks and translation?
+        List<bool> sampledMetaTileisAllowed = Enumerable.Repeat(false, sampledMetaTiles.Count).ToList();
 
-        // Get the faces for each position
-        List<int> faceList = GetFaceList(position);
-
-        // Calculate the entropy
-        float entropy = metatilepool.palette.tileFaces.Count;
-        for (int i = 0; i < faceList.Count; i++)
+        foreach (MetaTile metatile in sampledMetaTiles)
         {
-            float thisEntropy = faceList[i] == 1 ? 0 : 1; //Is a pipe?
-            //float thisEntropy = metatilepool.palette.GetPossibleConnections(faceList[i]).Count;
-
-            entropy = Mathf.Min(entropy, thisEntropy);
+            bool isAllowed = false;
+            foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
+            {
+                foreach (bool flipped in new List<bool> { false, true })
+                {
+                    foreach (Tile tile in metatile.tiles) // iterate over every tile in the metatile as the origin
+                    {
+                        if (CanPlaceMetaTile(wavefrontPosition, tile.transform.localPosition, metatile, orientation, flipped))
+                        {
+                            isAllowed = true;
+                            break;
+                        }
+                    }
+                    if (isAllowed)
+                    {
+                        break;
+                    }
+                }
+                if (isAllowed)
+                {
+                    break;
+                }
+            }
+            sampledMetaTileisAllowed[sampledMetaTiles.IndexOf(metatile)] = isAllowed;
         }
 
-        return entropy;
+        float sumWeight = 0;
+        float sumWeightLogWeight = 0;
+        for (int i = 0; i < sampledMetaTiles.Count; i++)
+        {
+            if (sampledMetaTileisAllowed[i])
+            {
+                sumWeight += sampledMetaTileWeights[i];
+                sumWeightLogWeight += sampledMetaTileWeights[i] * Mathf.Log(sampledMetaTileWeights[i]);
+            }
+        }
+
+        float positionEntropy = Mathf.Log(sumWeight) - sumWeightLogWeight / sumWeight;
+        return positionEntropy;
     }
 
     /*public bool ValidateOrientation(Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
@@ -1015,7 +1075,7 @@ public class MetaTileEnvironment : MonoBehaviour
                         }
 
                         // if the metatile can be placed, place it and break out of the loop
-                        if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped))
+                        if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, new Vector3(0, 0, 0), candidateMetatile, orientation, flipped))
                         {
                             PlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped);
                             CollapseWaveFunction();
