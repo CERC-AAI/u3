@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 121081934370275679}
   - component: {fileID: 4368192324598907990}
   m_Layer: 0
-  m_Name: DebugMetaTilePool
+  m_Name: XLandPool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,10 +46,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parent: {fileID: 0}
   tags: 
-  palette: {fileID: -6947243484448938200, guid: 9937bfa7ad7243c429dc6051cf37ac84,
+  palette: {fileID: -6947243484448938200, guid: 9ec3828689b891a42908e9d5854658dc,
     type: 3}
   metatileProbabilities:
-  - metaTileProbability: {fileID: 100174510953274016, guid: bd2bf94392b9f3848a6bcbf9d4d5f979,
+  - metaTileProbability: {fileID: 100174510953274016, guid: f0f3cbb83efd3de45a65738d6270ea2c,
+      type: 3}
+    weight: 5
+  - metaTileProbability: {fileID: 100174510953274016, guid: 57b54493777ec1d4c94b08234aeed401,
+      type: 3}
+    weight: 20
+  - metaTileProbability: {fileID: 4368192324598907990, guid: 022d853db15f80c4191ecf22badf16c9,
+      type: 3}
+    weight: 1
+  - metaTileProbability: {fileID: 100174510953274016, guid: e63ae47d9dbc6514f8f06e9bfb3767db,
       type: 3}
     weight: 1
   weights: []

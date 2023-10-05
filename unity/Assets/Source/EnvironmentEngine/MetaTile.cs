@@ -14,7 +14,8 @@ public class MetaTile : IMetaTileProbability
     public List<Tile> tiles;
     public Transform payload;
     public List<int> tags; // list of tags
-    public Vector3Int rotationDirections;  // allowed rotation directions (0 = rotation not allowed, 1 = rotation allowed)
+    public Vector3Int rotationDirections = Vector3Int.one;  // allowed rotation directions (0 = rotation not allowed, 1 = rotation allowed)
+    public bool canFlip = true;  // allowed rotation directions (0 = rotation not allowed, 1 = rotation allowed)
 
     public List<int> GetTags()
     {

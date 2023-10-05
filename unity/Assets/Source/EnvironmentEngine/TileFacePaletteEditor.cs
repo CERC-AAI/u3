@@ -50,7 +50,7 @@ public class TileFacePaletteEditor : Editor
 
             for (int i = 0; i < numFaces; i++)
             {
-                Vector2 textDimensions = GUI.skin.label.CalcSize(new GUIContent(selectedPalette.tileFaces[i].name));
+                Vector2 textDimensions = GUI.skin.label.CalcSize(new GUIContent(selectedPalette.tileFaces[i].name)); 
                 if (labelSize < textDimensions.x)
                 {
                     labelSize = textDimensions.x;
@@ -126,6 +126,7 @@ public class TileFacePaletteEditor : Editor
                 {
                     if (i <= j)
                     {
+                        bool oldValue = tempData[i][j];
                         Rect checkboxRect = new Rect(labelSize + indent + checkboxSize * i + margin + 2, labelSize + checkboxSize * j, colorSize - margin, colorSize - margin);
                         bool toggled = GUI.Toggle(checkboxRect, tempData[i][j], "");
 
@@ -135,6 +136,11 @@ public class TileFacePaletteEditor : Editor
 
                             index++;
                         }
+
+                        if (oldValue != toggled)
+                        {
+                            EditorUtility.SetDirty(selectedPalette);
+                        }
                     }
                 }
             }
@@ -143,9 +149,6 @@ public class TileFacePaletteEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
-
-
-
 
 
         /*    for (int i = 0; i < numFaces+1; i++)

@@ -46,12 +46,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   voxelSize: 1
   tileFaces:
-  - color: {r: 0.4764151, g: 0.9738466, b: 1, a: 1}
-    name: Air
-  - color: {r: 0.4245283, g: 0.20080326, b: 0.122152, a: 1}
-    name: Ground
+  - color: {r: 0, g: 1, b: 0.13757396, a: 1}
+    name: Top
+  - color: {r: 1, g: 0.038367797, b: 0, a: 1}
+    name: Bottom
+  - color: {r: 1, g: 0.8126906, b: 0, a: 1}
+    name: Left
+  - color: {r: 0.051886797, g: 0.108821005, b: 1, a: 1}
+    name: Right
+  - color: {r: 1, g: 0, b: 0.9107642, a: 1}
+    name: Front
   - color: {r: 0, g: 0, b: 0, a: 1}
-    name: Bedrock
+    name: Back
   matchingMatrix:
   - mA: 0
     mB: 0
@@ -59,3 +65,9 @@ MonoBehaviour:
     mB: 1
   - mA: 2
     mB: 2
+  - mA: 3
+    mB: 3
+  - mA: 4
+    mB: 4
+  - mA: 5
+    mB: 5

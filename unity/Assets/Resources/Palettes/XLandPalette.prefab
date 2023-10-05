@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1153103851100550116}
   - component: {fileID: -6947243484448938200}
   m_Layer: 0
-  m_Name: TestPalette
+  m_Name: XLandPalette
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,18 +46,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   voxelSize: 1
   tileFaces:
-  - color: {r: 0.4764151, g: 0.9738466, b: 1, a: 1}
-    name: Top
-  - color: {r: 0.4245283, g: 0.20080326, b: 0.122152, a: 1}
-    name: Bottom
+  - color: {r: 0.4745098, g: 0.972549, b: 1, a: 1}
+    name: Air
+  - color: {r: 0.3584906, g: 0.18379787, b: 0.07271271, a: 1}
+    name: Ground
   - color: {r: 0, g: 0, b: 0, a: 1}
-    name: Left
-  - color: {r: 1, g: 0, b: 0, a: 1}
-    name: Right
-  - color: {r: 0, g: 1, b: 0.11449838, a: 1}
-    name: Front
-  - color: {r: 1, g: 0, b: 0.8710184, a: 1}
-    name: Back
+    name: Bedrock
+  - color: {r: 1, g: 0.042735044, b: 0, a: 1}
+    name: RampLeft
+  - color: {r: 1, g: 0.41037738, b: 0.47036862, a: 1}
+    name: RampRight
+  - color: {r: 0, g: 1, b: 0.07667947, a: 1}
+    name: CornerFrontRight
+  - color: {r: 0.6698386, g: 1, b: 0.6273585, a: 1}
+    name: CornerFrontLeft
+  - color: {r: 0, g: 0.41509432, b: 0.016012829, a: 1}
+    name: CornerBackLeft
+  - color: {r: 0.22441262, g: 0.38679248, b: 0.24391967, a: 1}
+    name: CornerBackRight
+  - color: {r: 0, g: 0.48081636, b: 0.5, a: 1}
+    name: StrictAir
   matchingMatrix:
   - mA: 0
     mB: 0
@@ -71,3 +79,11 @@ MonoBehaviour:
     mB: 4
   - mA: 5
     mB: 5
+  - mA: 6
+    mB: 6
+  - mA: 7
+    mB: 7
+  - mA: 8
+    mB: 8
+  - mA: 9
+    mB: 9
