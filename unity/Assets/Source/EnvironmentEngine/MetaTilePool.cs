@@ -31,6 +31,14 @@ public class MetaTilePool : IMetaTileProbability
     // TODO: filter the list of metatiles by the possible faces in filterFaces
     // the metatile must contain at least one tile with a face in filterFaces
     // if this tile has a face in filterFaces, then check the other faces of the tile against the other faces in possibleFaces
+
+    public List<MetaTileProbability> BuildMetaTilePoolDeepCopy()
+    {
+        List<MetaTileProbability> metatileProbabilitiesForSampling = new List<MetaTileProbability>();
+        GetWeightedMetaTiles(1, metatileProbabilitiesForSampling);
+        return metatileProbabilitiesForSampling;
+    }
+
     public void GetWeightedMetaTiles(float weight, List<MetaTileProbability> deepCopy)
     {
         int depth_count = 0;
@@ -79,7 +87,7 @@ public class MetaTilePool : IMetaTileProbability
 
     }
 
-    public static (MetaTile, float) DrawMetaTileWithoutReplacement(List<MetaTileProbability> metatileProbabilities)
+    public static MetaTile DrawMetaTileWithoutReplacement(List<MetaTileProbability> metatileProbabilities)
     {
         float totalWeight = 0f;
         foreach (MetaTileProbability metatileprobability in metatileProbabilities)
@@ -94,9 +102,8 @@ public class MetaTilePool : IMetaTileProbability
             if (randomWeight < metatileProbabilities[i].weight)
             {
                 MetaTile metatileForRemoval = metatileProbabilities[i].metaTileProbability.DrawMetaTile();
-                float metatileWeight = metatileProbabilities[i].weight;
                 metatileProbabilities.RemoveAt(i);
-                return (metatileForRemoval, metatileWeight);
+                return metatileForRemoval;
             }
             randomWeight -= metatileProbabilities[i].weight;
 
@@ -104,7 +111,7 @@ public class MetaTilePool : IMetaTileProbability
 
         // If no metatile probability was selected (which shouldn't happen if the weights are set up correctly), return null
         Debug.Log("No metatile probability was selected.");
-        return (null, 0);
+        return null;
     }
 
 
