@@ -447,6 +447,14 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public bool CanPlaceMetaTile(Vector3Int placementPosition, Vector3 currentOrigin, MetaTile metatile, Orientation orientation, bool flipped)
     {
+        if (flipped && !metatile.canFlip ||
+            OrientationToQuaternion[orientation].x != 0 && metatile.rotationDirections.x == 0 ||
+            OrientationToQuaternion[orientation].y != 0 && metatile.rotationDirections.y == 0 ||
+            OrientationToQuaternion[orientation].z != 0 && metatile.rotationDirections.z == 0)
+        {
+            return false;
+        }
+
         // TODO: add rotations and reflections
         foreach (Tile tile in metatile.tiles)
         {
@@ -1062,17 +1070,36 @@ public class MetaTileEnvironment : MonoBehaviour
                         break;
                     }
 
+                    if (OrientationToQuaternion[orientation].x != 0 && candidateMetatile.rotationDirections.x == 0)
+                    {
+                        continue;
+                    }
+                    else if (OrientationToQuaternion[orientation].y != 0 && candidateMetatile.rotationDirections.y == 0)
+                    {
+                        continue;
+                    }
+                    else if (OrientationToQuaternion[orientation].z != 0 && candidateMetatile.rotationDirections.z == 0)
+                    {
+                        continue;
+                    }
+
                     // iterate through the possible flips of the metatile
                     int isFlipped = UnityEngine.Random.Range(0, 2);
                     for (int i = 0; i <= 1; i++)
                     {
-                        //bool flipped = (i + isFlipped) % 2 == 1;
-                        bool flipped = true;
-
                         if (resultType == MetaTilePool.RESULTTYPE.SUCCESS)
                         {
                             break;
                         }
+
+                        bool flipped = (i + isFlipped) % 2 == 1;
+                        //bool flipped = true;
+
+                        if (flipped == true && !candidateMetatile.canFlip)
+                        {
+                            continue;
+                        }
+
 
                         // if the metatile can be placed, place it and break out of the loop
                         if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, new Vector3(0, 0, 0), candidateMetatile, orientation, flipped))
