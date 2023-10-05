@@ -5912,7 +5912,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74f88f56251051741a36a4233bfcfde8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugMode: 1
+  debugMode: 0
   forceSaveData: 0
   scenes:
   - environmentID: key
@@ -8349,7 +8349,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   voxelSize: 1
-  metatilepool: {fileID: 4368192324598907990, guid: 734a7c84cbfdb274abdaae3d16e6b29c,
+  metatilepool: {fileID: 2721922502780412005, guid: eea1d9fca23e8ff48b734b563b2febb7,
     type: 3}
   placedMetaTiles: []
   placedRotations: []
@@ -8357,7 +8357,7 @@ MonoBehaviour:
   placedFlipped: 
   wavefrontPositions: []
   wavefrontEntropies: []
-  DEBUG: 1
+  DEBUG: 0
   debugTile: {fileID: 8411421930320262341, guid: 854926c658783f947a2964d1b81dbfc1,
     type: 3}
 --- !u!4 &2033542608

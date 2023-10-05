@@ -75,4 +75,5 @@ MonoBehaviour:
     weight: 1
   - metaTileProbability: {fileID: 8013033377143349393, guid: c333ead635e6ca149bade23645afb8f5,
       type: 3}
-    weight: 0
+    weight: 1
+  weights: []

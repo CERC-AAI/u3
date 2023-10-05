@@ -48,8 +48,10 @@ MonoBehaviour:
   tileFaces:
   - color: {r: 0.4764151, g: 0.9738466, b: 1, a: 1}
     name: Air
+    weight: 0
   - color: {r: 0.2924528, g: 0.28121978, b: 0.27727836, a: 1}
     name: Pipe
+    weight: 10
   matchingMatrix:
   - mA: 0
     mB: 0

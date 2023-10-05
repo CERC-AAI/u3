@@ -10,6 +10,7 @@ public class TileFace
     public Color color;
     public string name;
     int mIndex;
+    public float weight;
 }
 
 public class TileFacePalette : MonoBehaviour
@@ -29,6 +30,7 @@ public class TileFacePalette : MonoBehaviour
 
     public float voxelSize = 1;
     public List<TileFace> tileFaces = new List<TileFace>();
+
 
     [HideInInspector]
     public List<MatchedFaces> matchingMatrix = new List<MatchedFaces>();
