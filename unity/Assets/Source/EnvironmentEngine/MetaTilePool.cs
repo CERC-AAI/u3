@@ -26,6 +26,10 @@ public class MetaTilePool : IMetaTileProbability
         return tags;
     }
 
+    public override MetaTile GetMetaTile()
+    {
+        return null;
+    }
     public List<float> weights;
 
     // TODO: filter the list of metatiles by the possible faces in filterFaces
@@ -254,6 +258,11 @@ public class IMetaTileProbability : MonoBehaviour
     }
 
     public virtual List<MetaTile> GetMetaTiles()
+    {
+        return null;
+    }
+
+    public virtual MetaTile GetMetaTile()
     {
         return null;
     }

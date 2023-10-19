@@ -11,6 +11,10 @@ using UnityEditor.Tilemaps;
 
 public class MetaTileEnvironment : MonoBehaviour
 {
+    private Dictionary<MetaTile, List<bool>>[,,] mValidMetaTiles = new Dictionary<MetaTile, List<bool>>[10, 10, 10];
+    // 10 by 10 by 10 list of dictionaries. Each dictionary represents a position,
+    // you give one dict a metatile and it returns a list of bools that correspond
+    // to whether config[i] is legal for that metatile at that position.
 
     public static int mWidth = 10;
     /*private static Dictionary<int, List<int>> matchingMatrix = new Dictionary<int, List<int>>()
@@ -30,6 +34,9 @@ public class MetaTileEnvironment : MonoBehaviour
     public float voxelSize = 1;
 
     public MetaTilePool metatilepool;
+
+    private List<MetaTile> metatileList = new List<MetaTile>();
+
 
     public List<MetaTile> placedMetaTiles = new List<MetaTile>();
     public List<Quaternion> placedRotations = new List<Quaternion>();
@@ -146,6 +153,166 @@ public class MetaTileEnvironment : MonoBehaviour
         { Orientation.RightBack, new List<Tile.FACETYPE> { Tile.FACETYPE.RIGHT, Tile.FACETYPE.LEFT, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.TOP, Tile.FACETYPE.BACK, Tile.FACETYPE.FRONT } }
     };
 
+
+    public List<MetaTileProbability> mDynamicWeights = new List<MetaTileProbability>();
+
+    public void UpdateDynamicWeights()
+    {
+        //Called whenever you add a tile to the environment. This can either recalculate the weights, or just refresh the list using the "DeepCopy" function.
+        // TODO: encapsulate in MetaTilePool
+        // mDynamicWeights = metatilepool.UpdateDynamicWeights();
+    }
+
+    public float GetMetaTileWeight(MetaTile tile)
+    {
+        int index = mDynamicWeights.FindIndex((MetaTileProbability thisTile) => thisTile.metaTileProbability.GetMetaTile() == tile);
+
+        if (index == -1)
+        {
+            return 0;
+        }
+
+        return mDynamicWeights[index].weight;
+    }
+
+    public void RecalculateMetaTileValidity(Vector3Int wavefrontPosition)
+    {
+        //Helper function to update the monster structure above. Should deal with pruning/initalizing the dictionary as needed.
+
+        Dictionary<MetaTile, List<bool>> wavefrontPositionMetaTileValidityDict = mValidMetaTiles[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z];
+        if (wavefrontPositionMetaTileValidityDict == null)
+        {
+            mValidMetaTiles[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z] = new Dictionary<MetaTile, List<bool>>();
+            foreach (MetaTile metatile in metatileList)
+            {
+                mValidMetaTiles[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z][metatile] = new List<bool>();
+                for (int i = 0; i < metatile.GetConfigurations().Count; i++)
+                {
+                    mValidMetaTiles[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z][metatile].Add(true);
+                }
+            }
+            wavefrontPositionMetaTileValidityDict = mValidMetaTiles[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z];
+        }
+
+        // print($"wavefrontPositionMetaTileValidityDict.Count: {wavefrontPositionMetaTileValidityDict.Count}");
+
+        foreach (MetaTile metatile in wavefrontPositionMetaTileValidityDict.Keys)
+        {
+            List<bool> validConfigurations = wavefrontPositionMetaTileValidityDict[metatile];
+
+            // print($"validConfigurations.Count: {validConfigurations.Count}");
+            // if (validConfigurations == null)
+            // {
+            //     mValidMetaTiles[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z][metatile] = new List<bool>();
+            //     validConfigurations = mValidMetaTiles[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z][metatile];
+            // }
+
+            for (int i = 0; i < validConfigurations.Count(); i++)
+            {
+                if (validConfigurations[i])
+                {
+                    MetaTile.Configuration configTuple = metatile.GetConfiguration(i);
+                    bool canPlace = CanPlaceMetaTile(wavefrontPosition, metatile, configTuple.origin, configTuple.orientation, configTuple.flipped);
+                    if (!canPlace)
+                    {
+                        validConfigurations[i] = false;
+                    }
+                }
+            }
+
+            // sampledMetaTileisAllowed[sampledMetaTiles.IndexOf(metatile)] = isAllowed;
+        }
+
+    }
+
+    // public int CountTotalConfigurations(Vector3Int position)
+    // {
+
+    // }
+
+    public int CountValidConfigurations(Vector3Int position)
+    {
+        //Helper function used for entropy calculation. Counts the number of valid metatiles. Not sure which of these functions to use for the entropy calculation.
+        // at least 1 valid configuration
+        int count = 0;
+        foreach (KeyValuePair<MetaTile, List<bool>> pair in mValidMetaTiles[position.x, position.y, position.z])
+        {
+            foreach (bool validConfiguration in pair.Value)
+            {
+                if (validConfiguration)
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public int CountValidMetaTiles(Vector3Int position)
+    {
+        //Helper function used for entropy calculation. Counts the number of valid metatiles. Not sure which of these functions to use for the entropy calculation.
+        // at least 1 valid configuration
+        int count = 0;
+        foreach (KeyValuePair<MetaTile, List<bool>> pair in mValidMetaTiles[position.x, position.y, position.z])
+        {
+            if (pair.Value.Contains(true))
+            {
+                count++;
+            }
+
+        }
+
+        // print($"count : {count}");
+        return count;
+    }
+
+    public MetaTile DrawMetaTile(List<MetaTile> list)
+    {
+        //Helper function to draw a metatile (respecting pool weights) for a given list,
+        //or a given position. The only difference is if you want to encapsulate the
+        //drawing procedure, or make it specific to the environment format...
+        //probably doesn't really matter. You could even write both functions.
+
+        //for each metatile in the list, get the corresponding weight from the dynamic weights list
+        //and add it to a list of weights
+        List<float> weights = new List<float>();
+        foreach (MetaTile metatile in list)
+        {
+            weights.Add(GetMetaTileWeight(metatile));
+        }
+
+        //use the weights to select a random metatile from the list
+        float totalWeight = 0;
+        foreach (float weight in weights)
+        {
+            totalWeight += weight;
+        }
+
+        float randomWeight = UnityEngine.Random.value * totalWeight;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (randomWeight < weights[i])
+            {
+                MetaTile metatileForRemoval = list[i];
+                return metatileForRemoval;
+            }
+            randomWeight -= weights[i];
+        }
+
+        //select a random metatile from the list using the weights
+        return null;
+
+
+    }
+
+    public MetaTile DrawMetaTile(Vector3Int position)
+    {
+        List<MetaTile> list = mValidMetaTiles[position.x, position.y, position.z].Keys.ToList();
+        return DrawMetaTile(list);
+
+    }
+
     public Vector3Int SelectPlacementPosition()
     {
         // Selects a position to place a metatile
@@ -232,7 +399,6 @@ public class MetaTileEnvironment : MonoBehaviour
 
         return metatilepool.palette.tileFaces[faceID].weight;
     }
-
 
     public List<int> GetFaceList(Vector3Int position, bool debug = false)
     {
@@ -358,7 +524,7 @@ public class MetaTileEnvironment : MonoBehaviour
         // this is an example of a pre-filtering pass
         foreach (MetaTileProbability metatile in metatiles)
         {
-            foreach (Tile tile in metatile.metaTileProbability.GetMetaTiles()[0].tiles)
+            foreach (Tile tile in metatile.metaTileProbability.GetMetaTile().tiles)
             {
                 //Vector3Int tilePosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
                 //FIX ME
@@ -456,7 +622,7 @@ public class MetaTileEnvironment : MonoBehaviour
         }*/
     }
 
-    public bool CanPlaceMetaTile(Vector3Int placementPosition, Vector3 currentOrigin, MetaTile metatile, Orientation orientation, bool flipped)
+    private bool CanPlaceMetaTile(Vector3Int placementPosition, MetaTile metatile, Vector3 currentOrigin, Orientation orientation, bool flipped)
     {
         if (flipped && !metatile.canFlip ||
             OrientationToQuaternion[orientation].x != 0 && metatile.rotationDirections.x == 0 ||
@@ -686,80 +852,41 @@ public class MetaTileEnvironment : MonoBehaviour
 
     }
 
-    public void CollapseWaveFunction(int num_sampled_metatiles = 100)
+    public void CollapseWaveFunction()
     {
-        List<MetaTile> sampledMetaTiles = SampleMetaTiles(num_sampled_metatiles);
-
         for (int position = 0; position < wavefrontPositions.Count; position++)
         {
-            wavefrontEntropies[position] = CalculateEntropy(wavefrontPositions[position], sampledMetaTiles);
+            RecalculateMetaTileValidity(wavefrontPositions[position]);
+            wavefrontEntropies[position] = CalculateEntropy(wavefrontPositions[position]);
         }
+
     }
 
-    private List<MetaTile> SampleMetaTiles(int num_sampled_metatiles)
+    // private List<MetaTile> SampleMetaTiles(int num_sampled_metatiles)
+    // {
+
+    //     List<MetaTileProbability> metatilepoolForSampling = metatilepool.BuildMetaTilePoolDeepCopy();
+    //     Debug.Log("metatilepoolForSampling.metatileProbabilities.Count: " + metatilepoolForSampling.Count);
+
+    //     List<MetaTile> sampledMetaTiles = new List<MetaTile>();
+    //     for (int i = 0; i < num_sampled_metatiles; i++)
+    //     {
+    //         // draw without replacement
+    //         MetaTile sampledMetaTile = MetaTilePool.DrawMetaTileWithoutReplacement(metatilepoolForSampling);
+    //         if (sampledMetaTile == null)
+    //         {
+    //             // if null then stop
+    //             Debug.Log("CollapseWaveFunction: ran out of metatiles to sample");
+    //             break;
+    //         }
+    //         sampledMetaTiles.Add(sampledMetaTile);
+    //     }
+
+    //     return (sampledMetaTiles);
+    // }
+
+    public float CalculateEntropy(Vector3Int wavefrontPosition)
     {
-
-        List<MetaTileProbability> metatilepoolForSampling = metatilepool.BuildMetaTilePoolDeepCopy();
-        Debug.Log("metatilepoolForSampling.metatileProbabilities.Count: " + metatilepoolForSampling.Count);
-
-        List<MetaTile> sampledMetaTiles = new List<MetaTile>();
-        for (int i = 0; i < num_sampled_metatiles; i++)
-        {
-            // draw without replacement
-            MetaTile sampledMetaTile = MetaTilePool.DrawMetaTileWithoutReplacement(metatilepoolForSampling);
-            if (sampledMetaTile == null)
-            {
-                // if null then stop
-                Debug.Log("CollapseWaveFunction: ran out of metatiles to sample");
-                break;
-            }
-            sampledMetaTiles.Add(sampledMetaTile);
-        }
-
-        return (sampledMetaTiles);
-    }
-
-    public float CalculateEntropy(Vector3Int wavefrontPosition, List<MetaTile> sampledMetaTiles)
-    {
-        // Do full translation/rotation tests and cache adjacent tile legality
-        // Dilation of tile checks and translation?
-        // Add face priorities to the metatiles, when approxmating count, multiply
-
-        // TODO: every position has a dict of {metatile, list of valid configurations}
-        List<bool> sampledMetaTileisAllowed = Enumerable.Repeat(false, sampledMetaTiles.Count).ToList();
-        float sumWeight = 0;
-
-        foreach (MetaTile metatile in sampledMetaTiles)
-        {
-            bool isAllowed = false;
-            foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
-            {
-                foreach (bool flipped in new List<bool> { false, true })
-                {
-                    foreach (Tile tile in metatile.tiles) // iterate over every tile in the metatile as the origin
-                    {
-                        if (CanPlaceMetaTile(wavefrontPosition, tile.transform.localPosition, metatile, orientation, flipped))
-                        {
-                            isAllowed = true;
-                            sumWeight += 1;
-                            break;
-                        }
-
-                    }
-                    if (isAllowed)
-                    {
-                        break;
-                    }
-                }
-                if (isAllowed)
-                {
-                    break;
-                }
-            }
-            // sampledMetaTileisAllowed[sampledMetaTiles.IndexOf(metatile)] = isAllowed;
-        }
-
-        // return sumWeight;
 
         List<int> wavefrontPositionFaces = GetFaceList(wavefrontPosition);
         float faceWeight = 0;
@@ -770,7 +897,58 @@ public class MetaTileEnvironment : MonoBehaviour
                 faceWeight += metatilepool.palette.tileFaces[face].weight;
             }
         }
-        return sumWeight / (faceWeight + 0.001f);
+        return CountValidMetaTiles(wavefrontPosition) / (faceWeight + 0.001f);
+
+        // // Do full translation/rotation tests and cache adjacent tile legality
+        // // Dilation of tile checks and translation?
+        // // Add face priorities to the metatiles, when approxmating count, multiply
+
+        // // TODO: every position has a dict of {metatile, list of valid configurations}
+        // List<bool> sampledMetaTileisAllowed = Enumerable.Repeat(false, sampledMetaTiles.Count).ToList();
+        // float sumWeight = 0;
+
+        // foreach (MetaTile metatile in sampledMetaTiles)
+        // {
+        //     bool isAllowed = false;
+        //     foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
+        //     {
+        //         foreach (bool flipped in new List<bool> { false, true })
+        //         {
+        //             foreach (Tile tile in metatile.tiles) // iterate over every tile in the metatile as the origin
+        //             {
+        //                 if (CanPlaceMetaTile(wavefrontPosition, metatile, tile.transform.localPosition, orientation, flipped))
+        //                 {
+        //                     isAllowed = true;
+        //                     sumWeight += 1;
+        //                     break;
+        //                 }
+
+        //             }
+        //             if (isAllowed)
+        //             {
+        //                 break;
+        //             }
+        //         }
+        //         if (isAllowed)
+        //         {
+        //             break;
+        //         }
+        //     }
+        //     // sampledMetaTileisAllowed[sampledMetaTiles.IndexOf(metatile)] = isAllowed;
+        // }
+
+        // // return sumWeight;
+
+        // List<int> wavefrontPositionFaces = GetFaceList(wavefrontPosition);
+        // float faceWeight = 0;
+        // foreach (int face in wavefrontPositionFaces)
+        // {
+        //     if (face != -1)
+        //     {
+        //         faceWeight += metatilepool.palette.tileFaces[face].weight;
+        //     }
+        // }
+        // return sumWeight / (faceWeight + 0.001f);
     }
 
     /*public bool ValidateOrientation(Tile.FACETYPE topOrientation, Tile.FACETYPE frontOrientation, Tile.FACETYPE rightOrientation)
@@ -1007,6 +1185,9 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public IEnumerator GenerateEnvironment(MetaTilePool metatilepool)
     {
+        metatileList = metatilepool.GetMetaTiles();
+
+        mValidMetaTiles = new Dictionary<MetaTile, List<bool>>[10, 10, 10];
         placedFlipped.Clear();
         placedMetaTiles.Clear();
         placedPositions.Clear();
@@ -1020,10 +1201,11 @@ public class MetaTileEnvironment : MonoBehaviour
 
         // set up the attempt loop around the metatile pool
         MetaTilePool.RESULTTYPE resultType = MetaTilePool.RESULTTYPE.SUCCESS;
-        int timeoutCounter = 0;
+        // int timeoutCounter = 0;
         MetaTile candidateMetatile;
 
         Vector3Int placementPosition = new Vector3Int(0, 0, 0);
+
 
         while (resultType != MetaTilePool.RESULTTYPE.COMPLETE)
         {
@@ -1045,6 +1227,11 @@ public class MetaTileEnvironment : MonoBehaviour
                 break;
             }
 
+            if (placedMetaTiles.Count == 0)
+            {
+                RecalculateMetaTileValidity(placementPosition);
+            }
+
             List<MetaTileProbability> filteredMetatiles = GetMetaTiles(placementPosition, metatilepool);
             int filteredMetatileCount = filteredMetatiles.Count;
 
@@ -1054,91 +1241,59 @@ public class MetaTileEnvironment : MonoBehaviour
             }
 
             resultType = MetaTilePool.RESULTTYPE.FAILURE;
+
+            Dictionary<MetaTile, List<bool>> placementPositionMetaTileValidityDict = mValidMetaTiles[placementPosition.x, placementPosition.y, placementPosition.z];
+
+
             //Loop through all permissable meta tiles and try to place them
             while (resultType != MetaTilePool.RESULTTYPE.SUCCESS && filteredMetatiles.Count > 0)
             {
                 // Select a candidate metatile
                 // candidateMetatile = DrawMetaTile(placementPosition, metatilepool);
                 int candidateIndex = UnityEngine.Random.Range(0, filteredMetatiles.Count);
-                candidateMetatile = filteredMetatiles[candidateIndex].metaTileProbability.GetMetaTiles()[0];
+                candidateMetatile = filteredMetatiles[candidateIndex].metaTileProbability.GetMetaTile();
 
-                // Try to find a place to put the metatile
-                // iterate through the possible orientations of the metatile
-                Orientation[] values = (Orientation[])Enum.GetValues(typeof(Orientation));
-                System.Random random = new System.Random();
-                random.Shuffle(values);
-                foreach (Orientation orientation in values)
+                List<bool> validConfigurations = placementPositionMetaTileValidityDict[candidateMetatile];
+
+
+                int index = 0;
+                // print($"Valid configurations for {candidateMetatile.name}: {validConfigurations.Count}");
+                foreach (bool validConfigurationBool in validConfigurations)
                 {
-                    if (resultType == MetaTilePool.RESULTTYPE.SUCCESS)
+                    if (validConfigurationBool)
                     {
+                        MetaTile.Configuration configTuple = candidateMetatile.GetConfiguration(index);
+
+                        Vector3Int placementPositionOriginOffset = placementPosition - new Vector3Int((int)configTuple.origin.x, (int)configTuple.origin.y, (int)configTuple.origin.z);
+                        PlaceMetaTile(placementPositionOriginOffset, candidateMetatile, configTuple.orientation, configTuple.flipped);
+                        CollapseWaveFunction();
+
+                        resultType = MetaTilePool.RESULTTYPE.SUCCESS;
+                        placedMetaTiles.Add(candidateMetatile);
+                        placedPositions.Add(placementPositionOriginOffset);
+                        placedRotations.Add(OrientationToQuaternion[configTuple.orientation]);
+                        placedFlipped.Add(configTuple.flipped);
+                        Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPositionOriginOffset}, orientation={configTuple.orientation}, flipped = {configTuple.flipped}, Count={placedMetaTiles.Count}");
+
+                        if (DEBUG)
+                        {
+                            candidateMetatile.DepositPayload(placementPositionOriginOffset, OrientationToQuaternion[configTuple.orientation], configTuple.flipped, false);
+                            Debug.Break();
+
+                            yield return null;
+                        }
+
                         break;
+
                     }
-
-                    if (OrientationToQuaternion[orientation].x != 0 && candidateMetatile.rotationDirections.x == 0)
-                    {
-                        continue;
-                    }
-                    else if (OrientationToQuaternion[orientation].y != 0 && candidateMetatile.rotationDirections.y == 0)
-                    {
-                        continue;
-                    }
-                    else if (OrientationToQuaternion[orientation].z != 0 && candidateMetatile.rotationDirections.z == 0)
-                    {
-                        continue;
-                    }
-
-                    // iterate through the possible flips of the metatile
-                    int isFlipped = UnityEngine.Random.Range(0, 2);
-                    for (int i = 0; i <= 1; i++)
-                    {
-                        if (resultType == MetaTilePool.RESULTTYPE.SUCCESS)
-                        {
-                            break;
-                        }
-
-                        bool flipped = (i + isFlipped) % 2 == 1;
-                        //bool flipped = true;
-
-                        if (flipped == true && !candidateMetatile.canFlip)
-                        {
-                            continue;
-                        }
+                    index++;
+                }
 
 
-                        // if the metatile can be placed, place it and break out of the loop
-                        if (candidateMetatile != null && CanPlaceMetaTile(placementPosition, new Vector3(0, 0, 0), candidateMetatile, orientation, flipped))
-                        {
-                            PlaceMetaTile(placementPosition, candidateMetatile, orientation, flipped);
-                            CollapseWaveFunction();
-                            resultType = MetaTilePool.RESULTTYPE.SUCCESS;
-                            placedMetaTiles.Add(candidateMetatile);
-                            placedPositions.Add(placementPosition);
-                            placedRotations.Add(OrientationToQuaternion[orientation]);
-                            placedFlipped.Add(flipped);
-                            Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPosition}, orientation={orientation}, flipped = {flipped}, Count={placedMetaTiles.Count}");
 
-                            if (DEBUG)
-                            {
-                                candidateMetatile.DepositPayload(placementPosition, OrientationToQuaternion[orientation], flipped, false);
-                                Debug.Break();
-
-                                yield return null;
-                            }
-
-                            break;
-                        }
-                        else
-                        {
-                            resultType = MetaTilePool.RESULTTYPE.FAILURE;
-                            //timeoutCounter++;
-                            //Debug.Log("MetaTilePool.RESULTTYPE.FAILURE, timeoutCounter++");
-                        }
-                    }
-
-                    if (DEBUG)
-                    {
-                        yield return null;
-                    }
+                if (DEBUG)
+                {
+                    yield return null;
                 }
 
                 if (resultType != MetaTilePool.RESULTTYPE.SUCCESS)
@@ -1166,6 +1321,7 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public void Awake()
     {
+        UpdateDynamicWeights();
         //Initialize face array
         for (int i = 0; i < faces.GetLength(0); i++)
         {
