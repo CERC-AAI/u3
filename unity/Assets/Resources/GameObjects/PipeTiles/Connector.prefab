@@ -827,7 +827,8 @@ MonoBehaviour:
   - {fileID: 6693838878744961841}
   payload: {fileID: 5719564469284369926}
   tags: 
-  rotationDirections: {x: 0, y: 0, z: 0}
+  rotationDirections: {x: 1, y: 1, z: 1}
+  canFlip: 1
 --- !u!1 &7290355049124028334
 GameObject:
   m_ObjectHideFlags: 0
