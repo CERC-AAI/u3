@@ -48,42 +48,152 @@ MonoBehaviour:
   tileFaces:
   - color: {r: 0.4745098, g: 0.972549, b: 1, a: 1}
     name: Air
+    weight: 0
   - color: {r: 0.3584906, g: 0.18379787, b: 0.07271271, a: 1}
     name: Ground
+    weight: 0
   - color: {r: 0, g: 0, b: 0, a: 1}
     name: Bedrock
+    weight: 1000
   - color: {r: 1, g: 0.042735044, b: 0, a: 1}
     name: RampLeft
+    weight: 0
   - color: {r: 1, g: 0.41037738, b: 0.47036862, a: 1}
     name: RampRight
+    weight: 0
   - color: {r: 0, g: 1, b: 0.07667947, a: 1}
     name: CornerFrontRight
+    weight: 0
   - color: {r: 0.6698386, g: 1, b: 0.6273585, a: 1}
     name: CornerFrontLeft
+    weight: 0
   - color: {r: 0, g: 0.41509432, b: 0.016012829, a: 1}
     name: CornerBackLeft
+    weight: 0
   - color: {r: 0.22441262, g: 0.38679248, b: 0.24391967, a: 1}
     name: CornerBackRight
+    weight: 0
   - color: {r: 0, g: 0.48081636, b: 0.5, a: 1}
     name: StrictAir
+    weight: 100
+  - color: {r: 0, g: 0.0032477886, b: 0.5019608, a: 1}
+    name: Surface
+    weight: 0
+  - color: {r: 0.6509434, g: 0.43393463, b: 0.31626025, a: 1}
+    name: ThinGround
+    weight: 0
   matchingMatrix:
   - mA: 0
     mB: 0
+    mWeight: 1
+  - mA: 0
+    mB: 1
+    mWeight: 1
+  - mA: 0
+    mB: 3
+    mWeight: 1
+  - mA: 0
+    mB: 4
+    mWeight: 1
+  - mA: 0
+    mB: 5
+    mWeight: 10
+  - mA: 0
+    mB: 6
+    mWeight: 10
+  - mA: 0
+    mB: 7
+    mWeight: 10
+  - mA: 0
+    mB: 8
+    mWeight: 10
+  - mA: 0
+    mB: 9
+    mWeight: 1
+  - mA: 0
+    mB: 10
+    mWeight: 10
+  - mA: 0
+    mB: 11
+    mWeight: 100
+  - mA: 1
+    mB: 0
+    mWeight: 1
   - mA: 1
     mB: 1
+    mWeight: 1
+  - mA: 1
+    mB: 2
+    mWeight: 1
+  - mA: 1
+    mB: 5
+    mWeight: 1
+  - mA: 1
+    mB: 6
+    mWeight: 1
+  - mA: 1
+    mB: 7
+    mWeight: 1
+  - mA: 1
+    mB: 8
+    mWeight: 1
+  - mA: 1
+    mB: 10
+    mWeight: 1
+  - mA: 1
+    mB: 11
+    mWeight: 1
+  - mA: 2
+    mB: 1
+    mWeight: 1
   - mA: 2
     mB: 2
+    mWeight: 1
+  - mA: 2
+    mB: 10
+    mWeight: 5
   - mA: 3
-    mB: 3
-  - mA: 4
+    mB: 0
+    mWeight: 1
+  - mA: 3
     mB: 4
+    mWeight: 10
+  - mA: 3
+    mB: 9
+    mWeight: 1
+  - mA: 4
+    mB: 0
+    mWeight: 1
+  - mA: 4
+    mB: 3
+    mWeight: 10
+  - mA: 4
+    mB: 9
+    mWeight: 1
   - mA: 5
     mB: 5
+    mWeight: 100
   - mA: 6
     mB: 6
+    mWeight: 100
   - mA: 7
     mB: 7
+    mWeight: 100
   - mA: 8
     mB: 8
+    mWeight: 100
+  - mA: 9
+    mB: 0
+    mWeight: 1
+  - mA: 9
+    mB: 3
+    mWeight: 1
+  - mA: 9
+    mB: 4
+    mWeight: 1
   - mA: 9
     mB: 9
+    mWeight: 1
+  - mA: 11
+    mB: 11
+    mWeight: 1

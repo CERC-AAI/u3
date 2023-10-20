@@ -20,11 +20,13 @@ public class TileFacePalette : MonoBehaviour
     {
         public int mA;
         public int mB;
+        public float mWeight = 1.0f;
 
-        public MatchedFaces(int a, int b)
+        public MatchedFaces(int a, int b, float weight)
         {
             mA = a;
             mB = b;
+            mWeight = weight;
         }
     }
 
@@ -38,7 +40,7 @@ public class TileFacePalette : MonoBehaviour
     List<List<int>> mPossibleFaces = new List<List<int>>();
     List<int> mAllFaces = new List<int>();
 
-    public bool CanConnect(int tileFace1, int tileFace2)
+    /*public bool CanConnect(int tileFace1, int tileFace2)
     {
 
         for (int i = 0; i < matchingMatrix.Count; i++)
@@ -51,6 +53,19 @@ public class TileFacePalette : MonoBehaviour
         }
 
         return false;
+    }*/
+
+    public float ConnectionWeight(int tileFace1, int tileFace2)
+    {
+        for (int i = 0; i < matchingMatrix.Count; i++)
+        {
+            if (matchingMatrix[i].mA == tileFace1 && matchingMatrix[i].mB == tileFace2)
+            {
+                return matchingMatrix[i].mWeight;
+            }
+        }
+
+        return 0.0f;
     }
 
     public List<int> GetPossibleConnections(int tileFace)
@@ -76,25 +91,13 @@ public class TileFacePalette : MonoBehaviour
 
                 for (int i = 0; i < matchingMatrix.Count; i++)
                 {
-                    if (matchingMatrix[i].mA == j)
+                    if (matchingMatrix[i].mA == j && matchingMatrix[i].mWeight != 0)
                     {
-                        if (!mPossibleFaces[j].Contains(matchingMatrix[i].mB))
-                        {
-                            mPossibleFaces[j].Add(matchingMatrix[i].mB);
-                        }
-                    }
-                    else if (matchingMatrix[i].mB == j)
-                    {
-                        if (!mPossibleFaces[j].Contains(matchingMatrix[i].mA))
-                        {
-                            mPossibleFaces[j].Add(matchingMatrix[i].mA);
-                        }
+                        mPossibleFaces[j].Add(matchingMatrix[i].mB);
                     }
                 }
             }
         }
-
-        //Debug.Log($"Face {tileFace} -> {string.Join(", ", faceList)}");
 
         return mPossibleFaces[tileFace];
     }

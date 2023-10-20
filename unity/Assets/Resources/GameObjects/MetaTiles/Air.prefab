@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faceIDs: 000000000000000000000000000000000000000000000000
+  faceIDs: 090000000000000000000000000000000000000000000000
 --- !u!1 &4953736298549603606
 GameObject:
   m_ObjectHideFlags: 0
@@ -161,6 +161,7 @@ MonoBehaviour:
   payload: {fileID: 371776409249493707}
   tags: 
   rotationDirections: {x: 0, y: 0, z: 0}
+  canFlip: 0
 --- !u!1 &7390156511696648833
 GameObject:
   m_ObjectHideFlags: 0
@@ -174,7 +175,7 @@ GameObject:
   - component: {fileID: 1521369539812902070}
   - component: {fileID: 904878212642601293}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Air Debug
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

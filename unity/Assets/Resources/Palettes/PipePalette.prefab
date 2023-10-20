@@ -55,5 +55,7 @@ MonoBehaviour:
   matchingMatrix:
   - mA: 0
     mB: 0
+    mWeight: 1
   - mA: 1
     mB: 1
+    mWeight: 1

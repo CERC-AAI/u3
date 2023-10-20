@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faceIDs: 080000000800000009000000010000000900000001000000
+  faceIDs: 0800000008000000090000000b000000090000000b000000
 --- !u!1 &6552369819736916210
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,7 +128,7 @@ MonoBehaviour:
   - {fileID: 2499566853283043604}
   payload: {fileID: 371776409249493707}
   tags: 
-  rotationDirections: {x: 0, y: 1, z: 0}
+  rotationDirections: {x: 0, y: 0, z: 0}
   canFlip: 0
 --- !u!1 &7552926363554527522
 GameObject:

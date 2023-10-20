@@ -30,7 +30,6 @@ public class MetaTilePool : IMetaTileProbability
     {
         return null;
     }
-    public List<float> weights;
 
     // TODO: filter the list of metatiles by the possible faces in filterFaces
     // the metatile must contain at least one tile with a face in filterFaces
@@ -50,7 +49,7 @@ public class MetaTilePool : IMetaTileProbability
         {
             if (metatileProbabilities[i].metaTileProbability is MetaTile)
             {
-                Debug.Log("is MetaTile");
+                //Debug.Log("is MetaTile");
                 MetaTileProbability metatileprobability = new MetaTileProbability();
                 metatileprobability.metaTileProbability = metatileProbabilities[i].metaTileProbability;
                 metatileprobability.weight = metatileProbabilities[i].weight * weight;
@@ -59,14 +58,14 @@ public class MetaTilePool : IMetaTileProbability
             else if (metatileProbabilities[i].metaTileProbability is MetaTilePool)
             {
                 depth_count++;
-                if (depth_count > 2)
+                if (depth_count > 20)
                 {
                     throw new Exception("depth count too big, something went wrong");
                 }
                 Debug.Log("is not Metatile, going one level deeper");
-                Debug.Log("Type: " + metatileProbabilities[i].metaTileProbability.GetType());
+                //Debug.Log("Type: " + metatileProbabilities[i].metaTileProbability.GetType());
                 MetaTilePool metatilepool = (MetaTilePool)metatileProbabilities[i].metaTileProbability;
-                Debug.Log("metatilepool: " + metatilepool);
+                //Debug.Log("metatilepool: " + metatilepool);
                 metatilepool.GetWeightedMetaTiles(metatileProbabilities[i].weight * weight, deepCopy);
             }
 

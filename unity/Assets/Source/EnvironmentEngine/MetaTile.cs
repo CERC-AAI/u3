@@ -82,12 +82,12 @@ public class MetaTile : IMetaTileProbability
         return Resources.Load<TileFacePalette>(TileFacePaletteEditor.defaultPalettePath);
     }
 
-    public bool CanConnect(int faceType1, int faceType2)
+    /*public bool CanConnect(int faceType1, int faceType2)
     {
         return GetPalette().CanConnect(faceType1, faceType2);
     }
 
-    public bool CanPlace(Tile[,,] environment, int startX, int startY, int startZ)
+    /*public bool CanPlace(Tile[,,] environment, int startX, int startY, int startZ)
     {
 
         foreach (Tile tile in tiles)
@@ -161,7 +161,7 @@ public class MetaTile : IMetaTileProbability
         }
 
         return true;  // no conflicts were found
-    }
+    }*/
 
     public Tile GetTile(Tile[,,] environment, Vector3Int position)
     {

@@ -188,6 +188,7 @@
     <Compile Include="Assets\KinematicCharacterController\ExampleCharacter\Scripts\ExamplePlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\1- Player Camera Character Setup\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\StarterAssets\InputSystem\StarterAssetsInputs.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\MetaTilePoolEditor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\11- Charging state\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\GridObject.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\GraphicsObject.cs" />

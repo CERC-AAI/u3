@@ -48,16 +48,22 @@ MonoBehaviour:
   tileFaces:
   - color: {r: 0, g: 1, b: 0.13757396, a: 1}
     name: Top
+    weight: 0
   - color: {r: 1, g: 0.038367797, b: 0, a: 1}
     name: Bottom
+    weight: 0
   - color: {r: 1, g: 0.8126906, b: 0, a: 1}
     name: Left
+    weight: 0
   - color: {r: 0.051886797, g: 0.108821005, b: 1, a: 1}
     name: Right
+    weight: 0
   - color: {r: 1, g: 0, b: 0.9107642, a: 1}
     name: Front
+    weight: 0
   - color: {r: 0, g: 0, b: 0, a: 1}
     name: Back
+    weight: 0
   matchingMatrix:
   - mA: 0
     mB: 0

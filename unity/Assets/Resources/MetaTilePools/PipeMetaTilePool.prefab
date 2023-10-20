@@ -51,10 +51,10 @@ MonoBehaviour:
   metatileProbabilities:
   - metaTileProbability: {fileID: 8013033377143349393, guid: 20fc7283ba6c2a14bb2ed16a94453384,
       type: 3}
-    weight: 1
+    weight: 20
   - metaTileProbability: {fileID: 8013033377143349393, guid: 067360c44e1791141aecc618c8201eaf,
       type: 3}
-    weight: 1
+    weight: 2
   - metaTileProbability: {fileID: 8013033377143349393, guid: 2bd79cf736516f94aaacc56f7f8e447c,
       type: 3}
     weight: 1
@@ -63,7 +63,7 @@ MonoBehaviour:
     weight: 1
   - metaTileProbability: {fileID: 8013033377143349393, guid: 5d91fb0ef0773ed42ae2b4fb9cc616a4,
       type: 3}
-    weight: 1
+    weight: 2
   - metaTileProbability: {fileID: 8013033377143349393, guid: 4d9b1d4f6eaeebf448f2030ee1108a61,
       type: 3}
     weight: 1
@@ -72,11 +72,10 @@ MonoBehaviour:
     weight: 1
   - metaTileProbability: {fileID: 8013033377143349393, guid: 01674276477ad5849bea17cb95c6286f,
       type: 3}
-    weight: 1
+    weight: 2
   - metaTileProbability: {fileID: 8013033377143349393, guid: c333ead635e6ca149bade23645afb8f5,
       type: 3}
     weight: 1
   - metaTileProbability: {fileID: 8013033377143349393, guid: f1d3d125ee6bf154a9fb962c1d3706d6,
       type: 3}
-    weight: 1
-  weights: []
+    weight: 0.01
