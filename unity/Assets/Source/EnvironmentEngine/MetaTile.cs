@@ -17,7 +17,37 @@ public class MetaTile : IMetaTileProbability
     public Vector3Int rotationDirections = Vector3Int.one;  // allowed rotation directions (0 = rotation not allowed, 1 = rotation allowed)
     public bool canFlip = true;  // allowed rotation directions (0 = rotation not allowed, 1 = rotation allowed)
 
-    public List<int> GetTags()
+    public struct Configuration
+    {
+        public Vector3 origin;
+        public MetaTileEnvironment.Orientation orientation;
+        public bool flipped;
+    }
+
+
+    List<Configuration> mConfigurationMap = new List<Configuration>();
+
+    // map that corresponds these tuples to indices
+
+    public Configuration GetConfiguration(int index)
+    {
+        Initialization();
+        return mConfigurationMap[index];
+    }
+
+    public int GetConfiguration(Vector3 origin, MetaTileEnvironment.Orientation orientation, bool flipped)
+    {
+        Initialization();
+        return mConfigurationMap.FindIndex((Configuration configMap) => { return origin == configMap.origin && orientation == configMap.orientation && flipped == configMap.flipped; });
+    }
+
+    public List<Configuration> GetConfigurations()
+    {
+        Initialization();
+        return mConfigurationMap;
+    }
+
+    public override List<int> GetTags()
     {
         return tags;
     }
@@ -34,6 +64,12 @@ public class MetaTile : IMetaTileProbability
         metaTiles.Add(this);
         return metaTiles;
     }
+
+    public override MetaTile GetMetaTile()
+    {
+        return this;
+    }
+
 
     public TileFacePalette GetPalette()
     {
@@ -56,7 +92,7 @@ public class MetaTile : IMetaTileProbability
 
         foreach (Tile tile in tiles)
         {
-            Vector3Int position = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+            Vector3Int position = tile.transform.localPosition.ToVector3Int();// new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
 
             Vector3Int environmentPosition = new Vector3Int(startX, startY, startZ) + position;
 
@@ -143,7 +179,7 @@ public class MetaTile : IMetaTileProbability
     {
         foreach (Tile tile in tiles)
         {
-            Vector3Int thisPosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+            Vector3Int thisPosition = tile.transform.localPosition.ToVector3Int();
 
             if (thisPosition == position)
             {
@@ -186,7 +222,36 @@ public class MetaTile : IMetaTileProbability
             tempParent.transform.localRotation = rotation;
         }
     }
-    private void Awake()
+
+    private void Initialization()
     {
+        if (mConfigurationMap.Count > 0)
+        {
+            return;
+        }
+        foreach (MetaTileEnvironment.Orientation orientation in Enum.GetValues(typeof(MetaTileEnvironment.Orientation)))
+        {
+            foreach (bool flipped in new List<bool> { false, true })
+            {
+                if (flipped && !this.canFlip ||
+                    MetaTileEnvironment.OrientationToQuaternion[orientation].x != 0 && this.rotationDirections.x == 0 ||
+                    MetaTileEnvironment.OrientationToQuaternion[orientation].y != 0 && this.rotationDirections.y == 0 ||
+                    MetaTileEnvironment.OrientationToQuaternion[orientation].z != 0 && this.rotationDirections.z == 0)
+                {
+                    continue;
+                }
+                foreach (Tile tile in this.tiles) // iterate over every tile in the metatile as the origin
+                {
+
+                    Configuration config;
+                    config.origin = tile.transform.localPosition;
+                    config.orientation = orientation;
+                    config.flipped = flipped;
+
+
+                    mConfigurationMap.Add(config);
+                }
+            }
+        }
     }
 }

@@ -14,6 +14,7 @@ public class Tile : MonoBehaviour
     public int[] faceIDs = new int[6]; // 6 edges for a cube
     MetaTile mParentMetaTile;
 
+    Vector3 mCachedPosition = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
 
     // Directions: 0 = -x, 1 = +x, 2 = -y, 3 = +y, 4 = -z, 5 = +z
 
@@ -121,7 +122,7 @@ public class Tile : MonoBehaviour
         List<Vector3> positions = new List<Vector3>();
         List<Vector3> sizes = new List<Vector3>();
 
-        Vector3Int thisPosition = new Vector3Int((int)transform.localPosition.x, (int)transform.localPosition.y, (int)transform.localPosition.z);
+        Vector3Int thisPosition = transform.localPosition.ToVector3Int();// new Vector3Int((int)transform.localPosition.x, (int)transform.localPosition.y, (int)transform.localPosition.z);
 
         //Draw each face
         for (FACETYPE i = FACETYPE.TOP; i <= FACETYPE.BACK; i++)
@@ -240,5 +241,15 @@ public class Tile : MonoBehaviour
         }
 
         return mParentMetaTile;
+    }
+
+    public Vector3 GetLocalPosition()
+    {
+        if (mCachedPosition.x == float.NegativeInfinity)
+        {
+            mCachedPosition = transform.localPosition;
+        }
+
+        return mCachedPosition;
     }
 }

@@ -75,7 +75,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faceIDs: 000000000000000000000000000000000000000000000000
+  faceIDs: 010000000000000001000000000000000000000000000000
 --- !u!1 &7117943551620991784
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 5825167187239474412}
   - component: {fileID: 8013033377143349393}
   m_Layer: 0
-  m_Name: Air
+  m_Name: Air JOrdan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -140,7 +140,7 @@ Transform:
   - {fileID: 5719564469284369926}
   - {fileID: 3244019247835566641}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8013033377143349393
 MonoBehaviour:
@@ -159,5 +159,5 @@ MonoBehaviour:
   - {fileID: 8887524634482644440}
   payload: {fileID: 5719564469284369926}
   tags: 
-  rotationDirections: {x: 0, y: 0, z: 0}
-  canFlip: 0
+  rotationDirections: {x: 1, y: 1, z: 1}
+  canFlip: 1

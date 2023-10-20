@@ -348,7 +348,8 @@ MonoBehaviour:
   - {fileID: 3245907590596696868}
   payload: {fileID: 5719564469284369926}
   tags: 
-  rotationDirections: {x: 0, y: 0, z: 0}
+  rotationDirections: {x: 1, y: 1, z: 1}
+  canFlip: 1
 --- !u!1001 &8182800816753007354
 PrefabInstance:
   m_ObjectHideFlags: 0

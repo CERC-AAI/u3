@@ -35,6 +35,9 @@ public class TileFacePalette : MonoBehaviour
     [HideInInspector]
     public List<MatchedFaces> matchingMatrix = new List<MatchedFaces>();
 
+    List<List<int>> mPossibleFaces = new List<List<int>>();
+    List<int> mAllFaces = new List<int>();
+
     public bool CanConnect(int tileFace1, int tileFace2)
     {
 
@@ -52,28 +55,47 @@ public class TileFacePalette : MonoBehaviour
 
     public List<int> GetPossibleConnections(int tileFace)
     {
-        List<int> faceList = new List<int>();
-
-        for (int i = 0; i < matchingMatrix.Count; i++)
+        if (tileFace == -1)
         {
-            if (matchingMatrix[i].mA == tileFace)
+            if (mAllFaces.Count == 0)
             {
-                if (!faceList.Contains(matchingMatrix[i].mB))
+                for (int j = 0; j < tileFaces.Count; j++)
                 {
-                    faceList.Add(matchingMatrix[i].mB);
+                    mAllFaces.Add(j);
                 }
             }
-            else if (matchingMatrix[i].mB == tileFace)
+
+            return mAllFaces;
+        }
+
+        if (mPossibleFaces.Count == 0)
+        {
+            for (int j = 0; j < tileFaces.Count; j++)
             {
-                if (!faceList.Contains(matchingMatrix[i].mA))
+                mPossibleFaces.Add(new List<int>());
+
+                for (int i = 0; i < matchingMatrix.Count; i++)
                 {
-                    faceList.Add(matchingMatrix[i].mA);
+                    if (matchingMatrix[i].mA == j)
+                    {
+                        if (!mPossibleFaces[j].Contains(matchingMatrix[i].mB))
+                        {
+                            mPossibleFaces[j].Add(matchingMatrix[i].mB);
+                        }
+                    }
+                    else if (matchingMatrix[i].mB == j)
+                    {
+                        if (!mPossibleFaces[j].Contains(matchingMatrix[i].mA))
+                        {
+                            mPossibleFaces[j].Add(matchingMatrix[i].mA);
+                        }
+                    }
                 }
             }
         }
 
         //Debug.Log($"Face {tileFace} -> {string.Join(", ", faceList)}");
 
-        return faceList;
+        return mPossibleFaces[tileFace];
     }
 }
