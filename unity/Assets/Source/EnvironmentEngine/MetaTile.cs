@@ -92,7 +92,7 @@ public class MetaTile : IMetaTileProbability
 
         foreach (Tile tile in tiles)
         {
-            Vector3Int position = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+            Vector3Int position = tile.transform.localPosition.ToVector3Int();// new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
 
             Vector3Int environmentPosition = new Vector3Int(startX, startY, startZ) + position;
 
@@ -179,7 +179,7 @@ public class MetaTile : IMetaTileProbability
     {
         foreach (Tile tile in tiles)
         {
-            Vector3Int thisPosition = new Vector3Int((int)tile.transform.localPosition.x, (int)tile.transform.localPosition.y, (int)tile.transform.localPosition.z);
+            Vector3Int thisPosition = tile.transform.localPosition.ToVector3Int();
 
             if (thisPosition == position)
             {
