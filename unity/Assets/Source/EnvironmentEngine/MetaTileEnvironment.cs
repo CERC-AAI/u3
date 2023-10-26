@@ -269,6 +269,10 @@ public class MetaTileEnvironment : MonoBehaviour
                 {
                     count++;
                 }
+                else
+                {
+                    break;
+                }
             }
         }
         return count;
@@ -638,7 +642,7 @@ public class MetaTileEnvironment : MonoBehaviour
     public List<MetaTileProbability> GetMetaTiles(Vector3Int placementPosition, MetaTilePool metatilepool)
     {
         // Create a list of all legal metatiles from the pool
-        List<MetaTileProbability> metatiles = metatilepool.BuildMetaTilePoolDeepCopy();        
+        List<MetaTileProbability> metatiles = metatilepool.BuildMetaTilePoolDeepCopy();
 
         if (DEBUG)
         {
