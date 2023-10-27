@@ -14,11 +14,13 @@ public class MetaTileEnvironment : MonoBehaviour
     public class EnvironmentTileState
     {
         public Dictionary<MetaTile, List<ConfigurationValidity>> mValidMetaTiles = new Dictionary<MetaTile, List<ConfigurationValidity>>();
+        public Dictionary<MetaTile, List<int>> mPutativeMetaTileIndices = new Dictionary<MetaTile, List<int>>();
         public float mEntropy = -1;
         public Tile mTile = null;
         public TileState mState = TileState.NotPlaced;
         public List<int> mFaceIndices = new List<int>() { -1, -1, -1, -1, -1, -1 };
         public List<List<int>> mPossibleFaces = new List<List<int>>();
+        public Dictionary<MetaTile, bool> mValidMetatileList = new Dictionary<MetaTile, bool>();
 
         public EnvironmentTileState(List<MetaTile> metatiles)
         {
@@ -27,10 +29,13 @@ public class MetaTileEnvironment : MonoBehaviour
                 foreach (MetaTile metatile in metatiles)
                 {
                     mValidMetaTiles[metatile] = new List<ConfigurationValidity>();
+                    mPutativeMetaTileIndices[metatile] = new List<int>();
                     for (int l = 0; l < metatile.GetConfigurations().Count; l++)
                     {
                         mValidMetaTiles[metatile].Add(ConfigurationValidity.UNKNOWN);
+                        mPutativeMetaTileIndices[metatile].Add(l);
                     }
+                    mValidMetatileList[metatile] = true;
                 }
 
                 for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
@@ -75,7 +80,7 @@ public class MetaTileEnvironment : MonoBehaviour
     public bool DEBUG = false;
     public Transform debugTile;
 
-    List<Tile.FACETYPE> mTempPermutationList = new List<Tile.FACETYPE>();
+    List<Tile.FACETYPE> mTempPermutationList = new List<Tile.FACETYPE>() { Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK};
     List<int> mTempTileFaceList = new List<int>();
     List<int> mPutativeConfigurationList = new List<int>();
 
@@ -230,6 +235,12 @@ public class MetaTileEnvironment : MonoBehaviour
 
         foreach (MetaTile metatile in tileState.mValidMetaTiles.Keys)
         {
+            if (!tileState.mValidMetatileList[metatile])
+            {
+                continue;
+            }
+
+            List<int> putativeConfigurations = tileState.mPutativeMetaTileIndices[metatile];
             List<ConfigurationValidity> validConfigurations = tileState.mValidMetaTiles[metatile];
 
             // print($"validConfigurations.Count: {validConfigurations.Count}");
@@ -239,45 +250,53 @@ public class MetaTileEnvironment : MonoBehaviour
             //     validConfigurations = mValidMetaTiles[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z][metatile];
             // }
 
+
             bool hasValidConfiguration = false;
-            for (int i = 0; i < validConfigurations.Count; i++)
+            // If we have a VALID index it's in the first index
+            if (validConfigurations[putativeConfigurations[0]] == ConfigurationValidity.VALID)
             {
-                if (validConfigurations[i] == ConfigurationValidity.VALID)
+                MetaTile.Configuration configTuple = metatile.GetConfiguration(putativeConfigurations[0]);
+                bool canPlace = CanPlaceMetaTile(
+                    wavefrontPosition, metatile, configTuple.origin, configTuple.orientation, configTuple.flipped);
+                if (!canPlace)
                 {
-                    MetaTile.Configuration configTuple = metatile.GetConfiguration(i);
-                    bool canPlace = CanPlaceMetaTile(
-                        wavefrontPosition, metatile, configTuple.origin, configTuple.orientation, configTuple.flipped);
-                    if (!canPlace)
-                    {
-                        tileState.mValidMetaTiles[metatile][i] = ConfigurationValidity.INVALID;
-                    }
-                    else
-                    {
-                        hasValidConfiguration = true;
-                        break;
-                    }
+                    tileState.mValidMetaTiles[metatile][putativeConfigurations[0]] = ConfigurationValidity.INVALID;
+                    tileState.mPutativeMetaTileIndices[metatile].RemoveAt(0);
+                }
+                else
+                {
+                    hasValidConfiguration = true;
                 }
             }
+
             if (!hasValidConfiguration)
             {
-                for (int i = 0; i < validConfigurations.Count; i++)
+                for (int i = 0; i < putativeConfigurations.Count; i++)
                 {
-                    if (validConfigurations[i] == ConfigurationValidity.UNKNOWN)
+                    if (validConfigurations[putativeConfigurations[i]] == ConfigurationValidity.UNKNOWN)
                     {
-                        MetaTile.Configuration configTuple = metatile.GetConfiguration(i);
+                        MetaTile.Configuration configTuple = metatile.GetConfiguration(putativeConfigurations[i]);
                         bool canPlace = CanPlaceMetaTile(
                             wavefrontPosition, metatile, configTuple.origin, configTuple.orientation, configTuple.flipped);
                         if (!canPlace)
                         {
-                            tileState.mValidMetaTiles[metatile][i] = ConfigurationValidity.INVALID;
+                            tileState.mValidMetaTiles[metatile][putativeConfigurations[i]] = ConfigurationValidity.INVALID;
+                            tileState.mPutativeMetaTileIndices[metatile].RemoveAt(i);
+                            i--;
                         }
                         else
                         {
-                            tileState.mValidMetaTiles[metatile][i] = ConfigurationValidity.VALID;
+                            tileState.mValidMetaTiles[metatile][putativeConfigurations[i]] = ConfigurationValidity.VALID;
+                            hasValidConfiguration = true;
                             break;
                         }
                     }
                 }
+            }
+
+            if (!hasValidConfiguration)
+            {
+                tileState.mValidMetatileList[metatile] = false;
             }
 
             // sampledMetaTileisAllowed[sampledMetaTiles.IndexOf(metatile)] = isAllowed;
@@ -317,9 +336,9 @@ public class MetaTileEnvironment : MonoBehaviour
         //Helper function used for entropy calculation. Counts the number of valid metatiles. Not sure which of these functions to use for the entropy calculation.
         // at least 1 valid configuration
         int count = 0;
-        foreach (KeyValuePair<MetaTile, List<ConfigurationValidity>> pair in environment[position.x, position.y, position.z].mValidMetaTiles)
+        foreach (KeyValuePair<MetaTile, bool> pair in environment[position.x, position.y, position.z].mValidMetatileList)
         {
-            if (pair.Value.Contains(ConfigurationValidity.VALID))
+            if (pair.Value)
             {
                 count++;
             }
@@ -425,7 +444,10 @@ public class MetaTileEnvironment : MonoBehaviour
 
             Vector3Int minEntropyPosition = wavefrontPositions[minEntropyIndex];
             // select the position with the minimum entropy value
-            Debug.Log("SelectPlacementPosition() placementPosition: " + minEntropyPosition);
+            if (DEBUG)
+            {
+                Debug.Log("SelectPlacementPosition() placementPosition: " + minEntropyPosition);
+            }
             return minEntropyPosition;
         }
 
@@ -696,10 +718,12 @@ public class MetaTileEnvironment : MonoBehaviour
     public bool CanPlaceMetaTile(
         Vector3Int placementPosition, MetaTile metatile, Vector3 currentOrigin, Orientation orientation, bool flipped)
     {
+        Quaternion quaternion = OrientationToQuaternion[orientation];
+
         if (flipped && !metatile.canFlip ||
-            OrientationToQuaternion[orientation].x != 0 && metatile.rotationDirections.x == 0 ||
-            OrientationToQuaternion[orientation].y != 0 && metatile.rotationDirections.y == 0 ||
-            OrientationToQuaternion[orientation].z != 0 && metatile.rotationDirections.z == 0)
+            quaternion.x != 0 && metatile.rotationDirections.x == 0 ||
+            quaternion.y != 0 && metatile.rotationDirections.y == 0 ||
+            quaternion.z != 0 && metatile.rotationDirections.z == 0)
         {
             return false;
         }
@@ -708,25 +732,23 @@ public class MetaTileEnvironment : MonoBehaviour
         {
             // from enum to list of integers that corresponds to a permuted list of faces
 
-            mTempPermutationList.Clear();
-            mTempPermutationList.AddRange(OrientationToPermutation[orientation]);
+            //mTempPermutationList.Clear();
+            //mTempPermutationList.AddRange(OrientationToPermutation[orientation]);
+
+            //This wasn't fast
+            //Vector3Int tilePosition = metatile.GetCachedTileOffset(tile, currentOrigin, orientation, flipped);
 
             // multiply the tile position by a quaternion
             UnityEngine.Vector3 unRotatedPosition = new Vector3(tile.GetLocalPosition().x, tile.GetLocalPosition().y, tile.GetLocalPosition().z) - currentOrigin;
             if (flipped)
             {
                 unRotatedPosition.y = unRotatedPosition.y * -1;
-                //(permutation[1], permutation[0]) = (permutation[0], permutation[1]);
-                int topIndex = mTempPermutationList.IndexOf(Tile.FACETYPE.TOP);
-                int bottomIndex = mTempPermutationList.IndexOf(Tile.FACETYPE.BOTTOM);
-                (mTempPermutationList[bottomIndex], mTempPermutationList[topIndex]) = (mTempPermutationList[topIndex], mTempPermutationList[bottomIndex]);
 
             }
-            Vector3 rotatedPosition = OrientationToQuaternion[orientation] * unRotatedPosition;
+            Vector3 rotatedPosition = quaternion * unRotatedPosition;
 
             Vector3 newRotatedPosition = rotatedPosition;
-            // not sure if you can multiply Vector3Ints by quaternion
-            Vector3Int tilePosition = newRotatedPosition.ToVector3Int();// new Vector3Int(Mathf.RoundToInt(newRotatedPosition.x), Mathf.RoundToInt(newRotatedPosition.y), Mathf.RoundToInt(newRotatedPosition.z));
+            Vector3Int tilePosition = newRotatedPosition.ToVector3Int();
 
             Vector3Int environmentPosition = placementPosition + tilePosition;
 
@@ -755,17 +777,32 @@ public class MetaTileEnvironment : MonoBehaviour
                 return false;
             }
 
+            // Only calculate purmutations if tiles have succeeded
+            List<Tile.FACETYPE> permutation = OrientationToPermutation[orientation];
+
+            //We directly overwrite to save speed
+            for (int i = 0; i < permutation.Count; i++)
+            {
+                mTempPermutationList[i] = permutation[i];
+            }
+
+            if (flipped)
+            {
+                int topIndex = mTempPermutationList.IndexOf(Tile.FACETYPE.TOP);
+                int bottomIndex = mTempPermutationList.IndexOf(Tile.FACETYPE.BOTTOM);
+                (mTempPermutationList[bottomIndex], mTempPermutationList[topIndex]) = (mTempPermutationList[topIndex], mTempPermutationList[bottomIndex]);
+            }
+
             // TODO: check neighbor tiles for adjacency conflicts
             List<List<int>> possibleFaces = GetPossibleFaces(environmentPosition);
-            mTempTileFaceList.Clear();
-            mTempTileFaceList.AddRange(tile.faceIDs);
-            for (int i = 0; i < mTempTileFaceList.Count; i++)
-            {
-                // if the face is not in the list of possible faces at the index of the face in tileFaces, return false
-                // tilefaces[permutation[i]]
+            int poolFaceCount = metatilepool.palette.tileFaces.Count;
 
+            //mTempTileFaceList.Clear();
+            //mTempTileFaceList.AddRange(tile.faceIDs);
+            for (int i = 0; i < tile.faceIDs.Length; i++)
+            {
                 //If the face list as all possibilities, then we don't have to check them
-                if (possibleFaces[i].Count != metatilepool.palette.tileFaces.Count && !possibleFaces[i].Contains(mTempTileFaceList[(int)mTempPermutationList[i]]))
+                if (possibleFaces[i].Count != poolFaceCount && !possibleFaces[i].Contains(tile.faceIDs[(int)mTempPermutationList[i]]))
                 {
                     return false;
                 }
@@ -1250,6 +1287,8 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public IEnumerator GenerateEnvironment(MetaTilePool metatilepool)
     {
+        float startTime = Time.realtimeSinceStartup;
+
         mMetatileList = metatilepool.GetMetaTiles();
 
         placedFlipped.Clear();
@@ -1390,10 +1429,11 @@ public class MetaTileEnvironment : MonoBehaviour
                     placedPositions.Add(placementPositionOriginOffset);
                     placedRotations.Add(OrientationToQuaternion[configTuple.orientation]);
                     placedFlipped.Add(configTuple.flipped);
-                    Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPositionOriginOffset}, origin={rotatedOffset}, orientation={configTuple.orientation}, flipped = {configTuple.flipped}, Count={placedMetaTiles.Count}");
-
+                    
                     if (DEBUG)
                     {
+                        Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPositionOriginOffset}, origin={rotatedOffset}, orientation={configTuple.orientation}, flipped = {configTuple.flipped}, Count={placedMetaTiles.Count}");
+
                         candidateMetatile.DepositPayload(placementPositionOriginOffset, OrientationToQuaternion[configTuple.orientation], configTuple.flipped);
                         Debug.Break();
 
@@ -1426,6 +1466,8 @@ public class MetaTileEnvironment : MonoBehaviour
                 break;
             }
         }
+
+        Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to generate.");
     }
 
     private void DepositPayloads()

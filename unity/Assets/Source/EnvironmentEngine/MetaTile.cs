@@ -24,8 +24,10 @@ public class MetaTile : IMetaTileProbability
         public bool flipped;
     }
 
-
     List<Configuration> mConfigurationMap = new List<Configuration>();
+
+    Dictionary<Tile, Vector3Int> mTilePositionMap = new Dictionary<Tile, Vector3Int>();
+    Configuration mLastCachedConfiguration;
 
     // map that corresponds these tuples to indices
 
@@ -81,6 +83,44 @@ public class MetaTile : IMetaTileProbability
         Debug.LogError("Meta tile had no parent.");
         return Resources.Load<TileFacePalette>(TileFacePaletteEditor.defaultPalettePath);
     }
+
+    /*public Vector3Int GetCachedTileOffset(Tile tile, Vector3 currentOrigin, MetaTileEnvironment.Orientation orientation, bool flipped)
+    {
+
+        if (mLastCachedConfiguration.origin != currentOrigin || mLastCachedConfiguration.orientation != orientation || mLastCachedConfiguration.flipped != flipped || mTilePositionMap.Count == 0)
+        {
+            Configuration configuration = new Configuration();
+            configuration.origin = currentOrigin;
+            configuration.orientation = orientation;
+            configuration.flipped = flipped;
+
+            mLastCachedConfiguration = configuration;
+
+            for (int i = 0; i < tiles.Count; i++)
+            {
+                mTilePositionMap[tiles[i]] = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
+            }
+        }
+
+        if (mTilePositionMap[tile].x == int.MinValue)
+        {
+            Quaternion quaternion = MetaTileEnvironment.OrientationToQuaternion[orientation];
+
+            // multiply the tile position by a quaternion
+            UnityEngine.Vector3 unRotatedPosition = new Vector3(tile.GetLocalPosition().x, tile.GetLocalPosition().y, tile.GetLocalPosition().z) - currentOrigin;
+            if (flipped)
+            {
+                unRotatedPosition.y = unRotatedPosition.y * -1;
+
+            }
+            Vector3 rotatedPosition = quaternion * unRotatedPosition;
+
+            Vector3 newRotatedPosition = rotatedPosition;
+            mTilePositionMap[tile] = newRotatedPosition.ToVector3Int();
+        }
+
+        return mTilePositionMap[tile];
+    }*/
 
     /*public bool CanConnect(int faceType1, int faceType2)
     {

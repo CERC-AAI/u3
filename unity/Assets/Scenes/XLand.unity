@@ -8513,6 +8513,7 @@ MonoBehaviour:
   placedFlipped: 
   wavefrontPositions: []
   wavefrontEntropies: []
+  timelapse: 0
   DEBUG: 1
   debugTile: {fileID: 8411421930320262341, guid: 854926c658783f947a2964d1b81dbfc1,
     type: 3}
