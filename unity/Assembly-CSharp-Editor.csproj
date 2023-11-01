@@ -60,9 +60,12 @@
   <ItemGroup>
     <Compile Include="Assets\Libraries\JSON\Editor\JSONChecker.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\Editor\KinematicCharacterMotorEditor.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\Editor\TileEditor.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\Editor\TileFacePaletteEditor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\Editor\PauseStateHandler.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\Editor\ReadOnlyPropertyDrawer.cs" />
     <Compile Include="Assets\StarterAssets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\Editor\MetaTilePoolEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

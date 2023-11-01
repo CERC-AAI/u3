@@ -103,6 +103,7 @@ public class Tile : MonoBehaviour
     //     return neighborFaces;
     // }
 
+#if UNITY_EDITOR
     // Draw a semitransparent red cube at the transforms position
     void OnDrawGizmos()
     {
@@ -232,6 +233,7 @@ public class Tile : MonoBehaviour
             Gizmos.DrawWireCube(position, size);
         }
     }
+#endif
 
     public MetaTile GetMetaTile()
     {

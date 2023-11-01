@@ -15,6 +15,8 @@ public class TileFace
 
 public class TileFacePalette : MonoBehaviour
 {
+    public static string defaultPalettePath = "Palettes/TestPalette";
+
     [Serializable]
     public class MatchedFaces
     {

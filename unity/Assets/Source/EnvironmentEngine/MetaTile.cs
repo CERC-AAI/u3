@@ -81,7 +81,7 @@ public class MetaTile : IMetaTileProbability
         }
 
         Debug.LogError("Meta tile had no parent.");
-        return Resources.Load<TileFacePalette>(TileFacePaletteEditor.defaultPalettePath);
+        return Resources.Load<TileFacePalette>(TileFacePalette.defaultPalettePath);
     }
 
     /*public Vector3Int GetCachedTileOffset(Tile tile, Vector3 currentOrigin, MetaTileEnvironment.Orientation orientation, bool flipped)
@@ -230,11 +230,13 @@ public class MetaTile : IMetaTileProbability
         return false;
     }
 
-    public void DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, bool debug = false)
+    public Transform DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, bool debug = false)
     {
+        Transform payloadCopy = null;
+
         if (payload != null)
         {
-            Transform payloadCopy = Instantiate(payload);
+            payloadCopy = MetaTileEnvironment.instantiateNewObject(payload);
             payloadCopy.transform.position = position;
             payloadCopy.transform.localRotation = rotation;
 
@@ -261,6 +263,8 @@ public class MetaTile : IMetaTileProbability
 
             tempParent.transform.localRotation = rotation;
         }
+
+        return payloadCopy;
     }
 
     private void Initialization()

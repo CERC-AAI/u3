@@ -8,7 +8,6 @@ using UnityEditor;
 public class TileFacePaletteEditor : Editor
 {
     static bool isOpen = true;
-    public static string defaultPalettePath = "Palettes/TestPalette";
 
     public override void OnInspectorGUI()
     {

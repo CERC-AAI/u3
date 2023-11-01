@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEditor.Tilemaps;
 
 public class MetaTileEnvironment : MonoBehaviour
 {
@@ -56,8 +54,14 @@ public class MetaTileEnvironment : MonoBehaviour
     public static int mLength = 10;
     public static int mHeight = 10;
 
+    public static int mManyMetatileCount = 2;
+
     public EnvironmentTileState[,,] environment = new EnvironmentTileState[mWidth, mWidth, mWidth];
     public float voxelSize = 1;
+
+    static protected Dictionary<string, List<Transform>> mInactiveObjectPool = new Dictionary<string, List<Transform>>();
+    static protected Dictionary<Transform, string> mActiveObjectPool = new Dictionary<Transform, string>();
+    static Transform mPoolRoot;
 
     public MetaTilePool metatilepool;
     private List<MetaTile> mMetatileList = new List<MetaTile>();
@@ -66,6 +70,7 @@ public class MetaTileEnvironment : MonoBehaviour
     public List<Quaternion> placedRotations = new List<Quaternion>();
     public List<Vector3Int> placedPositions = new List<Vector3Int>();
     public List<bool> placedFlipped = new List<bool>();
+    public List<Transform> placedPayloads = new List<Transform>();
 
     public enum TileState { NotPlaced, Wavefront, Placed };
     public TileState[,,] tileState = new TileState[mWidth, mHeight, mLength];
@@ -79,6 +84,7 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public bool DEBUG = false;
     public Transform debugTile;
+    public bool mGeneratingEnvironment = false;
 
     List<Tile.FACETYPE> mTempPermutationList = new List<Tile.FACETYPE>() { Tile.FACETYPE.TOP, Tile.FACETYPE.BOTTOM, Tile.FACETYPE.LEFT, Tile.FACETYPE.RIGHT, Tile.FACETYPE.FRONT, Tile.FACETYPE.BACK};
     List<int> mTempTileFaceList = new List<int>();
@@ -233,6 +239,7 @@ public class MetaTileEnvironment : MonoBehaviour
 
         // print($"wavefrontPositionMetaTileValidityDict.Count: {wavefrontPositionMetaTileValidityDict.Count}");
 
+        int validCount = 0;
         foreach (MetaTile metatile in tileState.mValidMetaTiles.Keys)
         {
             if (!tileState.mValidMetatileList[metatile])
@@ -297,6 +304,15 @@ public class MetaTileEnvironment : MonoBehaviour
             if (!hasValidConfiguration)
             {
                 tileState.mValidMetatileList[metatile] = false;
+            }
+            else
+            {
+                validCount++;
+            }
+
+            if (validCount >= mManyMetatileCount)
+            {
+                break;
             }
 
             // sampledMetaTileisAllowed[sampledMetaTiles.IndexOf(metatile)] = isAllowed;
@@ -998,7 +1014,7 @@ public class MetaTileEnvironment : MonoBehaviour
             }
         }
 
-        return CountValidMetaTiles(wavefrontPosition) / (faceWeight + 0.001f);
+        return CountValidMetaTiles(wavefrontPosition) * 10000 - (faceWeight + 0.001f);
 
         // // Do full translation/rotation tests and cache adjacent tile legality
         // // Dilation of tile checks and translation?
@@ -1287,14 +1303,24 @@ public class MetaTileEnvironment : MonoBehaviour
 
     public IEnumerator GenerateEnvironment(MetaTilePool metatilepool)
     {
+        mGeneratingEnvironment = true;
+
         float startTime = Time.realtimeSinceStartup;
 
         mMetatileList = metatilepool.GetMetaTiles();
+
+        mMetatileList.Sort((MetaTile a, MetaTile b) => a.GetConfigurations().Count.CompareTo(b.GetConfigurations().Count));
+
+        foreach (Transform payload in placedPayloads)
+        {
+            returnObjectToPool(payload.gameObject);
+        }
 
         placedFlipped.Clear();
         placedMetaTiles.Clear();
         placedPositions.Clear();
         placedRotations.Clear();
+        placedPayloads.Clear();
 
         UpdateDynamicWeights();
         InitializeEnvironment();
@@ -1430,18 +1456,22 @@ public class MetaTileEnvironment : MonoBehaviour
                     placedRotations.Add(OrientationToQuaternion[configTuple.orientation]);
                     placedFlipped.Add(configTuple.flipped);
                     
-                    if (DEBUG)
+                    if (DEBUG || timelapse)
                     {
-                        Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPositionOriginOffset}, origin={rotatedOffset}, orientation={configTuple.orientation}, flipped = {configTuple.flipped}, Count={placedMetaTiles.Count}");
-
                         candidateMetatile.DepositPayload(placementPositionOriginOffset, OrientationToQuaternion[configTuple.orientation], configTuple.flipped);
-                        Debug.Break();
+
+                        if (DEBUG)
+                        {
+                            Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPositionOriginOffset}, origin={rotatedOffset}, orientation={configTuple.orientation}, flipped = {configTuple.flipped}, Count={placedMetaTiles.Count}");
+
+                            Debug.Break();
+                        }
 
                         yield return null;
                     }
                 }
 
-                if (DEBUG || timelapse)
+                if (DEBUG)
                 {
                     yield return null;
                 }
@@ -1459,13 +1489,12 @@ public class MetaTileEnvironment : MonoBehaviour
                 placementIndicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 placementIndicator.transform.position = placementPosition;
 
-                for (int i = 0; i < placedMetaTiles.Count; i++)
-                {
-                    placedMetaTiles[i].DepositPayload(placedPositions[i], placedRotations[i], placedFlipped[i]);
-                }
+                DepositPayloads();
                 break;
             }
         }
+
+        mGeneratingEnvironment = false;
 
         Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to generate.");
     }
@@ -1474,9 +1503,9 @@ public class MetaTileEnvironment : MonoBehaviour
     {
         for (int i = 0; i < placedMetaTiles.Count; i++)
         {
-            placedMetaTiles[i].DepositPayload(
+            placedPayloads.Add(placedMetaTiles[i].DepositPayload(
                 placedPositions[i], placedRotations[i], placedFlipped[i]
-            );
+            ));
         }
     }
 
@@ -1494,6 +1523,9 @@ public class MetaTileEnvironment : MonoBehaviour
                 }
             }
         }
+
+        wavefrontEntropies.Clear();
+        wavefrontPositions.Clear();
     }
 
     public void Awake()
@@ -1502,6 +1534,81 @@ public class MetaTileEnvironment : MonoBehaviour
         //Making this a coroutine enbales step by step debugging. This is not fast, and should be changed back at some point.
         StartCoroutine(GenerateEnvironment(metatilepool));
         //GenerateEnvironment(metatilepool);
+    }
+
+    public void Update()
+    {
+        if (!mGeneratingEnvironment)
+        {
+            StartCoroutine(GenerateEnvironment(metatilepool));
+        }
+    }
+
+    static public Transform instantiateNewObject(Transform prefab)
+    {
+        string path = prefab.gameObject.GetInstanceID().ToString();
+        Transform tempObject = null;
+
+        if (mInactiveObjectPool.ContainsKey(path) && mInactiveObjectPool[path].Count > 0 && mInactiveObjectPool[path][0] != null)
+        {
+            tempObject = mInactiveObjectPool[path][0];
+            mInactiveObjectPool[path].RemoveAt(0);
+
+            tempObject.gameObject.SetActive(true);
+        }
+        else
+        {
+            tempObject = (Transform)Transform.Instantiate(prefab);
+        }
+
+        if (!mActiveObjectPool.ContainsKey(tempObject))
+        {
+            mActiveObjectPool[tempObject] = path;
+        }
+
+        return tempObject;
+    }
+    static public void returnObjectToPool(GameObject removeObject)
+    {
+        if (mPoolRoot == null)
+        {
+            GameObject tempObejct = GameObject.Find("PoolRoot");
+            if (tempObejct)
+            {
+                mPoolRoot = tempObejct.transform;
+            }
+
+            if (mPoolRoot == null)
+            {
+                mPoolRoot = new GameObject("PoolRoot").transform;
+            }
+        }
+
+        if (mActiveObjectPool.ContainsKey(removeObject.transform))
+        {
+            string path = mActiveObjectPool[removeObject.transform];
+
+            if (!mInactiveObjectPool.ContainsKey(path))
+            {
+                mInactiveObjectPool[path] = new List<Transform>();
+            }
+
+            mInactiveObjectPool[path].Add(removeObject.transform);
+            mActiveObjectPool.Remove(removeObject.transform);
+
+            removeObject.SetActive(false);
+            removeObject.transform.parent = mPoolRoot;
+
+
+            removeObject.transform.position = new Vector3(-9999, -9999);
+        }
+        else
+        {
+            if (removeObject.transform.parent != mPoolRoot)
+            {
+                Destroy(removeObject);
+            }
+        }
     }
 }
 

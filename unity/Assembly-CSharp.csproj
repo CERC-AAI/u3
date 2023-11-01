@@ -101,7 +101,6 @@
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\c- Wall Jumping\MyCharacterController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\KCCSettings.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\TileFacePaletteEditor.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\TargettingCursor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\ExampleAIController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\7- Orienting towards arbitrary up direction\Scripts\MyCharacterController.cs" />
@@ -153,7 +152,6 @@
     <Compile Include="Assets\Source\Scripts\ButtonGame\HealthOrb.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\13- Swimming state\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\4- Landing and leaving ground\Scripts\MyCharacterController.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\TileEditor.cs" />
     <Compile Include="Assets\FreeSelectionOutline\Scripts\SelectionOutlineController.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\HealthBar.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\a- Simple Jumping\MyCharacterController.cs" />
@@ -188,7 +186,6 @@
     <Compile Include="Assets\KinematicCharacterController\ExampleCharacter\Scripts\ExamplePlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\1- Player Camera Character Setup\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\StarterAssets\InputSystem\StarterAssetsInputs.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\MetaTilePoolEditor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\11- Charging state\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\GridObject.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\GraphicsObject.cs" />
