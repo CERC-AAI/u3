@@ -12,7 +12,7 @@ public class Tile : MonoBehaviour
     [HideInInspector]
     // TODO: are we not using faceIDs anymore?
     public int[] faceIDs = new int[6]; // 6 edges for a cube
-    MetaTile mParentMetaTile;
+    Metatile mParentMetatile;
 
     Vector3 mCachedPosition = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
 
@@ -57,12 +57,12 @@ public class Tile : MonoBehaviour
 
     void OnEnable()
     {
-        mParentMetaTile = GetComponentInParent<MetaTile>();
+        mParentMetatile = GetComponentInParent<Metatile>();
     }
 
-    public void SetParent(MetaTile parent)
+    public void SetParent(Metatile parent)
     {
-        mParentMetaTile = parent;
+        mParentMetatile = parent;
     }
 
     // public static Tile GetNeighbor(Tile[,,] environment, int x, int y, int z)
@@ -107,13 +107,13 @@ public class Tile : MonoBehaviour
     // Draw a semitransparent red cube at the transforms position
     void OnDrawGizmos()
     {
-        MetaTile parentMetaTile = mParentMetaTile;
-        if (parentMetaTile == null)
+        Metatile parentMetatile = mParentMetatile;
+        if (parentMetatile == null)
         {
-            parentMetaTile = GetComponentInParent<MetaTile>();
+            parentMetatile = GetComponentInParent<Metatile>();
         }
 
-        float voxelSize = parentMetaTile.GetPalette().voxelSize;
+        float voxelSize = parentMetatile.GetPalette().voxelSize;
         voxelSize = voxelSize * 1.01f;
 
         Gizmos.color = new Color(1, 1, 1, 0.25f);
@@ -133,11 +133,11 @@ public class Tile : MonoBehaviour
             Vector3 size = Vector3.zero;
 
             int faceID = faceIDs[(int)i];
-            TileFace faceData = parentMetaTile.GetPalette().tileFaces[faceID];
+            TileFace faceData = parentMetatile.GetPalette().tileFaces[faceID];
             switch (i)
             {
                 case FACETYPE.TOP:
-                    if (parentMetaTile.HasTile(thisPosition + new Vector3Int(0, 1, 0)))
+                    if (parentMetatile.HasTile(thisPosition + new Vector3Int(0, 1, 0)))
                     {
                         break;
                     }
@@ -148,7 +148,7 @@ public class Tile : MonoBehaviour
                     break;
 
                 case FACETYPE.BOTTOM:
-                    if (parentMetaTile.HasTile(thisPosition - new Vector3Int(0, 1, 0)))
+                    if (parentMetatile.HasTile(thisPosition - new Vector3Int(0, 1, 0)))
                     {
                         break;
                     }
@@ -159,7 +159,7 @@ public class Tile : MonoBehaviour
                     break;
 
                 case FACETYPE.LEFT:
-                    if (parentMetaTile.HasTile(thisPosition - new Vector3Int(1, 0, 0)))
+                    if (parentMetatile.HasTile(thisPosition - new Vector3Int(1, 0, 0)))
                     {
                         break;
                     }
@@ -170,7 +170,7 @@ public class Tile : MonoBehaviour
                     break;
 
                 case FACETYPE.RIGHT:
-                    if (parentMetaTile.HasTile(thisPosition + new Vector3Int(1, 0, 0)))
+                    if (parentMetatile.HasTile(thisPosition + new Vector3Int(1, 0, 0)))
                     {
                         break;
                     }
@@ -181,7 +181,7 @@ public class Tile : MonoBehaviour
                     break;
 
                 case FACETYPE.FRONT:
-                    if (parentMetaTile.HasTile(thisPosition - new Vector3Int(0, 0, 1)))
+                    if (parentMetatile.HasTile(thisPosition - new Vector3Int(0, 0, 1)))
                     {
                         break;
                     }
@@ -192,7 +192,7 @@ public class Tile : MonoBehaviour
                     break;
 
                 case FACETYPE.BACK:
-                    if (parentMetaTile.HasTile(thisPosition + new Vector3Int(0, 0, 1)))
+                    if (parentMetatile.HasTile(thisPosition + new Vector3Int(0, 0, 1)))
                     {
                         break;
                     }
@@ -235,14 +235,14 @@ public class Tile : MonoBehaviour
     }
 #endif
 
-    public MetaTile GetMetaTile()
+    public Metatile GetMetatile()
     {
-        if (mParentMetaTile == null)
+        if (mParentMetatile == null)
         {
-            mParentMetaTile = GetComponentInParent<MetaTile>();
+            mParentMetatile = GetComponentInParent<Metatile>();
         }
 
-        return mParentMetaTile;
+        return mParentMetatile;
     }
 
     public Vector3 GetLocalPosition()

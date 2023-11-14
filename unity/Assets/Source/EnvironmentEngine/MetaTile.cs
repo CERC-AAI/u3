@@ -9,7 +9,7 @@ using UnityEngine;
 // Tile is just a definitional thing now
 
 [ExecuteInEditMode]
-public class MetaTile : IMetaTileProbability
+public class Metatile : IMetatileContainer
 {
     public List<Tile> tiles;
     public Transform payload;
@@ -20,7 +20,7 @@ public class MetaTile : IMetaTileProbability
     public struct Configuration
     {
         public Vector3 origin;
-        public MetaTileEnvironment.Orientation orientation;
+        public MetatileEnvironment.Orientation orientation;
         public bool flipped;
     }
 
@@ -37,7 +37,7 @@ public class MetaTile : IMetaTileProbability
         return mConfigurationMap[index];
     }
 
-    public int GetConfiguration(Vector3 origin, MetaTileEnvironment.Orientation orientation, bool flipped)
+    public int GetConfiguration(Vector3 origin, MetatileEnvironment.Orientation orientation, bool flipped)
     {
         Initialization();
         return mConfigurationMap.FindIndex((Configuration configMap) => { return origin == configMap.origin && orientation == configMap.orientation && flipped == configMap.flipped; });
@@ -54,20 +54,20 @@ public class MetaTile : IMetaTileProbability
         return tags;
     }
 
-    public override MetaTile DrawMetaTile()
+    public override Metatile DrawMetatile()
     {
         // TODO: do we need to instantiate a game object here?
         return this;
     }
 
-    public override List<MetaTile> GetMetaTiles()
+    public override List<Metatile> GetMetatiles()
     {
-        List<MetaTile> metaTiles = new List<MetaTile>();
-        metaTiles.Add(this);
-        return metaTiles;
+        List<Metatile> metatiles = new List<Metatile>();
+        metatiles.Add(this);
+        return metatiles;
     }
 
-    public override MetaTile GetMetaTile()
+    public override Metatile GetMetatile()
     {
         return this;
     }
@@ -84,7 +84,7 @@ public class MetaTile : IMetaTileProbability
         return Resources.Load<TileFacePalette>(TileFacePalette.defaultPalettePath);
     }
 
-    /*public Vector3Int GetCachedTileOffset(Tile tile, Vector3 currentOrigin, MetaTileEnvironment.Orientation orientation, bool flipped)
+    /*public Vector3Int GetCachedTileOffset(Tile tile, Vector3 currentOrigin, MetatileEnvironment.Orientation orientation, bool flipped)
     {
 
         if (mLastCachedConfiguration.origin != currentOrigin || mLastCachedConfiguration.orientation != orientation || mLastCachedConfiguration.flipped != flipped || mTilePositionMap.Count == 0)
@@ -104,7 +104,7 @@ public class MetaTile : IMetaTileProbability
 
         if (mTilePositionMap[tile].x == int.MinValue)
         {
-            Quaternion quaternion = MetaTileEnvironment.OrientationToQuaternion[orientation];
+            Quaternion quaternion = MetatileEnvironment.OrientationToQuaternion[orientation];
 
             // multiply the tile position by a quaternion
             UnityEngine.Vector3 unRotatedPosition = new Vector3(tile.GetLocalPosition().x, tile.GetLocalPosition().y, tile.GetLocalPosition().z) - currentOrigin;
@@ -236,7 +236,7 @@ public class MetaTile : IMetaTileProbability
 
         if (payload != null)
         {
-            payloadCopy = MetaTileEnvironment.instantiateNewObject(payload);
+            payloadCopy = MetatileEnvironment.instantiateNewObject(payload);
             payloadCopy.transform.position = position;
             payloadCopy.transform.localRotation = rotation;
 
@@ -273,14 +273,14 @@ public class MetaTile : IMetaTileProbability
         {
             return;
         }
-        foreach (MetaTileEnvironment.Orientation orientation in Enum.GetValues(typeof(MetaTileEnvironment.Orientation)))
+        foreach (MetatileEnvironment.Orientation orientation in Enum.GetValues(typeof(MetatileEnvironment.Orientation)))
         {
             foreach (bool flipped in new List<bool> { false, true })
             {
                 if (flipped && !this.canFlip ||
-                    MetaTileEnvironment.OrientationToQuaternion[orientation].x != 0 && this.rotationDirections.x == 0 ||
-                    MetaTileEnvironment.OrientationToQuaternion[orientation].y != 0 && this.rotationDirections.y == 0 ||
-                    MetaTileEnvironment.OrientationToQuaternion[orientation].z != 0 && this.rotationDirections.z == 0)
+                    MetatileEnvironment.OrientationToQuaternion[orientation].x != 0 && this.rotationDirections.x == 0 ||
+                    MetatileEnvironment.OrientationToQuaternion[orientation].y != 0 && this.rotationDirections.y == 0 ||
+                    MetatileEnvironment.OrientationToQuaternion[orientation].z != 0 && this.rotationDirections.z == 0)
                 {
                     continue;
                 }

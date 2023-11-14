@@ -4,8 +4,8 @@ using System;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(MetaTilePool))]
-public class MetaTilePoolEditor : Editor
+[CustomEditor(typeof(MetatilePool))]
+public class MetatilePoolEditor : Editor
 {
     static bool isOpen = true;
 
@@ -15,14 +15,14 @@ public class MetaTilePoolEditor : Editor
 
         DrawDefaultInspector();
 
-        MetaTilePool selectedMetatilePool = (MetaTilePool)target;
+        MetatilePool selectedMetatilePool = (MetatilePool)target;
 
         if (GUILayout.Button("Update Children"))
         {
             for (int i = 0; i < selectedMetatilePool.metatileProbabilities.Count; i++)
             {
-                selectedMetatilePool.metatileProbabilities[i].metaTileProbability.parent = selectedMetatilePool;
-            }            
+                selectedMetatilePool.metatileProbabilities[i].metatileContainer.parent = selectedMetatilePool;
+            }
 
             EditorUtility.SetDirty(selectedMetatilePool);
         }

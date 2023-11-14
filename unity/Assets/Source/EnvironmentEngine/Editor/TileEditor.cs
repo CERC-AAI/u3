@@ -21,9 +21,9 @@ public class TileEditor : Editor
 
         SerializedProperty serializedProperty = serializedObject.FindProperty("faceIDs").Copy();
 
-        if (serializedProperty.isArray && selectedTile.GetMetaTile() != null)
+        if (serializedProperty.isArray && selectedTile.GetMetatile() != null)
         {
-            List<TileFace> faces = selectedTile.GetMetaTile().GetPalette().tileFaces;
+            List<TileFace> faces = selectedTile.GetMetatile().GetPalette().tileFaces;
 
             string[] faceOptions = new string[faces.Count];
             for (int i = 0; i < faces.Count; i++)
