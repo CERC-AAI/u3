@@ -6,11 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
+using NUnit.Framework.Constraints;
 
 public class MetatileEnvironment : MonoBehaviour
 {
     public static int mWidth = 10, mLength = 10, mHeight = 10;
     public static int mManyMetatileCount = 2;
+    public static int mMaxConfigurationCount = 20;
+
     public float voxelSize = 1;
 
     public enum ConfigurationValidity
@@ -217,6 +220,10 @@ public class MetatileEnvironment : MonoBehaviour
     }
     Vector3Int mPlacementPosition = new Vector3Int(0, 0, 0);
 
+
+    List<float> mFinalWeights = new List<float>();
+    List<bool> mUseIndicies = new List<bool>();
+
     public void Awake()
     {
 
@@ -227,10 +234,10 @@ public class MetatileEnvironment : MonoBehaviour
 
     public void Update()
     {
-        if (!mGeneratingEnvironment)
+        /*if (!mGeneratingEnvironment)
         {
             StartCoroutine(GenerateEnvironment(metatilepool));
-        }
+        }*/
     }
 
     public IEnumerator GenerateEnvironment(MetatilePool metatilepool)
@@ -336,7 +343,7 @@ public class MetatileEnvironment : MonoBehaviour
 
                 if (DEBUG || timelapse)
                 {
-                    candidateMetatile.DepositPayload(placementPositionOriginOffset, rotation, configuration.flipped);
+                    candidateMetatile.DepositPayload(placementPositionOriginOffset, rotation, configuration.flipped, this);
                     if (DEBUG)
                     {
                         Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPositionOriginOffset}, origin={rotatedOffset}, orientation={configuration.orientation}, flipped = {configuration.flipped}, Count={placedMetatiles.Count}");
@@ -581,12 +588,12 @@ public class MetatileEnvironment : MonoBehaviour
     {
         // Recalculates the validity of all metatiles at a position
         EnvironmentTileState tileState = environment[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z];
-        List<float> finalWeights = new List<float>();
+        mFinalWeights.Clear();
 
         int validCount = 0;
         if (!tileState.mValidMetatileList[metatile])
         {
-            return finalWeights;
+            return mFinalWeights;
         }
 
         List<int> potentialConfigurations = tileState.mPutativeMetatileIndices[metatile];
@@ -603,9 +610,35 @@ public class MetatileEnvironment : MonoBehaviour
         bool hasValidConfiguration = false;
         // If we have a VALID index it's in the first index
 
+        mUseIndicies.Clear();
+        if (potentialConfigurations.Count > mMaxConfigurationCount)
+        {
+            int i = 0;
+            for (i = 0; i < mMaxConfigurationCount; i++)
+            {
+                mUseIndicies.Add(true);
+            }
+            for (; i < potentialConfigurations.Count; i++)
+            {
+                mUseIndicies.Add(false);
+            }
+        }
+
         for (int i = 0; i < potentialConfigurations.Count; i++)
         {
-            if (validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.VALID || validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.UNKNOWN)
+            bool shouldUseConfiguration = true;
+            if (mUseIndicies.Count > 0)
+            {
+                shouldUseConfiguration = false;
+
+                int randomNumber = UnityEngine.Random.Range(0, mUseIndicies.Count);
+                if (mUseIndicies[randomNumber])
+                {
+                    mUseIndicies.RemoveAt(randomNumber);
+                    shouldUseConfiguration = true;
+                }
+            }
+            if (shouldUseConfiguration && (validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.VALID || validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.UNKNOWN))
             {
                 List<float> faceWeights = new List<float>();
                 Metatile.Configuration configTuple = metatile.GetConfiguration(potentialConfigurations[i]);
@@ -613,20 +646,20 @@ public class MetatileEnvironment : MonoBehaviour
                     wavefrontPosition, metatile, configTuple, faceWeights);
                 if (!canPlace)
                 {
-                    finalWeights.Add(0);
+                    mFinalWeights.Add(0);
                 }
                 else
                 {
-                    finalWeights.Add(faceWeights.Aggregate(1f, (a, b) => a * b));
+                    mFinalWeights.Add(faceWeights.Aggregate(1f, (a, b) => a * b));
                 }
             }
             else
             {
-                finalWeights.Add(0);
+                mFinalWeights.Add(0);
             }
         }
 
-        return finalWeights;
+        return mFinalWeights;
 
     }
 
@@ -1354,7 +1387,8 @@ public class MetatileEnvironment : MonoBehaviour
             placedPayloads.Add(placedMetatiles[i].metatile.DepositPayload(
                 placedMetatiles[i].position,
                 placedMetatiles[i].rotation,
-                placedMetatiles[i].flipped
+                placedMetatiles[i].flipped,
+                this
             ));
         }
     }

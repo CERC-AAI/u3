@@ -36,6 +36,7 @@ public class Floor : MonoBehaviour
         bottom.localScale = new Vector3(edgeSize, 0.02f, finalY * 2 + edgeSize * 2);
 
         material.mainTextureScale = new Vector2(finalX / 15.0f, finalY / 16.0f);
+        transform.localPosition = new Vector3(radiusX, -0.5f, radiusY);
 
     }
 }

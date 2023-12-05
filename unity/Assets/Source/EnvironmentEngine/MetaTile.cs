@@ -230,7 +230,7 @@ public class Metatile : IMetatileContainer
         return false;
     }
 
-    public Transform DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, bool debug = false)
+    public Transform DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileEnvironment metatileEnvironment, bool debug = false)
     {
         Transform payloadCopy = null;
 
@@ -239,6 +239,7 @@ public class Metatile : IMetatileContainer
             payloadCopy = MetatileEnvironment.instantiateNewObject(payload);
             payloadCopy.transform.position = position;
             payloadCopy.transform.localRotation = rotation;
+            payloadCopy.parent = metatileEnvironment.transform;
 
             if (flipped)
             {
