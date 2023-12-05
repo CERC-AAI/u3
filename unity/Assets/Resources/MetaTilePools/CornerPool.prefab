@@ -49,15 +49,15 @@ MonoBehaviour:
   palette: {fileID: -6947243484448938200, guid: 9ec3828689b891a42908e9d5854658dc,
     type: 3}
   metatileProbabilities:
-  - metaTileProbability: {fileID: 100174510953274016, guid: de39bbb62ec871c4a8042fb4a89d3ae0,
+  - metatileContainer: {fileID: 100174510953274016, guid: de39bbb62ec871c4a8042fb4a89d3ae0,
       type: 3}
     weight: 1
-  - metaTileProbability: {fileID: 100174510953274016, guid: 55cab9ae48b68f845be4d1724ddba5ea,
+  - metatileContainer: {fileID: 100174510953274016, guid: 55cab9ae48b68f845be4d1724ddba5ea,
       type: 3}
     weight: 1
-  - metaTileProbability: {fileID: 100174510953274016, guid: 6eb7157d3f21765479fc93b0b1ea7eb7,
+  - metatileContainer: {fileID: 100174510953274016, guid: 6eb7157d3f21765479fc93b0b1ea7eb7,
       type: 3}
     weight: 1
-  - metaTileProbability: {fileID: 100174510953274016, guid: d0dbd1ab0c3527042b4cbd0a37f846f5,
+  - metatileContainer: {fileID: 100174510953274016, guid: d0dbd1ab0c3527042b4cbd0a37f846f5,
       type: 3}
     weight: 1

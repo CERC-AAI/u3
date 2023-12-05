@@ -49,10 +49,9 @@ MonoBehaviour:
   palette: {fileID: -6947243484448938200, guid: 9ec3828689b891a42908e9d5854658dc,
     type: 3}
   metatileProbabilities:
-  - metaTileProbability: {fileID: 100174510953274016, guid: 21fb743398c0c3e4d880395d49bafa90,
+  - metatileContainer: {fileID: 100174510953274016, guid: f0f3cbb83efd3de45a65738d6270ea2c,
       type: 3}
     weight: 20
-  - metaTileProbability: {fileID: 100174510953274016, guid: f0f3cbb83efd3de45a65738d6270ea2c,
+  - metatileContainer: {fileID: 100174510953274016, guid: 21fb743398c0c3e4d880395d49bafa90,
       type: 3}
     weight: 1
-  weights: []
