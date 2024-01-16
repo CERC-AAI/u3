@@ -51,7 +51,7 @@ MonoBehaviour:
   metatileProbabilities:
   - metatileContainer: {fileID: 4368192324598907990, guid: d16a3b3427b0fe447933ca6cc1f765c0,
       type: 3}
-    weight: 2
+    weight: 10
   - metatileContainer: {fileID: 4368192324598907990, guid: 59c816794efff9e4181fd0f5ebce8cda,
       type: 3}
     weight: 20

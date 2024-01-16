@@ -234,10 +234,10 @@ public class MetatileEnvironment : MonoBehaviour
 
     public void Update()
     {
-        /*if (!mGeneratingEnvironment)
+        if (!mGeneratingEnvironment)
         {
             StartCoroutine(GenerateEnvironment(metatilepool));
-        }*/
+        }
     }
 
     public IEnumerator GenerateEnvironment(MetatilePool metatilepool)
@@ -302,8 +302,8 @@ public class MetatileEnvironment : MonoBehaviour
                 }
             }
             resultType = MetatilePool.RESULTTYPE.FAILURE;
-            while (resultType != MetatilePool.RESULTTYPE.SUCCESS && filteredMetatiles.Count > 0)
-            {
+            //while (resultType != MetatilePool.RESULTTYPE.SUCCESS && filteredMetatiles.Count > 0)
+            //{
                 // Metatile candidateMetatile = MetatilePool.DrawMetatileWithoutReplacement(filteredMetatiles);
 
                 // List<ConfigurationValidity> validConfigurations = tileState.mValidMetatiles[candidateMetatile];
@@ -317,15 +317,16 @@ public class MetatileEnvironment : MonoBehaviour
                 //     }
                 //     continue;
                 // }
-                if (metatileConfigurationWeights.Count == 0)
+                /*if (metatileConfigurationWeights.Count == 0)
                 {
                     if (DEBUG)
                     {
                         yield return null;
                     }
-                    continue;
-                }
-
+                    break;
+                }*/
+            if (metatileConfigurationWeights.Count > 0)
+            { 
                 MetatileConfigurationWeights chosenMetatileConfiguration = DrawMetaTileWithConfiguration(metatileConfigurationWeights);
                 Metatile candidateMetatile = chosenMetatileConfiguration.metatile;
                 int selectedConfigurationIndex = chosenMetatileConfiguration.configurationIndex;
@@ -359,7 +360,7 @@ public class MetatileEnvironment : MonoBehaviour
             }
 
             List<MetatileProbability> startList = new List<MetatileProbability>(filteredMetatiles);
-            if (resultType != MetatilePool.RESULTTYPE.SUCCESS && filteredMetatiles.Count == 0)
+            if (resultType != MetatilePool.RESULTTYPE.SUCCESS && metatileConfigurationWeights.Count == 0)
             {
                 Debug.Log($"No metatile to place at {mPlacementPosition}. Tried {filteredMetatiles.Count} tiles:");
                 foreach (MetatileProbability tile in startList)
@@ -376,7 +377,7 @@ public class MetatileEnvironment : MonoBehaviour
             }
         }
 
-        mGeneratingEnvironment = false;
+        //mGeneratingEnvironment = false;
         Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to generate.");
     }
 
@@ -638,7 +639,7 @@ public class MetatileEnvironment : MonoBehaviour
                     shouldUseConfiguration = true;
                 }
             }
-            if (shouldUseConfiguration && (validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.VALID || validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.UNKNOWN))
+            if ((i == 0 || shouldUseConfiguration) && (validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.VALID || validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.UNKNOWN))
             {
                 List<float> faceWeights = new List<float>();
                 Metatile.Configuration configTuple = metatile.GetConfiguration(potentialConfigurations[i]);
