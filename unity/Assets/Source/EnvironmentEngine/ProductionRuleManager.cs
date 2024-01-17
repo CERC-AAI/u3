@@ -25,7 +25,8 @@ public enum ACTION
 {
     SPAWN,
     REMOVE,
-    REWARD
+    REWARD,
+    PRINT
 }
 
 public enum CONDITION
@@ -57,9 +58,9 @@ public enum CONDITION
 public class ProductionRuleManager : EnvironmentComponent
 {
     // A list to store all production rules
-    private List<ProductionRule> productionRules;
+    private List<ProductionRule> productionRules = new List<ProductionRule>();
 
-    private List<ProductionRuleObject> allProdRuleObjects;
+    private List<ProductionRuleObject> allProdRuleObjects = new List<ProductionRuleObject>();
     public float NEAR_DISTANCE = 1.0f;
 
     [Serializable]
@@ -67,9 +68,20 @@ public class ProductionRuleManager : EnvironmentComponent
     {
         public string name;
         public GameObject prefab;
+
     }
 
     public List<ProductionRulePrefab> productionRulePrefabs = new List<ProductionRulePrefab>();
+
+    [Serializable]
+    public class DefaultProductionRules
+    {
+        // pairs of condition and action
+        public List<ProductionRuleCondition> conditions;
+        public List<ProductionRuleAction> actions;
+    }
+
+    public List<DefaultProductionRules> defaultProductionRules = new List<DefaultProductionRules>();
 
     void Awake()
     {
@@ -80,8 +92,7 @@ public class ProductionRuleManager : EnvironmentComponent
         // ProductionRule rule = new ProductionRule(condition, action);
         // AddRule(rule);
 
-        productionRules = new List<ProductionRule>();
-        allProdRuleObjects = new List<ProductionRuleObject>();
+        LoadDefaultProductionRules();
     }
 
     // Method to add a rule to the list
@@ -112,9 +123,13 @@ public class ProductionRuleManager : EnvironmentComponent
         CheckAndExecuteRules(GetEngine());
     }
 
-    void LoadProductionRules()
+    void LoadDefaultProductionRules()
     {
-        // Method to check and execute rules
+        for (int i = 0; i < defaultProductionRules.Count; i++)
+        {
+            ProductionRule rule = new ProductionRule(defaultProductionRules[i].conditions, defaultProductionRules[i].actions);
+            AddRule(rule);
+        }
     }
 
     public float GetNearDistance()

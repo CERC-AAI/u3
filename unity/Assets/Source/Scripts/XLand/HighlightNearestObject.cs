@@ -24,7 +24,7 @@ public class HighlightNearestObject : MonoBehaviour
         if (Physics.Raycast(mouseRay, out hitInfo, highlightDistance, objectLayerMask))
         {
             // Check if the hit object has a Rigidbody component
-            Rigidbody hitRigidbody = hitInfo.collider.GetComponent<Rigidbody>();
+            Rigidbody hitRigidbody = hitInfo.collider.GetComponentInParent<Rigidbody>();
             if (hitRigidbody != null)
             {
                 // If there is a highlighted object, unhighlight it

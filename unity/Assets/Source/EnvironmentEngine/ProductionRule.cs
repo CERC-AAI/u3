@@ -8,28 +8,34 @@ using UnityEngine.InputSystem;
 
 public class ProductionRule
 {
-    public ProductionRuleCondition condition; // may contain multiple CONDITION
-    public ProductionRuleAction action;
+    public List<ProductionRuleCondition> conditions; // may contain multiple CONDITION
+    public List<ProductionRuleAction> actions;
 
-    public ProductionRule(ProductionRuleCondition condition, ProductionRuleAction action)
+    public ProductionRule(List<ProductionRuleCondition> condition, List<ProductionRuleAction> action)
     {
-        this.condition = condition;
-        this.action = action;
+        this.conditions = condition;
+        this.actions = action;
     }
 
 
     public bool CheckRule(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
-        if (this.condition.IsSatisfied(subject, obj, env))
+        foreach (ProductionRuleCondition condition in conditions)
         {
-            return true;
+            if (!condition.IsSatisfied(subject, obj, env))
+            {
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     public void ExecuteRule(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
-        this.action.Execute(subject, obj, env);
+        foreach (ProductionRuleAction action in actions)
+        {
+            action.Execute(subject, obj, env);
+        }
     }
 
     // public bool CanBeSubject(ProductionRuleObject obj)
@@ -39,7 +45,26 @@ public class ProductionRule
 
     public string Encode()
     {
-        return $"if {condition.Encode()} then {action.Encode()}";
+        string encoded = "If ";
+        for (int i = 0; i < conditions.Count; i++)
+        {
+            encoded += conditions[i].Encode();
+            if (i < conditions.Count - 1)
+            {
+                encoded += " and ";
+            }
+        }
+        encoded += " then ";
+        for (int i = 0; i < actions.Count; i++)
+        {
+            encoded += actions[i].Encode();
+            if (i < actions.Count - 1)
+            {
+                encoded += " and ";
+            }
+        }
+        return encoded;
+
     }
 
 }

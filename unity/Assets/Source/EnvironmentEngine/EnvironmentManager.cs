@@ -41,7 +41,7 @@ public class EnvironmentManager : MonoBehaviour
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.
-        if (Instance != null && Instance != this) 
+        if (Instance != null && Instance != this)
         {
             if (Application.isPlaying && !Application.isEditor)
             {
@@ -168,7 +168,7 @@ public class EnvironmentManager : MonoBehaviour
 
     public void OnRunEnded(EnvironmentEngine environment)
     {
-        
+
     }
 
     public bool IsPython()
@@ -349,19 +349,19 @@ public class EnvironmentManager : MonoBehaviour
                 messageEnvironment.SetPythonTraining(messageJSON["data"].b);
                 break;
 
-            /*case "element":
-                messageEnvironment.SetEnvironmentElement(messageJSON["data"]);
-                break;
+                /*case "element":
+                    messageEnvironment.SetEnvironmentElement(messageJSON["data"]);
+                    break;
 
-            case "reset":
-                messageEnvironment.ClearEnvironmentElements();
-                break;*/
+                case "reset":
+                    messageEnvironment.ClearEnvironmentElements();
+                    break;*/
         }
         /*else if (receivedString.Substring(0, 8) == "getstate")
         {
             mBrain.SendChannelMessage("state" + mBrain.BuildRunStateToJSON().ToString());
         }
-        
+
         else if (receivedString.Substring(0, 3) == "get")
         {
             string getString = receivedString.Substring(3);
@@ -372,7 +372,7 @@ public class EnvironmentManager : MonoBehaviour
             {
                 mBrain.SendChannelMessage("get" + tempJSON[getString].ToString());
             }
-        }        
+        }
         else if (receivedString.Substring(0, 9) == "loadstate")
         {
             string loadStateString = receivedString.Substring(9);

@@ -76,7 +76,7 @@ public class GravityGun : EnvironmentComponent
                     Collider[] hitColliders = Physics.OverlapSphere(hitInfo.point, 0.1f, objectLayerMask);
                     foreach (Collider hitCollider in hitColliders)
                     {
-                        Rigidbody hitRigidbody = hitCollider.GetComponent<Rigidbody>();
+                        Rigidbody hitRigidbody = hitCollider.GetComponentInParent<Rigidbody>();
                         if (hitRigidbody != null)
                         {
                             float distance = Vector3.Distance(transform.position, hitCollider.transform.position);

@@ -19,17 +19,17 @@ public class ProductionRuleObject : EnvironmentComponent
         base.Initialize();
 
         DebugCube.SetActive(false);
-        Initalize();
+        Initalize(identifier.ObjectShape, identifier.ObjectColor);
+
+        GetProductionRuleManager().AddProdRuleObject(this);
+
     }
 
     // Initialize the object with a shape and color, defaulting to a red sphere
     public void Initalize(string shape = "sphere", string color = "red")
     {
         //Initialize production rule manager if needed
-        if (mManager == null)
-        {
-            mManager = GetProductionRuleManager();
-        }
+        mManager = GetProductionRuleManager();
 
         identifier = new ProductionRuleIdentifier(shape, color);
 
@@ -51,7 +51,11 @@ public class ProductionRuleObject : EnvironmentComponent
 
     public ProductionRuleManager GetProductionRuleManager()
     {
-        return (ProductionRuleManager)GetEngine().GetEnvironmentComponent<ProductionRuleManager>();
+        if (mManager == null)
+        {
+            mManager = (ProductionRuleManager)GetEngine().GetEnvironmentComponent<ProductionRuleManager>();
+        }
+        return mManager;
         //return ProductionRuleManager.productionRuleManager;
     }
 

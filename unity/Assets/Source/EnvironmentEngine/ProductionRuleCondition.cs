@@ -6,27 +6,26 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 
+[Serializable]
 public class ProductionRuleCondition
 {
-    private List<CONDITION> conditions;
-    private ProductionRuleIdentifier subject;
-    private ProductionRuleIdentifier obj;
+    public CONDITION condition;
+    public ProductionRuleIdentifier subject;
+    public ProductionRuleIdentifier obj;
 
-    public ProductionRuleCondition(List<CONDITION> conditions, ProductionRuleIdentifier subject, ProductionRuleIdentifier obj = null)
+    public ProductionRuleCondition(CONDITION condition, ProductionRuleIdentifier subject, ProductionRuleIdentifier obj = null)
     {
-        this.conditions = conditions;
+        this.condition = condition;
         this.subject = subject;
         this.obj = obj;
     }
 
     public bool IsSatisfied(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
-        foreach (var condition in conditions)
+
+        if (!CheckCondition(condition, subject, obj))
         {
-            if (!CheckCondition(condition, subject, obj))
-            {
-                return false;
-            }
+            return false;
         }
         return true;
     }
@@ -39,10 +38,6 @@ public class ProductionRuleCondition
         {
             case CONDITION.NEAR:
                 return CheckNear(subject, obj);
-
-            // Uncomment and implement other cases as needed
-            // case CONDITION.CONTACT:
-            //     return CheckContact(subject, obj);
 
             // case CONDITION.USE:
             //     return CheckUse(subject, obj);
@@ -68,49 +63,49 @@ public class ProductionRuleCondition
     {
         // Logic to check if the subject and object are near each other
         // Example: return Vector3.Distance(subject.transform.position, obj.transform.position) < 1.0f;
+
         Vector3 subjectPosition = subject.transform.position;
         Vector3 objPosition = obj.transform.position;
         float distance = Vector3.Distance(subjectPosition, objPosition);
         return distance < subject.GetProductionRuleManager().GetNearDistance();
+
     }
+
 
     public string Encode()
     {
         string conditionString = "";
-        foreach (var condition in conditions)
+        if (conditionString.Length > 0)
         {
-            if (conditionString.Length > 0)
-            {
-                conditionString += " and ";
-            }
-            if (condition == CONDITION.NEAR)
-            {
-                conditionString += $"{subject.Encode()} is near {obj.Encode()}";
-            }
-            else if (condition == CONDITION.CONTACT)
-            {
-                conditionString += $"{subject.Encode()} contacts {obj.Encode()}";
-            }
-            else if (condition == CONDITION.USE)
-            {
-                conditionString += $"{subject.Encode()} is used";
-            }
-            else if (condition == CONDITION.DROP)
-            {
-                conditionString += $"{subject.Encode()} is dropped";
-            }
-            else if (condition == CONDITION.PICKUP)
-            {
-                conditionString += $"{subject.Encode()} is picked up";
-            }
-            else if (condition == CONDITION.HOLD)
-            {
-                conditionString += $"{subject.Encode()} is held";
-            }
-            else if (condition == CONDITION.USE)
-            {
-                conditionString += $"{subject.Encode()} is seen";
-            }
+            conditionString += " and ";
+        }
+        if (condition == CONDITION.NEAR)
+        {
+            conditionString += $"{subject.Encode()} is near {obj.Encode()}";
+        }
+        else if (condition == CONDITION.CONTACT)
+        {
+            conditionString += $"{subject.Encode()} contacts {obj.Encode()}";
+        }
+        else if (condition == CONDITION.USE)
+        {
+            conditionString += $"{subject.Encode()} is used";
+        }
+        else if (condition == CONDITION.DROP)
+        {
+            conditionString += $"{subject.Encode()} is dropped";
+        }
+        else if (condition == CONDITION.PICKUP)
+        {
+            conditionString += $"{subject.Encode()} is picked up";
+        }
+        else if (condition == CONDITION.HOLD)
+        {
+            conditionString += $"{subject.Encode()} is held";
+        }
+        else if (condition == CONDITION.USE)
+        {
+            conditionString += $"{subject.Encode()} is seen";
         }
         return conditionString;
     }

@@ -6,51 +6,69 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 
+[Serializable]
 public class ProductionRuleAction
 {
-    private List<ACTION> actions;
+    public ACTION action;
     // private List<object> actionParameters;
 
-    private float reward;
+    public float reward;
 
-    private ProductionRuleObject spawnedObject;
+    public ProductionRuleObject spawnedObject;
 
-    private ProductionRuleObject removedObject;
+    public ProductionRuleObject removedObject;
 
-    public ProductionRuleAction(List<ACTION> actions, float reward)
+    public string debugPrintString = "Test print";
+
+    public ProductionRuleAction(ACTION action, float reward)
     {
-        this.actions = actions;
+        this.action = action;
         this.reward = reward;
     }
 
-    public bool Execute(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
+    public void Execute(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
-        throw new ArgumentException("Actions are not implemented yet");
+        switch (action)
+        {
+            // case ACTION.SPAWN:
+            //     return Spawn(subject, obj, env);
+
+            // case ACTION.REMOVE:
+            //     return Remove(subject, obj, env);
+
+            // case ACTION.REWARD:
+            //     return Reward(subject, obj, env);
+
+            case ACTION.PRINT:
+                Debug.Log(debugPrintString);
+                break;
+            default:
+                throw new ArgumentException("Action not recognized");
+        }
     }
 
     public string Encode()
     {
-        for (int i = 0; i < this.actions.Count; i++)
+        if (action == ACTION.SPAWN)
         {
-            if (this.actions[i] == ACTION.SPAWN)
-            {
-                return $"spawn a {this.spawnedObject}";
-            }
-            else if (this.actions[i] == ACTION.REMOVE)
-            {
-                return $"remove a {this.removedObject}";
-            }
-            else if (this.actions[i] == ACTION.REWARD)
-            {
-                return $"reward {this.reward}";
-            }
-            else
-            {
-                throw new ArgumentException("Action not recognized");
-            }
+            return $"spawn a {this.spawnedObject}";
         }
-
-        return "";
+        else if (action == ACTION.REMOVE)
+        {
+            return $"remove a {this.removedObject}";
+        }
+        else if (action == ACTION.REWARD)
+        {
+            return $"reward {this.reward}";
+        }
+        else if (action == ACTION.PRINT)
+        {
+            return $"print {this.reward}";
+        }
+        else
+        {
+            throw new ArgumentException("Action not recognized");
+        }
 
     }
 }

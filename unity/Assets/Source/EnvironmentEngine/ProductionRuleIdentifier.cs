@@ -44,8 +44,8 @@ public class ProductionRuleIdentifier
         {"agent", Resources.Load<GameObject>("Prefabs/Agent")}
     };*/
 
-    public string ObjectShape;
-    public string ObjectColor;
+    public string ObjectShape = "sphere";
+    public string ObjectColor = "red";
 
     public ProductionRuleIdentifier(string shape, string color = null)
     {

@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 2361428867353156637}
   - component: {fileID: 4936835452764818015}
   - component: {fileID: 1675973669787005215}
+  - component: {fileID: 4627954176509784982}
   m_Layer: 0
   m_Name: ProductionRuleObject
   m_TagString: Untagged
@@ -115,7 +116,7 @@ Transform:
   m_Children:
   - {fileID: 7391982576519970306}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4936835452764818015
 MonoBehaviour:
@@ -143,6 +144,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   identifier:
-    ObjectShape: 
-    ObjectColor: 
+    ObjectShape: sphere
+    ObjectColor: red
   DebugCube: {fileID: 5915670794980924370}
+--- !u!54 &4627954176509784982
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7393287890859856584}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
