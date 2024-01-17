@@ -8,7 +8,7 @@ using System;
 using UnityEngine;
 using NUnit.Framework.Constraints;
 
-public class MetatileEnvironment : MonoBehaviour
+public class MetatileManager : MonoBehaviour
 {
     public static int mWidth = 10, mLength = 10, mHeight = 10;
     public static int mManyMetatileCount = 2;
@@ -304,29 +304,29 @@ public class MetatileEnvironment : MonoBehaviour
             resultType = MetatilePool.RESULTTYPE.FAILURE;
             //while (resultType != MetatilePool.RESULTTYPE.SUCCESS && filteredMetatiles.Count > 0)
             //{
-                // Metatile candidateMetatile = MetatilePool.DrawMetatileWithoutReplacement(filteredMetatiles);
+            // Metatile candidateMetatile = MetatilePool.DrawMetatileWithoutReplacement(filteredMetatiles);
 
-                // List<ConfigurationValidity> validConfigurations = tileState.mValidMetatiles[candidateMetatile];
-                // setPotentialConfigurationList(validConfigurations);
-                // int selectedConfigurationIndex = SelectConfiguration(validConfigurations, candidateMetatile, mPlacementPosition, tileState);
-                // if (IsNoValidConfiguration(selectedConfigurationIndex))
-                // {
-                //     if (DEBUG)
-                //     {
-                //         yield return null;
-                //     }
-                //     continue;
-                // }
-                /*if (metatileConfigurationWeights.Count == 0)
+            // List<ConfigurationValidity> validConfigurations = tileState.mValidMetatiles[candidateMetatile];
+            // setPotentialConfigurationList(validConfigurations);
+            // int selectedConfigurationIndex = SelectConfiguration(validConfigurations, candidateMetatile, mPlacementPosition, tileState);
+            // if (IsNoValidConfiguration(selectedConfigurationIndex))
+            // {
+            //     if (DEBUG)
+            //     {
+            //         yield return null;
+            //     }
+            //     continue;
+            // }
+            /*if (metatileConfigurationWeights.Count == 0)
+            {
+                if (DEBUG)
                 {
-                    if (DEBUG)
-                    {
-                        yield return null;
-                    }
-                    break;
-                }*/
+                    yield return null;
+                }
+                break;
+            }*/
             if (metatileConfigurationWeights.Count > 0)
-            { 
+            {
                 MetatileConfigurationWeights chosenMetatileConfiguration = DrawMetaTileWithConfiguration(metatileConfigurationWeights);
                 Metatile candidateMetatile = chosenMetatileConfiguration.metatile;
                 int selectedConfigurationIndex = chosenMetatileConfiguration.configurationIndex;

@@ -20,7 +20,7 @@ public class Metatile : IMetatileContainer
     public struct Configuration
     {
         public Vector3 origin;
-        public MetatileEnvironment.Orientation orientation;
+        public MetatileManager.Orientation orientation;
         public bool flipped;
     }
 
@@ -37,7 +37,7 @@ public class Metatile : IMetatileContainer
         return mConfigurationMap[index];
     }
 
-    public int GetConfiguration(Vector3 origin, MetatileEnvironment.Orientation orientation, bool flipped)
+    public int GetConfiguration(Vector3 origin, MetatileManager.Orientation orientation, bool flipped)
     {
         Initialization();
         return mConfigurationMap.FindIndex((Configuration configMap) => { return origin == configMap.origin && orientation == configMap.orientation && flipped == configMap.flipped; });
@@ -230,13 +230,13 @@ public class Metatile : IMetatileContainer
         return false;
     }
 
-    public Transform DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileEnvironment metatileEnvironment, bool debug = false)
+    public Transform DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileManager metatileEnvironment, bool debug = false)
     {
         Transform payloadCopy = null;
 
         if (payload != null)
         {
-            payloadCopy = MetatileEnvironment.instantiateNewObject(payload);
+            payloadCopy = MetatileManager.instantiateNewObject(payload);
             payloadCopy.transform.position = position;
             payloadCopy.transform.localRotation = rotation;
             payloadCopy.parent = metatileEnvironment.transform;
@@ -274,14 +274,14 @@ public class Metatile : IMetatileContainer
         {
             return;
         }
-        foreach (MetatileEnvironment.Orientation orientation in Enum.GetValues(typeof(MetatileEnvironment.Orientation)))
+        foreach (MetatileManager.Orientation orientation in Enum.GetValues(typeof(MetatileManager.Orientation)))
         {
             foreach (bool flipped in new List<bool> { false, true })
             {
                 if (flipped && !this.canFlip ||
-                    MetatileEnvironment.OrientationToQuaternion[orientation].x != 0 && this.rotationDirections.x == 0 ||
-                    MetatileEnvironment.OrientationToQuaternion[orientation].y != 0 && this.rotationDirections.y == 0 ||
-                    MetatileEnvironment.OrientationToQuaternion[orientation].z != 0 && this.rotationDirections.z == 0)
+                    MetatileManager.OrientationToQuaternion[orientation].x != 0 && this.rotationDirections.x == 0 ||
+                    MetatileManager.OrientationToQuaternion[orientation].y != 0 && this.rotationDirections.y == 0 ||
+                    MetatileManager.OrientationToQuaternion[orientation].z != 0 && this.rotationDirections.z == 0)
                 {
                     continue;
                 }

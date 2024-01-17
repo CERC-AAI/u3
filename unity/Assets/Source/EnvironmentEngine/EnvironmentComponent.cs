@@ -58,7 +58,7 @@ public class Sensor : Attribute
     public int width;
     public bool grayscale;
     public SensorCompressionType compressionType;
-    // TODO: add new properties here for different sensor types, 
+    // TODO: add new properties here for different sensor types,
     // e.g. height and width for camera sensors
     // but add unit testing for property mismatching
 

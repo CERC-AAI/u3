@@ -18,13 +18,13 @@ public class EnvironmentObject : EnvironmentComponentHolder
     public Vector3 Position
     {
         get { return transform.localPosition; }
-        set { transform.localPosition = mEngine.ApplyEnvironmentPosition(value);  }
+        set { transform.localPosition = mEngine.ApplyEnvironmentPosition(value); }
     }
 
     public Vector3 Rotation
     {
         get { return transform.localPosition; }
-        set 
+        set
         {
             Quaternion currentRotation = transform.localRotation;
             Vector3 eulerAngles = currentRotation.eulerAngles;
@@ -347,7 +347,7 @@ public class EnvironmentObject : EnvironmentComponentHolder
             mColliders2D[i].isTrigger = true;
         }
     }
-    
+
     public void ClearColliders()
     {
         for (int i = 0; i < mColliders.Length; i++)
