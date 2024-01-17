@@ -62,8 +62,6 @@ public class ProductionRuleManager : EnvironmentComponent
     private List<ProductionRuleObject> allProdRuleObjects;
     public float NEAR_DISTANCE = 1.0f;
 
-    public static ProductionRuleManager productionRuleManager; // TODO: fix it
-
     [Serializable]
     public class ProductionRulePrefab
     {
@@ -84,7 +82,6 @@ public class ProductionRuleManager : EnvironmentComponent
 
         productionRules = new List<ProductionRule>();
         allProdRuleObjects = new List<ProductionRuleObject>();
-        productionRuleManager = this;
     }
 
     // Method to add a rule to the list
@@ -141,6 +138,19 @@ public class ProductionRuleManager : EnvironmentComponent
                 }
             }
         }
+    }
+
+    public GameObject getPrefabFromName(string name)
+    {
+        for (int i = 0; i < productionRulePrefabs.Count; i++)
+        {
+            if (productionRulePrefabs[i].name == name)
+            {
+                return productionRulePrefabs[i].prefab;
+            }
+        }
+
+        return null;
     }
 }
 // Change to ProductionRuleComponent

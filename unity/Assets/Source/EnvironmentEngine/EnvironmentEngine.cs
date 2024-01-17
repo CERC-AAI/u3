@@ -614,6 +614,37 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         return mEnvironmentObjects;
     }
 
+    public EnvironmentObject GetEnvironmentObject<T>(string name = null) where T : EnvironmentObject
+    {
+        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        {
+            if (mEnvironmentObjects[i] is T && (name == null || mEnvironmentObjects[i].name == name))
+            {
+                return mEnvironmentObjects[i];
+            }
+        }
+
+        return null;
+    }
+
+    public EnvironmentComponent GetEnvironmentComponent<T>(string name = null) where T : EnvironmentComponent
+    {
+        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        {
+            if ((name == null || mEnvironmentObjects[i].name == name))
+            {
+                T component = mEnvironmentObjects[i].GetComponent<T>();
+
+                if (component != null)
+                {
+                    return component;
+                }
+            }
+        }
+
+        return null;
+    }
+
     /*public void OnObjectMoved(EnvironmentObject movedObject)
     {
         CheckBrain();

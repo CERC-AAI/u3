@@ -9,50 +9,51 @@ using UnityEngine.InputSystem;
 [Serializable]
 public class ProductionRuleIdentifier
 {
-    public Dictionary<string, Tuple<float, float, float>> colorDict = new Dictionary<string, Tuple<float, float, float>>()
+    static public Dictionary<string, Color> colorDict = new Dictionary<string, Color>()
     {
-        {"red", new Tuple<float, float, float>(1.0f, 0.0f, 0.0f)},
-        {"green", new Tuple<float, float, float>(0.0f, 1.0f, 0.0f)},
-        {"blue", new Tuple<float, float, float>(0.0f, 0.0f, 1.0f)},
-        {"purple", new Tuple<float, float, float>(0.0f, 0.0f, 1.0f)},
-        {"yellow", new Tuple<float, float, float>(1.0f, 1.0f, 0.0f)},
-        {"grey", new Tuple<float, float, float>(0.5f, 0.5f, 0.5f)},
-        {"white", new Tuple<float, float, float>(1.0f, 1.0f, 1.0f)},
-        {"orange", new Tuple<float, float, float>(1.0f, 0.5f, 0.0f)},
-        {"brown", new Tuple<float, float, float>(0.5f, 0.25f, 0.0f)},
-        {"pink", new Tuple<float, float, float>(1.0f, 0.6f, 0.6f)},
-        {"black", new Tuple<float, float, float>(0.0f, 0.0f, 0.0f)},
-        {"cyan", new Tuple<float, float, float>(0.0f, 1.0f, 1.0f)},
-        {"dark_green", new Tuple<float, float, float>(0.0f, 0.5f, 0.0f)},
-        {"dark_grey", new Tuple<float, float, float>(0.25f, 0.25f, 0.25f)},
-        {"dark_brown", new Tuple<float, float, float>(0.25f, 0.125f, 0.0f)},
-        {"dark_purple", new Tuple<float, float, float>(0.5f, 0.0f, 0.5f)},
-        {"dark_red", new Tuple<float, float, float>(0.5f, 0.0f, 0.0f)},
-        {"dark_blue", new Tuple<float, float, float>(0.0f, 0.0f, 0.5f)},
-        {"dark_yellow", new Tuple<float, float, float>(0.5f, 0.5f, 0.0f)},
-        {"dark_orange", new Tuple<float, float, float>(0.5f, 0.25f, 0.0f)},
-        {"dark_pink", new Tuple<float, float, float>(0.5f, 0.3f, 0.3f)},
-        {"dark_cyan", new Tuple<float, float, float>(0.0f, 0.5f, 0.5f)}
+        {"red", new Color(1.0f, 0.0f, 0.0f)},
+        {"green", new Color(0.0f, 1.0f, 0.0f)},
+        {"blue", new Color(0.0f, 0.0f, 1.0f)},
+        {"purple", new Color(0.0f, 0.0f, 1.0f)},
+        {"yellow", new Color(1.0f, 1.0f, 0.0f)},
+        {"grey", new Color(0.5f, 0.5f, 0.5f)},
+        {"white", new Color(1.0f, 1.0f, 1.0f)},
+        {"orange", new Color(1.0f, 0.5f, 0.0f)},
+        {"brown", new Color(0.5f, 0.25f, 0.0f)},
+        {"pink", new Color(1.0f, 0.6f, 0.6f)},
+        {"black", new Color(0.0f, 0.0f, 0.0f)},
+        {"cyan", new Color(0.0f, 1.0f, 1.0f)},
+        {"dark_green", new Color(0.0f, 0.5f, 0.0f)},
+        {"dark_grey", new Color(0.25f, 0.25f, 0.25f)},
+        {"dark_brown", new Color(0.25f, 0.125f, 0.0f)},
+        {"dark_purple", new Color(0.5f, 0.0f, 0.5f)},
+        {"dark_red", new Color(0.5f, 0.0f, 0.0f)},
+        {"dark_blue", new Color(0.0f, 0.0f, 0.5f)},
+        {"dark_yellow", new Color(0.5f, 0.5f, 0.0f)},
+        {"dark_orange", new Color(0.5f, 0.25f, 0.0f)},
+        {"dark_pink", new Color(0.5f, 0.3f, 0.3f)},
+        {"dark_cyan", new Color(0.0f, 0.5f, 0.5f)}
     };
 
     // Create a dictionary of shapes and their corresponding prefabs
-    public Dictionary<string, GameObject> shapeDict = new Dictionary<string, GameObject>()
+    /*public Dictionary<string, GameObject> shapeDict = new Dictionary<string, GameObject>()
     {
         {"sphere", Resources.Load<GameObject>("Prefabs/Sphere")},
         {"cube", Resources.Load<GameObject>("Prefabs/Cube")},
         {"cylinder", Resources.Load<GameObject>("Prefabs/Cylinder")},
         {"agent", Resources.Load<GameObject>("Prefabs/Agent")}
-    };
+    };*/
 
     public string ObjectShape;
     public string ObjectColor;
 
     public ProductionRuleIdentifier(string shape, string color = null)
     {
-        if (!shapeDict.ContainsKey(shape))
+        // Fix me by adding a check to the production rule manager's shape dict
+        /*if (!shapeDict.ContainsKey(shape))
         {
             throw new ArgumentException($"Invalid shape: {shape}");
-        }
+        }*/
 
         if (color != null && !colorDict.ContainsKey(color))
         {

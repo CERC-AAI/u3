@@ -8,14 +8,16 @@ using UnityEngine.InputSystem;
 
 public class ProductionRuleObject : EnvironmentComponent
 {
-
     public ProductionRuleIdentifier identifier;
 
     public GameObject DebugCube;
 
-    public void Awake()
+    ProductionRuleManager mManager;
+
+    protected override void Initialize()
     {
-        // tell the debug cube to disappear
+        base.Initialize();
+
         DebugCube.SetActive(false);
         Initalize();
     }
@@ -23,17 +25,23 @@ public class ProductionRuleObject : EnvironmentComponent
     // Initialize the object with a shape and color, defaulting to a red sphere
     public void Initalize(string shape = "sphere", string color = "red")
     {
-        ProductionRuleManager manager = GetProductionRuleManager();
+        //Initialize production rule manager if needed
+        if (mManager == null)
+        {
+            mManager = GetProductionRuleManager();
+        }
+
         identifier = new ProductionRuleIdentifier(shape, color);
 
-        GameObject shapeObject = Instantiate(manager.productionRulePrefabs[0].prefab, this.transform);
-        shapeObject.transform.parent = this.transform;
         // this.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         // this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
-        // this.GetComponent<Renderer>().material.color = new Color(colorDict[color].Item1, colorDict[color].Item2, colorDict[color].Item3);
         // Need to set the shape and the color of the object
         // The shape is set by loading the correct prefab
+        GameObject shapeObject = Instantiate(mManager.getPrefabFromName(shape), this.transform);
+        shapeObject.transform.parent = this.transform;
+        shapeObject.transform.localPosition = Vector3.zero;
         // Ref the prefab, grab the renderer, set the color
+        shapeObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
     }
 
     public string getName()
@@ -43,8 +51,8 @@ public class ProductionRuleObject : EnvironmentComponent
 
     public ProductionRuleManager GetProductionRuleManager()
     {
-        // return GetEngine().GetComponent<ProductionRuleManager>();
-        return ProductionRuleManager.productionRuleManager;
+        return (ProductionRuleManager)GetEngine().GetEnvironmentComponent<ProductionRuleManager>();
+        //return ProductionRuleManager.productionRuleManager;
     }
 
     // public override void OnCollision(CONDITION condition, EnvironmentComponent other)
