@@ -183,7 +183,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     }
 
-    public override void OnLateUpdate(float deltaTime)
+    public override void OnLateFixedUpdate(float deltaTime)
     {
         HandleCharacterInput();
 

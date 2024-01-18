@@ -153,17 +153,17 @@ public class EnvironmentObject : EnvironmentComponentHolder
     sealed override public void OnObjectFixedUpdate(float fixedDeltaTime)
     {
         base.OnObjectFixedUpdate(fixedDeltaTime);
+    }
+
+    sealed override public void OnObjectLateFixedUpdate(float fixedDeltaTime)
+    {
+        base.OnObjectLateFixedUpdate(fixedDeltaTime);
 
         if (mHadInput)
         {
             FixedProcessInputs();
             mHadInput = false;
         }
-    }
-
-    sealed override public void OnObjectLateFixedUpdate(float fixedDeltaTime)
-    {
-        base.OnObjectLateFixedUpdate(fixedDeltaTime);
     }
 
     public override void OnStepEnded()
