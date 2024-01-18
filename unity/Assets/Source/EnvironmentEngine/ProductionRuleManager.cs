@@ -63,12 +63,27 @@ public class ProductionRuleManager : EnvironmentComponent
     private List<ProductionRuleObject> allProdRuleObjects = new List<ProductionRuleObject>();
     public float NEAR_DISTANCE = 1.0f;
 
+    public GravityGun mGravityGun;
+
     [Serializable]
     public class ProductionRulePrefab
     {
         public string name;
         public GameObject prefab;
 
+    }
+
+    public void OnGravityGunDrop(Rigidbody obj)
+    {
+        Debug.Log("Object dropped");
+    }
+    public void OnGravityGunPickup(Rigidbody obj)
+    {
+        Debug.Log("Object picked up");
+    }
+    public void OnGravityGunThrow(Rigidbody obj)
+    {
+        Debug.Log("Object thrown");
     }
 
     public List<ProductionRulePrefab> productionRulePrefabs = new List<ProductionRulePrefab>();
@@ -167,6 +182,17 @@ public class ProductionRuleManager : EnvironmentComponent
 
         return null;
     }
+
+    public GravityGun GetGravityGun()
+    {
+        if (mGravityGun == null)
+        {
+            mGravityGun = (GravityGun)GetEngine().GetEnvironmentComponent<GravityGun>();
+        }
+        return mGravityGun;
+        //return ProductionRuleManager.productionRuleManager;
+    }
+
 }
 // Change to ProductionRuleComponent
 // MetatileEnv done -> ProductionRuleEnv generates objects -> Backend scripts to create ProductionRuleObjects, call Initalize with color/shape and register callbacks

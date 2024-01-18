@@ -19,19 +19,19 @@ public class ProductionRuleObject : EnvironmentComponent
         base.Initialize();
 
         DebugCube.SetActive(false);
-        Initalize(identifier.ObjectShape, identifier.ObjectColor);
+        ProductionRuleObjectInitialize(identifier.ObjectShape, identifier.ObjectColor);
 
         GetProductionRuleManager().AddProdRuleObject(this);
 
     }
 
     // Initialize the object with a shape and color, defaulting to a red sphere
-    public void Initalize(string shape = "sphere", string color = "red")
+    public void ProductionRuleObjectInitialize(string shape = "sphere", string color = "red")
     {
         //Initialize production rule manager if needed
         mManager = GetProductionRuleManager();
 
-        identifier = new ProductionRuleIdentifier(shape, color);
+        identifier = new ProductionRuleIdentifier(shape.ToLower(), color.ToLower());
 
         // this.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         // this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
@@ -43,6 +43,7 @@ public class ProductionRuleObject : EnvironmentComponent
         // Ref the prefab, grab the renderer, set the color
         shapeObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
     }
+
 
     public string getName()
     {

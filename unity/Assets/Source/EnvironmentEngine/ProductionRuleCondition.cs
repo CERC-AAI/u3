@@ -10,14 +10,14 @@ using UnityEngine.InputSystem;
 public class ProductionRuleCondition
 {
     public CONDITION condition;
-    public ProductionRuleIdentifier subject;
-    public ProductionRuleIdentifier obj;
+    public ProductionRuleIdentifier subjectIdentifier;
+    public ProductionRuleIdentifier objectIdentifier;
 
-    public ProductionRuleCondition(CONDITION condition, ProductionRuleIdentifier subject, ProductionRuleIdentifier obj = null)
+    public ProductionRuleCondition(CONDITION condition, ProductionRuleIdentifier subjectIdentifier, ProductionRuleIdentifier objectIdentifier = null)
     {
         this.condition = condition;
-        this.subject = subject;
-        this.obj = obj;
+        this.subjectIdentifier = subjectIdentifier;
+        this.objectIdentifier = objectIdentifier;
     }
 
     public bool IsSatisfied(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
@@ -34,6 +34,14 @@ public class ProductionRuleCondition
     {
         // Access the state of the environment and check if the condition is satisfied
         // For example, if the condition is "near", check if the subject and object are near each other by checking their positions
+        if (subject == null)
+        {
+            return false;
+        }
+        if (!subjectIdentifier.CompareTo(subject.identifier) || !objectIdentifier.CompareTo(obj.identifier))
+        {
+            return false;
+        }
         switch (condition)
         {
             case CONDITION.NEAR:
@@ -48,11 +56,11 @@ public class ProductionRuleCondition
             // case CONDITION.PICKUP:
             //     return CheckPickup(subject, obj);
 
-            // case CONDITION.HOLD:
-            //     return CheckHold(subject, obj);
+            case CONDITION.HOLD:
+                return CheckHold(subject);
 
-            // case CONDITION.SEE:
-            //     return CheckSee(subject, obj);
+            case CONDITION.SEE:
+                return CheckSee(subject);
 
             default:
                 return false;
@@ -71,6 +79,35 @@ public class ProductionRuleCondition
 
     }
 
+    private bool CheckHold(ProductionRuleObject subject)
+    {
+        if (subject == null)
+            return false;
+
+        GravityGun gravityGun = subject.GetProductionRuleManager().GetGravityGun();
+        ProductionRuleObject heldObject = null;
+        if (gravityGun.GetHeldObject() != null)
+        {
+            heldObject = gravityGun.GetHeldObject().GetComponentInParent<ProductionRuleObject>();
+        }
+        return heldObject != null && heldObject == subject;
+    }
+
+    public bool CheckSee(ProductionRuleObject subject)
+    {
+
+        U3DPlayer player = (U3DPlayer)subject.GetEngine().GetEnvironmentComponent<U3DPlayer>();
+        Camera camera = player.Camera;
+        Vector3 viewPos = camera.WorldToViewportPoint(subject.transform.position);
+        if (viewPos.x > 0 && viewPos.x < 1 && viewPos.y > 0 && viewPos.y < 1 && viewPos.z > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public string Encode()
     {
@@ -81,31 +118,31 @@ public class ProductionRuleCondition
         }
         if (condition == CONDITION.NEAR)
         {
-            conditionString += $"{subject.Encode()} is near {obj.Encode()}";
+            conditionString += $"{subjectIdentifier.Encode()} is near {objectIdentifier.Encode()}";
         }
         else if (condition == CONDITION.CONTACT)
         {
-            conditionString += $"{subject.Encode()} contacts {obj.Encode()}";
+            conditionString += $"{subjectIdentifier.Encode()} contacts {objectIdentifier.Encode()}";
         }
         else if (condition == CONDITION.USE)
         {
-            conditionString += $"{subject.Encode()} is used";
+            conditionString += $"{subjectIdentifier.Encode()} is used";
         }
         else if (condition == CONDITION.DROP)
         {
-            conditionString += $"{subject.Encode()} is dropped";
+            conditionString += $"{subjectIdentifier.Encode()} is dropped";
         }
         else if (condition == CONDITION.PICKUP)
         {
-            conditionString += $"{subject.Encode()} is picked up";
+            conditionString += $"{subjectIdentifier.Encode()} is picked up";
         }
         else if (condition == CONDITION.HOLD)
         {
-            conditionString += $"{subject.Encode()} is held";
+            conditionString += $"{subjectIdentifier.Encode()} is held";
         }
         else if (condition == CONDITION.USE)
         {
-            conditionString += $"{subject.Encode()} is seen";
+            conditionString += $"{subjectIdentifier.Encode()} is seen";
         }
         return conditionString;
     }

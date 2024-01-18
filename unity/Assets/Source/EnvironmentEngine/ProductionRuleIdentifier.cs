@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
+using NUnit.Framework.Constraints;
 
 [Serializable]
 public class ProductionRuleIdentifier
@@ -62,6 +63,21 @@ public class ProductionRuleIdentifier
 
         ObjectShape = shape;
         ObjectColor = color;
+    }
+
+    public bool CompareTo(ProductionRuleIdentifier other)
+    {
+        if (ObjectShape.ToLower().Trim() != other.ObjectShape.ToLower().Trim())
+        {
+            return false;
+        }
+
+        if (ObjectColor.ToLower().Trim() != other.ObjectColor.ToLower().Trim())
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public string Encode()
