@@ -199,7 +199,7 @@ public class SelectionOutlineController : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
 
-            TargetRenderer = hit.transform.GetComponent<Renderer>();
+            TargetRenderer = hit.transform.GetComponentInChildren<Renderer>();
 
             if (TargetRenderer != null && hit.transform.GetComponent<Rigidbody>())
             {
