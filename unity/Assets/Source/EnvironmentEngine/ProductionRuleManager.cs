@@ -153,8 +153,6 @@ public class ProductionRuleManager : EnvironmentComponent
     }
     private void CheckAndExecuteRules(EnvironmentEngine env)
     {
-
-
         foreach (ProductionRule rule in productionRules)
         {
             foreach (ProductionRuleObject subject in allProdRuleObjects)

@@ -18,6 +18,8 @@ public class EnvironmentAgent : EnvironmentComponent
     public List<ActionInfo> mActions = new List<ActionInfo>();
     public List<SensorInfo> mSensors = new List<SensorInfo>();
 
+    int mLastInputFrame = 0;
+
     protected override void Initialize()
     {
         mAgentScript = GetComponent<U3Agent>();
@@ -188,7 +190,7 @@ public class EnvironmentAgent : EnvironmentComponent
     virtual public void Heuristic(in ActionBuffers actionsOut)
     {
         EnvironmentComponent[] environmentComponents = mParentObject.GetEnvironmentComponents();
-        mParentObject.ProcessInputs();
+        mParentObject.ProcessInputs();        
         for (int i = 0; i < environmentComponents.Length; i++)
         {
             environmentComponents[i].StoreUserInputs();

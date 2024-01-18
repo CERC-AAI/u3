@@ -60,6 +60,7 @@ public class GravityGun : EnvironmentComponent
 
         if (mHadRightClick)
         {
+            Debug.Log($"mHadRightClick {Time.fixedTime}");
             if (heldObject != null)
             {
                 // Drop the held object away
@@ -72,6 +73,7 @@ public class GravityGun : EnvironmentComponent
         }
         if (mHadLeftClick)
         {
+            Debug.Log($"mHadLeftClick {Time.fixedTime}");
             if (heldObject == null)
             {
                 // Find the closest object with a rigidbody using a mouse raycast
