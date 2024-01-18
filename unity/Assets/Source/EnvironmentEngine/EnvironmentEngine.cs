@@ -45,6 +45,9 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     Dictionary<GameObject, List<EnvironmentObject>> mUnusedObjects = new Dictionary<GameObject, List<EnvironmentObject>>();
 
 
+    Dictionary<Type, EnvironmentObject> mCachedObjects = new Dictionary<Type, EnvironmentObject>();
+    Dictionary<Type, EnvironmentComponent> mCachedComponents = new Dictionary<Type, EnvironmentComponent>();
+
     protected JSONObject mGameEvents = new JSONObject();
 
     override protected void Initialize()
@@ -614,20 +617,38 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         return mEnvironmentObjects;
     }
 
-    public EnvironmentObject GetEnvironmentObject<T>(string name = null) where T : EnvironmentObject
+    public T GetCachedEnvironmentObject<T>(string name = null) where T : EnvironmentObject
+    {
+        if (!mCachedObjects.ContainsKey(typeof(T)))
+        {
+            mCachedObjects[typeof(T)] = GetEnvironmentObject<T>(name);
+        }
+        return (T)mCachedObjects[typeof(T)];
+    }
+
+    public T GetEnvironmentObject<T>(string name = null) where T : EnvironmentObject
     {
         for (int i = 0; i < mEnvironmentObjects.Count; i++)
         {
             if (mEnvironmentObjects[i] is T && (name == null || mEnvironmentObjects[i].name == name))
             {
-                return mEnvironmentObjects[i];
+                return (T)mEnvironmentObjects[i];
             }
         }
 
         return null;
     }
 
-    public EnvironmentComponent GetEnvironmentComponent<T>(string name = null) where T : EnvironmentComponent
+    public T GetCachedEnvironmentComponent<T>(string name = null) where T : EnvironmentComponent
+    {
+        if (!mCachedComponents.ContainsKey(typeof(T)))
+        {
+            mCachedComponents[typeof(T)] = GetEnvironmentComponent<T>(name);
+        }
+        return (T)mCachedComponents[typeof(T)];
+    }
+
+    public T GetEnvironmentComponent<T>(string name = null) where T : EnvironmentComponent
     {
         for (int i = 0; i < mEnvironmentObjects.Count; i++)
         {
