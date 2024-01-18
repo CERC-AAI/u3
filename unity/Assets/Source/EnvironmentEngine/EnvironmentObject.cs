@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Linq;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -57,6 +59,7 @@ public class EnvironmentObject : EnvironmentComponentHolder
     Collider2D[] mColliders2D;
     Collider[] mColliders;
 
+    bool mHadInput = false;
 
     override protected void Initialize()
     {
@@ -150,6 +153,12 @@ public class EnvironmentObject : EnvironmentComponentHolder
     sealed override public void OnObjectFixedUpdate(float fixedDeltaTime)
     {
         base.OnObjectFixedUpdate(fixedDeltaTime);
+
+        if (mHadInput)
+        {
+            FixedProcessInputs();
+            mHadInput = false;
+        }
     }
 
     sealed override public void OnObjectLateFixedUpdate(float fixedDeltaTime)
@@ -377,10 +386,37 @@ public class EnvironmentObject : EnvironmentComponentHolder
         return mInput;
     }
 
+    //This is needed to keep the fixed updates from having multiple "PRESSED" events.
+    public void FixedProcessInputs()
+    {
+        if (mInputStates != null)
+        {
+            List<string> keyList = mInputStates.Keys.ToList();
+            foreach (string keyName in keyList)
+            {
+                if (mInputStates[keyName] == InputStates.PRESSED)
+                {
+                    mInputStates[keyName] = InputStates.IN_PROGRESS;
+                }
+                else if (mInputStates[keyName] == InputStates.RELEASED)
+                {
+                    mInputStates[keyName] = InputStates.NONE;
+                }
+            }
+
+            for (int i = 0; i < mComponents.Length; i++)
+            {
+                mComponents[i].StoreUserInputs();
+            }
+        }
+    }
+
     public void ProcessInputs()
     {
         if (mInput != null && mInputStates != null)
         {
+            mHadInput = true;
+
             foreach (InputAction action in mInput.actions)
             {
                 if (action != null)
