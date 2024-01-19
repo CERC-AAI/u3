@@ -325,6 +325,45 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mPrefabPath: 
+--- !u!1 &446171181 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7393287890859856584, guid: 08cd0431f661e3448b2eafbdabbe3740,
+    type: 3}
+  m_PrefabInstance: {fileID: 1675285535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &446171182 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+    type: 3}
+  m_PrefabInstance: {fileID: 1675285535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &446171183
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446171181}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &542508511
 GameObject:
   m_ObjectHideFlags: 0
@@ -1487,6 +1526,7 @@ Transform:
   - {fileID: 600408222}
   - {fileID: 855764765}
   - {fileID: 409706400}
+  - {fileID: 446171182}
   m_Father: {fileID: 1761730600}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1536,6 +1576,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NEAR_DISTANCE: 1
+  mGravityGun: {fileID: 0}
   productionRulePrefabs:
   - name: sphere
     prefab: {fileID: 3537155083289241935, guid: db217135fbe986a43a04352498e1c61c,
@@ -1548,18 +1589,116 @@ MonoBehaviour:
   defaultProductionRules:
   - conditions:
     - condition: 0
-      subject:
+      subjectIdentifier:
         ObjectShape: sphere
         ObjectColor: red
-      obj:
+      objectIdentifier:
         ObjectShape: cube
         ObjectColor: blue
     actions:
-    - action: 3
+    - predicateObjects: 0
+      identifier:
+        ObjectShape: 
+        ObjectColor: 
+      action: 3
       reward: 0
-      spawnedObject: {fileID: 0}
-      removedObject: {fileID: 0}
-      debugPrintString: Test debug print string :)
+      debugPrintString: 'object is near :) '
+  - conditions:
+    - condition: 6
+      subjectIdentifier:
+        ObjectShape: 'sphere '
+        ObjectColor: red
+      objectIdentifier:
+        ObjectShape: cube
+        ObjectColor: blue
+    actions:
+    - predicateObjects: 0
+      identifier:
+        ObjectShape: 
+        ObjectColor: 
+      action: 3
+      reward: 0
+      debugPrintString: 'object is held :) '
+  - conditions:
+    - condition: 3
+      subjectIdentifier:
+        ObjectShape: cube
+        ObjectColor: blue
+      objectIdentifier:
+        ObjectShape: cube
+        ObjectColor: blue
+    actions:
+    - predicateObjects: 0
+      identifier:
+        ObjectShape: 
+        ObjectColor: 
+      action: 3
+      reward: 0
+      debugPrintString: object is dropped :(
+  - conditions:
+    - condition: 4
+      subjectIdentifier:
+        ObjectShape: cube
+        ObjectColor: blue
+      objectIdentifier:
+        ObjectShape: 
+        ObjectColor: 
+    actions:
+    - predicateObjects: 0
+      identifier:
+        ObjectShape: 
+        ObjectColor: 
+      action: 3
+      reward: 0
+      debugPrintString: object is picked up :)
+  - conditions:
+    - condition: 7
+      subjectIdentifier:
+        ObjectShape: cube
+        ObjectColor: blue
+      objectIdentifier:
+        ObjectShape: 
+        ObjectColor: 
+    actions:
+    - predicateObjects: 0
+      identifier:
+        ObjectShape: 
+        ObjectColor: 
+      action: 3
+      reward: 0
+      debugPrintString: object is seen :)
+  - conditions:
+    - condition: 5
+      subjectIdentifier:
+        ObjectShape: cube
+        ObjectColor: blue
+      objectIdentifier:
+        ObjectShape: 
+        ObjectColor: 
+    actions:
+    - predicateObjects: 3
+      identifier:
+        ObjectShape: sphere
+        ObjectColor: red
+      action: 1
+      reward: 0
+      debugPrintString: blue cube is thrown :)
+  - conditions:
+    - condition: 5
+      subjectIdentifier:
+        ObjectShape: cube
+        ObjectColor: blue
+      objectIdentifier:
+        ObjectShape: 
+        ObjectColor: 
+    actions:
+    - predicateObjects: 3
+      identifier:
+        ObjectShape: sphere
+        ObjectColor: red
+      action: 3
+      reward: 0
+      debugPrintString: blue cube is thrown, green sphere is spawned :)
 --- !u!114 &1447110063
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1815,6 +1954,93 @@ Transform:
   m_Father: {fileID: 2050724454}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1675285535
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1437354646}
+    m_Modifications:
+    - target: {fileID: 1675973669787005215, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: identifier.ObjectColor
+      value: red
+      objectReference: {fileID: 0}
+    - target: {fileID: 1675973669787005215, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: identifier.ObjectShape
+      value: sphere
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 7.39
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7393287890859856584, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      propertyPath: m_Name
+      value: ProductionRuleObject (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7393287890859856584, guid: 08cd0431f661e3448b2eafbdabbe3740,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 446171183}
+  m_SourcePrefab: {fileID: 100100000, guid: 08cd0431f661e3448b2eafbdabbe3740, type: 3}
 --- !u!1 &1727909101 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7393287890859856584, guid: 08cd0431f661e3448b2eafbdabbe3740,
@@ -2647,17 +2873,17 @@ PrefabInstance:
     - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.4281068
+      value: 2.47
       objectReference: {fileID: 0}
     - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.8425422
+      value: 2.22
       objectReference: {fileID: 0}
     - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.75
+      value: 2.32
       objectReference: {fileID: 0}
     - target: {fileID: 2361428867353156637, guid: 08cd0431f661e3448b2eafbdabbe3740,
         type: 3}

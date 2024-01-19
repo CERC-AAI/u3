@@ -20,33 +20,67 @@ public class ProductionRuleCondition
         this.objectIdentifier = objectIdentifier;
     }
 
-    public bool IsSatisfied(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
+    public bool IsSatisfied(CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
-
-        if (!CheckCondition(condition, subject, obj))
+        if (CheckObject(subject, obj) && CheckCondition(callbackCondition, subject, obj))
         {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
-    private bool CheckCondition(CONDITION condition, ProductionRuleObject subject, ProductionRuleObject obj)
+    private bool CheckObject(ProductionRuleObject subject, ProductionRuleObject obj)
+    {
+        bool subjectIsPermissible = true;
+        bool objectIsPermissible = true;
+
+        switch (condition)
+        {
+            case CONDITION.NEAR:
+            case CONDITION.CONTACT:
+                subjectIsPermissible = subject != null && subjectIdentifier.CompareTo(subject.identifier);
+                objectIsPermissible = obj != null && objectIdentifier.CompareTo(obj.identifier);
+                break;
+
+            case CONDITION.HOLD:
+            case CONDITION.DROP:
+            case CONDITION.PICKUP:
+            case CONDITION.SEE:
+            case CONDITION.USE:
+            case CONDITION.THROW:
+                subjectIsPermissible = subject != null && subjectIdentifier.CompareTo(subject.identifier);
+                break;
+
+            default:
+                return false;
+        }
+
+        return subjectIsPermissible && objectIsPermissible;
+
+
+    }
+
+    private bool CheckCondition(CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj)
     {
         // Access the state of the environment and check if the condition is satisfied
         // For example, if the condition is "near", check if the subject and object are near each other by checking their positions
-        if (subject == null)
-        {
-            return false;
-        }
-        if (!subjectIdentifier.CompareTo(subject.identifier) || !objectIdentifier.CompareTo(obj.identifier))
-        {
-            return false;
-        }
+
+
         switch (condition)
         {
             case CONDITION.NEAR:
                 return CheckNear(subject, obj);
 
+            case CONDITION.HOLD:
+                return CheckHold(subject);
+
+            case CONDITION.SEE:
+                return CheckSee(subject);
+
+            case CONDITION.DROP:
+            case CONDITION.PICKUP:
+            case CONDITION.THROW:
+                return condition == callbackCondition;
             // case CONDITION.USE:
             //     return CheckUse(subject, obj);
 
@@ -56,11 +90,6 @@ public class ProductionRuleCondition
             // case CONDITION.PICKUP:
             //     return CheckPickup(subject, obj);
 
-            case CONDITION.HOLD:
-                return CheckHold(subject);
-
-            case CONDITION.SEE:
-                return CheckSee(subject);
 
             default:
                 return false;
@@ -69,9 +98,6 @@ public class ProductionRuleCondition
 
     private bool CheckNear(ProductionRuleObject subject, ProductionRuleObject obj)
     {
-        // Logic to check if the subject and object are near each other
-        // Example: return Vector3.Distance(subject.transform.position, obj.transform.position) < 1.0f;
-
         Vector3 subjectPosition = subject.transform.position;
         Vector3 objPosition = obj.transform.position;
         float distance = Vector3.Distance(subjectPosition, objPosition);

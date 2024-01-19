@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
-using NUnit;
+// using NUnit;
 
 // Class structure is fine, but start from scratch
 // ProductionRuleComponent that attaches to the MetatileEnvironment
@@ -36,8 +36,10 @@ public enum CONDITION
     USE,
     DROP,
     PICKUP,
+    THROW,
     HOLD,
-    SEE
+    SEE,
+    NONE
 }
 
 // replace with Vector3s
@@ -75,14 +77,20 @@ public class ProductionRuleManager : EnvironmentComponent
 
     public void OnGravityGunDrop(Rigidbody obj)
     {
-        Debug.Log("Object dropped");
+        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
+        CheckCallback(CONDITION.DROP, productionRuleObject, null, GetEngine());
+        Debug.Log($"Object dropped {productionRuleObject}");
     }
     public void OnGravityGunPickup(Rigidbody obj)
     {
+        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
+        CheckCallback(CONDITION.PICKUP, productionRuleObject, null, GetEngine());
         Debug.Log("Object picked up");
     }
     public void OnGravityGunThrow(Rigidbody obj)
     {
+        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
+        CheckCallback(CONDITION.THROW, productionRuleObject, null, GetEngine());
         Debug.Log("Object thrown");
     }
 
@@ -127,6 +135,18 @@ public class ProductionRuleManager : EnvironmentComponent
         allProdRuleObjects.Add(obj);
     }
 
+    public ProductionRuleObject GetProductionRuleObjectByIdentifier(ProductionRuleIdentifier identifier)
+    {
+        foreach (ProductionRuleObject obj in allProdRuleObjects)
+        {
+            if (obj.GetIdentifier().CompareTo(identifier))
+            {
+                return obj;
+            }
+        }
+        return null;
+    }
+
     public void RemoveProdRuleObject(ProductionRuleObject obj)
     {
         allProdRuleObjects.Remove(obj);
@@ -151,6 +171,19 @@ public class ProductionRuleManager : EnvironmentComponent
     {
         return NEAR_DISTANCE;
     }
+
+    private void CheckCallback(CONDITION condition, ProductionRuleObject sub, ProductionRuleObject obj, EnvironmentEngine env)
+    {
+        foreach (ProductionRule rule in productionRules)
+        {
+            if (rule.CheckCallback(condition, sub, obj, env))
+            {
+                rule.ExecuteRule(sub, obj, env);
+            }
+        }
+    }
+
+
     private void CheckAndExecuteRules(EnvironmentEngine env)
     {
         foreach (ProductionRule rule in productionRules)

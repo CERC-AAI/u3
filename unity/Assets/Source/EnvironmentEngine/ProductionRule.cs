@@ -18,11 +18,23 @@ public class ProductionRule
     }
 
 
+    public bool CheckCallback(CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
+    {
+        foreach (ProductionRuleCondition condition in conditions)
+        {
+            if (!condition.IsSatisfied(callbackCondition, subject, obj, env))
+            {
+                return false;
+            }
+        }
+        return true;
+
+    }
     public bool CheckRule(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
         foreach (ProductionRuleCondition condition in conditions)
         {
-            if (!condition.IsSatisfied(subject, obj, env))
+            if (!condition.IsSatisfied(CONDITION.NONE, subject, obj, env))
             {
                 return false;
             }

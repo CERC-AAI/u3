@@ -14,6 +14,10 @@ public class ProductionRuleObject : EnvironmentComponent
 
     ProductionRuleManager mManager;
 
+    public ProductionRuleObject(ProductionRuleIdentifier identifier)
+    {
+        this.identifier = identifier;
+    }
     protected override void Initialize()
     {
         base.Initialize();
@@ -24,6 +28,19 @@ public class ProductionRuleObject : EnvironmentComponent
         GetProductionRuleManager().AddProdRuleObject(this);
 
     }
+
+    public override void OnRemoved()
+    {
+        GetProductionRuleManager().RemoveProdRuleObject(this);
+        base.OnRemoved();
+
+    }
+
+    // public override void OnCreated()
+    // {
+    //     GetProductionRuleManager().AddProdRuleObject(this);
+    //     base.OnCreated();
+    // }
 
     // Initialize the object with a shape and color, defaulting to a red sphere
     public void ProductionRuleObjectInitialize(string shape = "sphere", string color = "red")
@@ -44,6 +61,11 @@ public class ProductionRuleObject : EnvironmentComponent
         shapeObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
     }
 
+
+    public ProductionRuleIdentifier GetIdentifier()
+    {
+        return this.identifier;
+    }
 
     public string getName()
     {
