@@ -68,7 +68,8 @@ public class GravityGun : EnvironmentComponent
                 heldObject.useGravity = true;  // Enable gravity
                 heldObject = null;
                 // Debug.Log("Dropped object");
-                mEngine.BroadcastMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);
+                ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+                productionRuleManager.SendMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);
             }
         }
         if (mHadLeftClick)
@@ -103,8 +104,9 @@ public class GravityGun : EnvironmentComponent
                 {
                     heldObject = closestObject;
                     heldObject.useGravity = false; // Disable gravity
-                    // Debug.Log("Object picked up");
-                    mEngine.BroadcastMessage("OnGravityGunPickup", heldObject, SendMessageOptions.DontRequireReceiver);
+                                                   // Debug.Log("Object picked up");
+                    ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+                    productionRuleManager.SendMessage("OnGravityGunPickup", heldObject, SendMessageOptions.DontRequireReceiver);
 
                 }
             }
@@ -116,8 +118,9 @@ public class GravityGun : EnvironmentComponent
                 heldObject.AddForce(playerCamera.transform.forward * throwingImpulse, ForceMode.Impulse);
                 heldObject = null;
                 // Debug.Log("Object thrown");
-                mEngine.BroadcastMessage("OnGravityGunThrow", tempHeldObject, SendMessageOptions.DontRequireReceiver);
-                mEngine.BroadcastMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);
+                ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+                productionRuleManager.SendMessage("OnGravityGunThrow", tempHeldObject, SendMessageOptions.DontRequireReceiver);
+                productionRuleManager.SendMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);
 
             }
         }
