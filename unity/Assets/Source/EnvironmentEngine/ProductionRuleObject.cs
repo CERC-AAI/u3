@@ -14,10 +14,10 @@ public class ProductionRuleObject : EnvironmentComponent
 
     ProductionRuleManager mManager;
 
-    public ProductionRuleObject(ProductionRuleIdentifier identifier)
-    {
-        this.identifier = identifier;
-    }
+    // public ProductionRuleObject(ProductionRuleIdentifier identifier)
+    // {
+    //     this.identifier = identifier;
+    // }
     protected override void Initialize()
     {
         base.Initialize();
