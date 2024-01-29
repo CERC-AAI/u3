@@ -11,6 +11,15 @@ public class ProductionRule
     public List<ProductionRuleCondition> conditions; // may contain multiple CONDITION
     public List<ProductionRuleAction> actions;
 
+
+    public ProductionRule(ProductionRuleCondition condition, ProductionRuleAction action)
+    {
+        this.conditions = new List<ProductionRuleCondition>();
+        this.conditions.Add(condition);
+        this.actions = new List<ProductionRuleAction>();
+        this.actions.Add(action);
+    }
+
     public ProductionRule(List<ProductionRuleCondition> condition, List<ProductionRuleAction> action)
     {
         this.conditions = condition;
@@ -47,6 +56,16 @@ public class ProductionRule
         foreach (ProductionRuleAction action in actions)
         {
             action.Execute(subject, obj, env);
+        }
+        // update the graph
+        env.GetCachedEnvironmentComponent<ProductionRuleManager>().UpdateProductionRuleGraph(this); // TODO: this is a hack, we need to update the graph with list of actions
+    }
+
+    public void forwardPropagateState()
+    {
+        foreach (ProductionRuleAction productionRuleAction in actions)
+        {
+            productionRuleAction.forwardPropagateState();
         }
     }
 

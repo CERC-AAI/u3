@@ -190,7 +190,7 @@ public class EnvironmentAgent : EnvironmentComponent
     virtual public void Heuristic(in ActionBuffers actionsOut)
     {
         EnvironmentComponent[] environmentComponents = mParentObject.GetEnvironmentComponents();
-        mParentObject.ProcessInputs();        
+        mParentObject.ProcessInputs();
         for (int i = 0; i < environmentComponents.Length; i++)
         {
             environmentComponents[i].StoreUserInputs();

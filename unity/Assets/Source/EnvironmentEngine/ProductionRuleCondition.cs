@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 [Serializable]
 public class ProductionRuleCondition
 {
+
     public CONDITION condition;
     public ProductionRuleIdentifier subjectIdentifier;
     public ProductionRuleIdentifier objectIdentifier;
@@ -98,6 +99,11 @@ public class ProductionRuleCondition
 
     private bool CheckNear(ProductionRuleObject subject, ProductionRuleObject obj)
     {
+        if (subject == null || obj == null)
+        {
+            throw new Exception("CheckNear: Subject or object is null");
+        }
+        // throw an exception
         Vector3 subjectPosition = subject.transform.position;
         Vector3 objPosition = obj.transform.position;
         float distance = Vector3.Distance(subjectPosition, objPosition);
@@ -108,7 +114,9 @@ public class ProductionRuleCondition
     private bool CheckHold(ProductionRuleObject subject)
     {
         if (subject == null)
-            return false;
+        {
+            throw new Exception("CheckHold: Subject is null");
+        }
 
         GravityGun gravityGun = subject.GetProductionRuleManager().GetGravityGun();
         ProductionRuleObject heldObject = null;
@@ -121,7 +129,10 @@ public class ProductionRuleCondition
 
     public bool CheckSee(ProductionRuleObject subject)
     {
-
+        if (subject == null)
+        {
+            throw new Exception("CheckSee: Subject is null");
+        }
         U3DPlayer player = (U3DPlayer)subject.GetEngine().GetEnvironmentComponent<U3DPlayer>();
         Camera camera = player.Camera;
         Vector3 viewPos = camera.WorldToViewportPoint(subject.transform.position);

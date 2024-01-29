@@ -148,7 +148,7 @@ public class ActionInfo
     protected float mMinValue = -DEFAULT_VALUE_RANGE;
     protected float mMaxValue = DEFAULT_VALUE_RANGE;
 
-    public void setBaseValues(FieldInfo fieldInfo, object parent, Action action)
+    public void setBaseValues(FieldInfo fieldInfo, object parent, ACTION action)
     {
         mFieldInfo = fieldInfo;
         mParent = parent;

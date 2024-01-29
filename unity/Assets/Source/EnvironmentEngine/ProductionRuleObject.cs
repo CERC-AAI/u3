@@ -12,12 +12,23 @@ public class ProductionRuleObject : EnvironmentComponent
 
     public GameObject DebugCube;
 
+    GameObject mCurrentDisplayObject;
+
     ProductionRuleManager mManager;
 
     // public ProductionRuleObject(ProductionRuleIdentifier identifier)
     // {
+    //     if (identifier == null)
+    //     {
+    //         throw new ArgumentException("ProductionRuleObject identifier cannot be null");
+    //     }
+    //     if (this == null)
+    //     {
+    //         throw new ArgumentException("ProductionRuleObject cannot be null");
+    //     }
     //     this.identifier = identifier;
     // }
+
     protected override void Initialize()
     {
         base.Initialize();
@@ -43,22 +54,23 @@ public class ProductionRuleObject : EnvironmentComponent
     // }
 
     // Initialize the object with a shape and color, defaulting to a red sphere
-    public void ProductionRuleObjectInitialize(string shape = "sphere", string color = "red")
+    public void ProductionRuleObjectInitialize(string shape, string color)
     {
-        //Initialize production rule manager if needed
-        mManager = GetProductionRuleManager();
-
         identifier = new ProductionRuleIdentifier(shape.ToLower(), color.ToLower());
-
-        // this.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        // this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
-        // Need to set the shape and the color of the object
-        // The shape is set by loading the correct prefab
-        GameObject shapeObject = Instantiate(mManager.getPrefabFromName(shape), this.transform);
-        shapeObject.transform.parent = this.transform;
-        shapeObject.transform.localPosition = Vector3.zero;
+        if (shape.Trim() == "" || color.Trim() == "")
+        {
+            return;
+        }
+        if (mCurrentDisplayObject != null)
+        {
+            Destroy(mCurrentDisplayObject);
+        }
+        mCurrentDisplayObject = Instantiate(GetProductionRuleManager().getPrefabFromName(shape), this.transform);
+        mCurrentDisplayObject.transform.parent = this.transform;
+        mCurrentDisplayObject.transform.localPosition = Vector3.zero;
         // Ref the prefab, grab the renderer, set the color
-        shapeObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
+        Debug.Log("Setting color to: " + ProductionRuleIdentifier.colorDict[color]);
+        mCurrentDisplayObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
     }
 
 

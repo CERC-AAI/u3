@@ -19,7 +19,7 @@ public class GridPlayer : EnvironmentAgent
     Movement mMovement;
     HealthBar mHealthBar;
 
-    [Action]
+    [ACTION]
     public GridEnvironment.Actions movementState;
 
     // Should be 3 vector3s for position, rotation, and scale

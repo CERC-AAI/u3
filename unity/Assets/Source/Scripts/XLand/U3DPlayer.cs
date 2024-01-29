@@ -52,22 +52,22 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 {
     [Header("Inputs")]
 
-    [Action]
+    [ACTION]
     public float mouseLookAxisUp;
-    [Action]
+    [ACTION]
     public float mouseLookAxisRight;
-    [Action]
+    [ACTION]
     public float scrollInput;
 
-    [Action]
+    [ACTION]
     public float MoveAxisForward;
-    [Action]
+    [ACTION]
     public float MoveAxisRight;
-    [Action]
+    [ACTION]
     public bool JumpDown;
-    [Action]
+    [ACTION]
     public bool CrouchDown;
-    [Action]
+    [ACTION]
     public bool CrouchUp;
 
     [Header("References")]
@@ -697,7 +697,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     public override bool ShouldRequestDecision(long fixedUdpateNumber)
     {
-        return (fixedUdpateNumber + 1) % (GetObjectID()+1) == 0;
+        return (fixedUdpateNumber + 1) % (GetObjectID() + 1) == 0;
 
         return base.ShouldRequestDecision(fixedUdpateNumber);
     }

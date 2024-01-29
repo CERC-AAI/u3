@@ -27,22 +27,22 @@ public class Callback : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-public class Action : Attribute
+public class ACTION : Attribute
 {
     public float minValue = -ActionInfo.DEFAULT_VALUE_RANGE;
     public float maxValue = ActionInfo.DEFAULT_VALUE_RANGE;
 
-    public Action()
+    public ACTION()
     {
     }
 
-    public Action(float minValue = float.MinValue, float maxValue = float.MinValue)
+    public ACTION(float minValue = float.MinValue, float maxValue = float.MinValue)
     {
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
 
-    public Action(int minValue = int.MinValue, int maxValue = int.MinValue)
+    public ACTION(int minValue = int.MinValue, int maxValue = int.MinValue)
     {
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -253,7 +253,7 @@ public class EnvironmentComponent : MonoBehaviour
 
             foreach (FieldInfo fieldInfo in fieldInfos)
             {
-                Action actionAttribute = fieldInfo.GetCustomAttribute<Action>();
+                ACTION actionAttribute = fieldInfo.GetCustomAttribute<ACTION>();
                 if (actionAttribute != null)
                 {
                     Type actionInfoType = typeof(ActionInfo);

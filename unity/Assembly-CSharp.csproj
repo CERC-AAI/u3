@@ -108,6 +108,7 @@
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\c- Wall Jumping\MyCharacterController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\KCCSettings.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyPlayer.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\TrialManager.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\TargettingCursor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\ExampleAIController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\7- Orienting towards arbitrary up direction\Scripts\MyCharacterController.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Assets\Source\Scripts\LineGame\LineSlider.cs" />
     <Compile Include="Assets\Source\Other\MakeCube.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\U3CharacterMotor.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleGraph.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\16- FramePerfect Rotation\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\14- Climbing Ladders\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\OvalSlider.cs" />

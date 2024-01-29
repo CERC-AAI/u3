@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
+using Unity.Mathematics;
 // using NUnit;
 
 // Class structure is fine, but start from scratch
@@ -21,7 +22,7 @@ using UnityEngine.InputSystem;
 // ProductionRuleObject overrides EnvironmentComponent OnCollision, the parameter will be the other object collided with.
 // If you're a productionRuleObject, do you match my identifier? If so, then if we have a production rule for our collision, then do X.
 
-public enum ACTION
+public enum Action
 {
     SPAWN,
     REMOVE,
@@ -42,6 +43,8 @@ public enum CONDITION
     NONE
 }
 
+
+
 // replace with Vector3s
 // public class Point
 // {
@@ -59,13 +62,23 @@ public enum CONDITION
 
 public class ProductionRuleManager : EnvironmentComponent
 {
+
     // A list to store all production rules
     private List<ProductionRule> productionRules = new List<ProductionRule>();
 
-    private List<ProductionRuleObject> allProdRuleObjects = new List<ProductionRuleObject>();
-    public float NEAR_DISTANCE = 1.0f;
+    private List<ProductionRule> permissibleProductionRules = new List<ProductionRule>();
 
-    public GravityGun mGravityGun;
+    private List<ProductionRuleObject> allProdRuleObjects = new List<ProductionRuleObject>();
+
+    public GameObject productionRuleObjectPrefab;
+
+    public float NEAR_DISTANCE = 2.0f;
+
+    private GravityGun mGravityGun;
+
+    public ProductionRuleGraph productionRuleGraph;
+
+    public TrialManager trialManager;
 
     [Serializable]
     public class ProductionRulePrefab
@@ -75,27 +88,6 @@ public class ProductionRuleManager : EnvironmentComponent
 
     }
 
-    public void OnGravityGunDrop(Rigidbody obj)
-    {
-        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
-        CheckCallback(CONDITION.DROP, productionRuleObject, null, GetEngine());
-        Debug.Log($"Object dropped {productionRuleObject}");
-    }
-    public void OnGravityGunPickup(Rigidbody obj)
-    {
-        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
-        CheckCallback(CONDITION.PICKUP, productionRuleObject, null, GetEngine());
-        Debug.Log("Object picked up");
-    }
-    public void OnGravityGunThrow(Rigidbody obj)
-    {
-        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
-        CheckCallback(CONDITION.THROW, productionRuleObject, null, GetEngine());
-        Debug.Log("Object thrown");
-    }
-
-    public List<ProductionRulePrefab> productionRulePrefabs = new List<ProductionRulePrefab>();
-
     [Serializable]
     public class DefaultProductionRules
     {
@@ -104,27 +96,41 @@ public class ProductionRuleManager : EnvironmentComponent
         public List<ProductionRuleAction> actions;
     }
 
+    public List<ProductionRulePrefab> productionRulePrefabs = new List<ProductionRulePrefab>();
     public List<DefaultProductionRules> defaultProductionRules = new List<DefaultProductionRules>();
 
     void Awake()
     {
-        // TODO: Load production rules
-        // otherwise create dummy rules
-        // Here's the code:
-        // if (productionRules.Count == 0)
-        // ProductionRule rule = new ProductionRule(condition, action);
-        // AddRule(rule);
-
-        LoadDefaultProductionRules();
+        // LoadDefaultProductionRules();
     }
 
-    // Method to add a rule to the list
+    protected override void Initialize()
+    {
+        base.Initialize();
+        // productionRuleGraph = new ProductionRuleGraph(); // TODO: make a prefab
+        // productionRuleGraph.BuildProductionRuleGraph(GetCurrentState());
+        // productionRules = productionRuleGraph.GetCurrentProductionRules();
+        LoadDefaultProductionRules();
+        trialManager = new TrialManager(); // TODO: make a prefab
+        trialManager.SaveInitialState(
+            GetEngine().GetEnvironmentComponent<U3DPlayer>(),
+            allProdRuleObjects
+        );
+
+    }
+
+    void Update()
+    {
+        CheckTrial();
+        CheckAndExecuteRules(GetEngine());
+        trialManager.IncrementTrialDurationCounter();
+    }
+
     public void AddRule(ProductionRule rule)
     {
         productionRules.Add(rule);
     }
 
-    // Method to remove a rule from the list
     public void RemoveRule(ProductionRule rule)
     {
         productionRules.Remove(rule);
@@ -153,10 +159,6 @@ public class ProductionRuleManager : EnvironmentComponent
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        CheckAndExecuteRules(GetEngine());
-    }
 
     void LoadDefaultProductionRules()
     {
@@ -165,6 +167,9 @@ public class ProductionRuleManager : EnvironmentComponent
             ProductionRule rule = new ProductionRule(defaultProductionRules[i].conditions, defaultProductionRules[i].actions);
             AddRule(rule);
         }
+
+        // ProductionRule newProductionRule = SampleNewForwardRule(allProdRuleObjects);
+        // AddRule(newProductionRule);
     }
 
     public float GetNearDistance()
@@ -183,10 +188,64 @@ public class ProductionRuleManager : EnvironmentComponent
         }
     }
 
-
-    private void CheckAndExecuteRules(EnvironmentEngine env)
+    private void CheckTrial()
     {
-        foreach (ProductionRule rule in productionRules)
+        if (trialManager.IsTrialOver() && !trialManager.IsMaxTrials())
+        {
+            StartNewTrial();
+        }
+    }
+
+    private void StartNewTrial()
+    {
+        trialManager.IncrementTrialCounter();
+        trialManager.ResetTrialDurationCounter();
+        ResetState();
+    }
+
+    public void ResetState()
+    {
+        ResetAgentState();
+        ResetProductionRuleObjectStates();
+    }
+
+    public void ResetAgentState()
+    {
+        U3DPlayer agent = GetEngine().GetCachedEnvironmentComponent<U3DPlayer>();
+        agent.transform.position = trialManager.GetInitialAgentState().position;
+        agent.transform.rotation = trialManager.GetInitialAgentState().rotation;
+    }
+
+    public void ResetProductionRuleObjectStates()
+    {
+        int numProdRuleObjects = allProdRuleObjects.Count;
+        for (int i = 0; i < numProdRuleObjects; i++)
+        {
+            ProductionRuleObject productionRuleObject = allProdRuleObjects[0];
+            productionRuleObject.Remove();
+        }
+
+        ProductionRuleObject productionRuleObjectPrefab = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>().productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
+
+        for (int i = 0; i < trialManager.GetInitialProductionRuleObjectStates().Count; i++)
+        {
+            EnvironmentObject productionRuleEnvironmentObject = GetEngine().CreateEnvironmentObject(productionRuleObjectPrefab.gameObject);
+            ProductionRuleObject productionRuleObject = productionRuleEnvironmentObject.GetComponent<ProductionRuleObject>();
+
+            productionRuleObject.ProductionRuleObjectInitialize(
+                trialManager.GetInitialProductionRuleObjectStates()[i].shape,
+                trialManager.GetInitialProductionRuleObjectStates()[i].color);
+            productionRuleObject.transform.position = trialManager.GetInitialProductionRuleObjectStates()[i].position;
+            productionRuleObject.transform.rotation = trialManager.GetInitialProductionRuleObjectStates()[i].rotation;
+            productionRuleObject.transform.localScale = trialManager.GetInitialProductionRuleObjectStates()[i].scale;
+        }
+    }
+
+    private void CheckAndExecuteRules(EnvironmentEngine env) //TODO: remove coupling with updating ProductionRuleGraph in ExecuteRule. Split into check and execute
+    {
+        // Shuffle the production rules
+        ShuffleUtility.ShuffleList(productionRules);
+        foreach (ProductionRule rule in productionRules) // TODO: foreach error with collection is correct because you're modifying the underlying collection: figure this out. Snapshot?
         {
             foreach (ProductionRuleObject subject in allProdRuleObjects)
             {
@@ -195,10 +254,17 @@ public class ProductionRuleManager : EnvironmentComponent
                     if (subject != obj && rule.CheckRule(subject, obj, env))
                     {
                         rule.ExecuteRule(subject, obj, env);
+
                     }
                 }
             }
         }
+    }
+
+    public void UpdateProductionRuleGraph(ProductionRule productionRule)
+    {
+        productionRuleGraph.ForwardWalk(productionRule);
+        productionRules = productionRuleGraph.GetCurrentProductionRules();
     }
 
     public GameObject getPrefabFromName(string name)
@@ -224,13 +290,72 @@ public class ProductionRuleManager : EnvironmentComponent
         //return ProductionRuleManager.productionRuleManager;
     }
 
+    public void OnGravityGunDrop(Rigidbody obj)
+    {
+        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
+        CheckCallback(CONDITION.DROP, productionRuleObject, null, GetEngine());
+        Debug.Log($"Object dropped {productionRuleObject}");
+    }
+
+    public void OnGravityGunPickup(Rigidbody obj)
+    {
+        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
+        CheckCallback(CONDITION.PICKUP, productionRuleObject, null, GetEngine());
+        Debug.Log("Object picked up");
+    }
+
+    public void OnGravityGunThrow(Rigidbody obj)
+    {
+        ProductionRuleObject productionRuleObject = obj.GetComponentInParent<ProductionRuleObject>();
+        CheckCallback(CONDITION.THROW, productionRuleObject, null, GetEngine());
+        Debug.Log("Object thrown");
+    }
+
+    public List<ProductionRuleIdentifier> GetCurrentState()
+    {
+        List<ProductionRuleIdentifier> currentState = new List<ProductionRuleIdentifier>();
+        foreach (ProductionRuleObject obj in allProdRuleObjects)
+        {
+            currentState.Add(obj.GetIdentifier());
+        }
+        return currentState;
+    }
+
+    public List<ProductionRuleObject> GetAllProdRuleObjects()
+    {
+        return allProdRuleObjects;
+    }
 }
-// Change to ProductionRuleComponent
-// MetatileEnv done -> ProductionRuleEnv generates objects -> Backend scripts to create ProductionRuleObjects, call Initalize with color/shape and register callbacks
-// Define ProductionRuleObject Prefab (empty game object with ProductionRuleObject script attached), then call Initialize on it
-// Management of the ProductionRuleObjects will be done by the ProductionRuleEnvironment
-// Singleton pattern: only one ProductionRuleEnvironment in the scene, always interface with that one
-// Similar logic to python script, conditions and actions, fancy if statements
-// Need to talk about how to actually implement actions and conditions
-// Simplest way: every frame, check the state of the environment. If it matches a condition, then do the action.
-// These below don't change very much, extend from monobehaviour (or not) to make sure they're accessible from Unity
+
+public class ShuffleUtility
+{
+    // Shuffle an array
+    public static void ShuffleArray<T>(T[] array)
+    {
+        System.Random rng = new System.Random();
+        int n = array.Length;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            T value = array[k];
+            array[k] = array[n];
+            array[n] = value;
+        }
+    }
+
+    // Shuffle a list
+    public static void ShuffleList<T>(IList<T> list)
+    {
+        System.Random rng = new System.Random();
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
+    }
+}

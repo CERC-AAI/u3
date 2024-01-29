@@ -6,23 +6,24 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 
+public enum PredicateObjects
+{
+    SUBJECT,
+    OBJECT,
+    BOTH,
+    NONE
+}
+
 [Serializable]
 public class ProductionRuleAction
 {
 
-    public enum PredicateObjects
-    {
-        SUBJECT,
-        OBJECT,
-        BOTH,
-        NONE
-    }
 
     public PredicateObjects predicateObjects;
 
     public ProductionRuleIdentifier identifier;
 
-    public ACTION action;
+    public Action action;
     // private List<object> actionParameters;
 
     public float reward;
@@ -30,7 +31,7 @@ public class ProductionRuleAction
 
     public string debugPrintString = "Test print";
 
-    public ProductionRuleAction(ACTION action, float reward, PredicateObjects predicateObjects, ProductionRuleIdentifier identifier = null)
+    public ProductionRuleAction(Action action, float reward, PredicateObjects predicateObjects, ProductionRuleIdentifier identifier = null)
     {
         this.action = action;
         this.reward = reward;
@@ -42,42 +43,32 @@ public class ProductionRuleAction
     {
         ProductionRuleManager productionRuleManager = env.GetCachedEnvironmentComponent<ProductionRuleManager>();
 
-        // if (predicateObjects == PredicateObjects.NONE)
-        // {
-        //     if (identifier == null)
-        //     {
-        //         ProductionRuleObject productionRuleObject = productionRuleManager.GetProductionRuleObjectByIdentifier(identifier);
-        //         ExecuteAction(productionRuleObject, env);
-
-        //     }
-        //     else
-        //     {
-        //         // create a new object
-        //         ProductionRuleObject productionRuleObject = new ProductionRuleObject(identifier);
-        //         ExecuteAction(productionRuleObject, env);
-
-        //     }
-
-        // }
-
-        if (predicateObjects == PredicateObjects.NONE)
+        if (predicateObjects == PredicateObjects.SUBJECT)
         {
-            ProductionRuleObject productionRuleObject = productionRuleManager.GetProductionRuleObjectByIdentifier(identifier);
-            ExecuteAction(productionRuleObject, env);
-        }
-
-        else if (predicateObjects == PredicateObjects.SUBJECT)
-        {
-            ExecuteAction(subject, env);
+            ExecuteAction(subject, env, subject, obj);
         }
         else if (predicateObjects == PredicateObjects.OBJECT)
         {
-            ExecuteAction(obj, env);
+            ExecuteAction(obj, env, subject, obj);
         }
         else if (predicateObjects == PredicateObjects.BOTH)
         {
-            ExecuteAction(subject, env);
-            ExecuteAction(obj, env);
+            ExecuteAction(subject, env, subject, obj);
+            ExecuteAction(obj, env, subject, obj);
+        }
+        else if (predicateObjects == PredicateObjects.NONE)
+        {
+            if (action != Action.SPAWN)
+            {
+                ProductionRuleObject productionRuleObject = productionRuleManager.GetProductionRuleObjectByIdentifier(identifier);
+                ExecuteAction(productionRuleObject, env, subject, obj);
+            }
+            else
+            {
+                ProductionRuleObject productionRulePrefab = productionRuleManager.productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
+                ExecuteAction(productionRulePrefab, env, subject, obj);
+            }
+
         }
         else
         {
@@ -85,26 +76,35 @@ public class ProductionRuleAction
         }
     }
 
-    public void ExecuteAction(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
+    public void ExecuteAction(ProductionRuleObject productionRuleObject, EnvironmentEngine env, ProductionRuleObject subject, ProductionRuleObject obj)
     {
 
         CheckParameterValidity(productionRuleObject, env);
         switch (action)
         {
-            case ACTION.SPAWN:
+            case Action.SPAWN:
                 Debug.Log(debugPrintString);
-                // Spawn(productionRuleObject, env);
+                if (subject == null)
+                {
+                    Spawn(productionRuleObject, env, Vector3.zero);
+                }
+                else
+                {
+                    Spawn(productionRuleObject, env, subject.transform.position);
+                }
                 break;
 
-            case ACTION.REMOVE:
+            case Action.REMOVE:
                 Debug.Log(debugPrintString);
                 Remove(productionRuleObject, env);
                 break;
 
-            // case ACTION.REWARD:
-            //     return Reward(subject, obj, env);
+            case Action.REWARD:
+                Debug.Log(debugPrintString);
+                Reward(env);
+                break;
 
-            case ACTION.PRINT:
+            case Action.PRINT:
                 Debug.Log(debugPrintString);
                 break;
             default:
@@ -112,11 +112,27 @@ public class ProductionRuleAction
         }
     }
 
-    // public void Spawn(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
-    // {
-    //     // CreateEnvironmentObject takes a base
-    //     productionRuleObject.GetEngine().CreateEnvironmentObject(productionRuleObject.gameObject);
-    // }
+    public void forwardPropagateState()
+    {
+        // do nothing
+    }
+    public void Reward(EnvironmentEngine env)
+    {
+        // Get the agent from the environment engine
+        var playerObject = GameObject.Find("Player");
+        U3Agent u3Agent = playerObject.GetComponent<U3Agent>();
+        u3Agent.AddReward(reward);
+    }
+    public void Spawn(ProductionRuleObject productionRuleObjectPrefab, EnvironmentEngine env, Vector3 position)
+    {
+        // Instantiate the production rule object
+        EnvironmentObject prodRuleObject = env.GetEngine().CreateEnvironmentObject(productionRuleObjectPrefab.gameObject);
+        ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
+        prodRuleObj.ProductionRuleObjectInitialize(identifier.ObjectShape, identifier.ObjectColor);
+        prodRuleObj.transform.position = position;
+
+    }
+
     public void Remove(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
     {
         productionRuleObject.Remove();
@@ -126,15 +142,15 @@ public class ProductionRuleAction
     {
         switch (action)
         {
-            case ACTION.SPAWN:
-            case ACTION.REMOVE:
+            case Action.SPAWN:
+            case Action.REMOVE:
                 if (productionRuleObject == null)
                 {
                     throw new ArgumentException("Invalid call to ExecuteAction: ProductionRuleObject is null");
                 }
                 break;
-            case ACTION.REWARD:
-            case ACTION.PRINT:
+            case Action.REWARD:
+            case Action.PRINT:
                 break;
             default:
                 throw new ArgumentException("Action not recognized");
@@ -144,19 +160,19 @@ public class ProductionRuleAction
 
     public string Encode()
     {
-        if (action == ACTION.SPAWN)
+        if (action == Action.SPAWN)
         {
             return $"spawn a {this.identifier.Encode()}";
         }
-        else if (action == ACTION.REMOVE)
+        else if (action == Action.REMOVE)
         {
             return $"remove a {this.identifier.Encode()}";
         }
-        else if (action == ACTION.REWARD)
+        else if (action == Action.REWARD)
         {
             return $"reward {this.reward}";
         }
-        else if (action == ACTION.PRINT)
+        else if (action == Action.PRINT)
         {
             return $"print {this.reward}";
         }

@@ -280,8 +280,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c86cff1a56124084c8bbaa8632ff2fad, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   Capsule: {fileID: 414432176}
   CapsuleRadius: 0.25
   CapsuleHeight: 1.01
@@ -322,9 +322,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  mPrefabPath:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mPrefabPath: 
 --- !u!1 &446171181 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7393287890859856584, guid: 08cd0431f661e3448b2eafbdabbe3740,
@@ -645,8 +645,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce75715bad05d7f47b55cc48c6b4c98c, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   radiusX: 5
   radiusY: 5
   edgeSize: 0.25
@@ -1150,8 +1150,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 27f5ccfddb3e73042a942b426d909f45, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   holdDistance: 1.5
   pullingSpeed: 20
   throwingImpulse: 10
@@ -1171,8 +1171,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 189331a0c11d8d34187546956c64ab2e, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   mouseLookAxisUp: 0
   mouseLookAxisRight: 0
   scrollInput: 0
@@ -1215,8 +1215,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b1497a5ecfdde064eb4e9e991d377bdf, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
@@ -1231,15 +1231,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_BrainParameters:
     VectorObservationSize: 0
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
-      BranchSizes:
-    VectorActionSize:
+      BranchSizes: 
+    VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
@@ -1261,8 +1261,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 973fcac06c0d8e04f896309bfb1dec1d,
     type: 3}
   m_NotificationBehavior: 0
@@ -1278,7 +1278,7 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme:
+  m_DefaultControlScheme: 
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
@@ -1292,9 +1292,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  mPrefabPath:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mPrefabPath: 
 --- !u!1 &1028513131
 GameObject:
   m_ObjectHideFlags: 0
@@ -1470,8 +1470,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74f88f56251051741a36a4233bfcfde8, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   debugMode: 1
   forceSaveData: 0
   scenes:
@@ -1573,10 +1573,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 26ddbb52241a5ec4b981bab6f45ab6a2, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  productionRuleObjectPrefab: {fileID: 7393287890859856584, guid: 08cd0431f661e3448b2eafbdabbe3740,
+    type: 3}
   NEAR_DISTANCE: 1
   mGravityGun: {fileID: 0}
+  productionRuleGraph: {fileID: 0}
   productionRulePrefabs:
   - name: sphere
     prefab: {fileID: 3537155083289241935, guid: db217135fbe986a43a04352498e1c61c,
@@ -1590,27 +1593,59 @@ MonoBehaviour:
   - conditions:
     - condition: 0
       subjectIdentifier:
-        ObjectShape:
-        ObjectColor:
+        ObjectShape: 
+        ObjectColor: 
       objectIdentifier:
-        ObjectShape:
-        ObjectColor:
+        ObjectShape: 
+        ObjectColor: 
     actions:
     - predicateObjects: 0
       identifier:
-        ObjectShape:
-        ObjectColor:
+        ObjectShape: 
+        ObjectColor: 
       action: 3
       reward: 0
       debugPrintString: Test debug print string :)
+  - conditions:
+    - condition: 0
+      subjectIdentifier:
+        ObjectShape: cube
+        ObjectColor: blue
+      objectIdentifier:
+        ObjectShape: sphere
+        ObjectColor: red
+    actions:
+    - predicateObjects: 3
+      identifier:
+        ObjectShape: cylinder
+        ObjectColor: green
+      action: 0
+      reward: 5
+      debugPrintString: Agent rewarded :)
   - conditions:
     - condition: 5
       subjectIdentifier:
         ObjectShape: sphere
         ObjectColor: red
       objectIdentifier:
-        ObjectShape:
-        ObjectColor:
+        ObjectShape: 
+        ObjectColor: 
+    actions:
+    - predicateObjects: 3
+      identifier:
+        ObjectShape: sphere
+        ObjectColor: green
+      action: 0
+      reward: 0
+      debugPrintString: Test debug print string :)
+  - conditions:
+    - condition: 4
+      subjectIdentifier:
+        ObjectShape: sphere
+        ObjectColor: green
+      objectIdentifier:
+        ObjectShape: 
+        ObjectColor: 
     actions:
     - predicateObjects: 3
       identifier:
@@ -1629,9 +1664,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  mPrefabPath:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mPrefabPath: 
 --- !u!1 &1532024477
 GameObject:
   m_ObjectHideFlags: 0
@@ -2040,9 +2075,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  mPrefabPath:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mPrefabPath: 
 --- !u!114 &1761730603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2053,8 +2088,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a4c2ad7df2762d459419179fbd5ede3, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   recycleBin: {fileID: 1826306623}
   fixedUpdatesPerSecond: 50
   isTraining: 0
@@ -2165,8 +2200,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6c1c3ff9b2fd8a4d9b36214e332e4c5, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   voxelSize: 1
   metatilepool: {fileID: 4368192324598907990, guid: f49107dc9e4fa6e4382dac87214619eb,
     type: 3}
@@ -2426,8 +2461,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e950cacae63d61a4e821edb397a8cd95, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   SelectionMode: 1
   OutlineType: 2
   AlphaMode: 0
@@ -2445,8 +2480,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 377cdd2fc9c51fd458f39153765434c3, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   cursorTexture: {fileID: 2800000, guid: c541c0f98497b4646aa9efb198dc5017, type: 3}
   cursorSize: {x: 32, y: 32}
 --- !u!114 &1890097399
@@ -2459,8 +2494,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a1f6075223b554f4a93c70e487a92802, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   FollowPointFraming: {x: 0, y: 0}
   FollowingSharpness: 1e+9
   DefaultDistance: 0
@@ -2764,9 +2799,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  mPrefabPath:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mPrefabPath: 
 --- !u!1001 &2119803969
 PrefabInstance:
   m_ObjectHideFlags: 0
