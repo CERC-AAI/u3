@@ -212,8 +212,15 @@ public class ProductionRuleManager : EnvironmentComponent
     public void ResetAgentState()
     {
         U3DPlayer agent = GetEngine().GetCachedEnvironmentComponent<U3DPlayer>();
-        agent.transform.position = trialManager.GetInitialAgentState().position;
-        agent.transform.rotation = trialManager.GetInitialAgentState().rotation;
+        U3CharacterMotor motor = agent.Motor;
+        U3DCamera camera = agent.CharacterCamera;
+        motor.SetPosition(trialManager.GetInitialAgentState().position);
+        motor.SetRotation(trialManager.GetInitialAgentState().rotation);
+        camera.ResetFacingDistance(
+            trialManager.GetInitialAgentState().cameraPlanarDirection,
+            trialManager.GetInitialAgentState().cameraTargetDistance
+        );
+
     }
 
     public void ResetProductionRuleObjectStates()

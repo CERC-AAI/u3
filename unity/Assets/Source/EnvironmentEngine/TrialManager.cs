@@ -16,6 +16,10 @@ public class TrialManager
         public Quaternion rotation;
         // public Vector3 velocity;
         // public Vector3 angularVelocity;
+        public Vector3 cameraPosition;
+        public Quaternion cameraRotation;
+        public Vector3 cameraPlanarDirection;
+        public float cameraTargetDistance;
     }
 
     public class InitialProductionRuleObjectState
@@ -33,7 +37,7 @@ public class TrialManager
     public int maxTrials = 10;
     InitialAgentState agentState = new InitialAgentState();
     List<InitialProductionRuleObjectState> productionRuleObjectStates = new List<InitialProductionRuleObjectState>();
-    public int TrialResetUpdateFrequency = 10000;
+    public int TrialResetUpdateFrequency = 500;
     public int trialDurationCounter = 0;
 
     public void SaveInitialState(U3DPlayer player, List<ProductionRuleObject> productionRuleObjects)
@@ -86,6 +90,10 @@ public class TrialManager
         // Save the agent's position, rotation, velocity, angular velocity, etc.
         agentState.position = agent.transform.position;
         agentState.rotation = agent.transform.rotation;
+        agentState.cameraPosition = agent.CharacterCamera.transform.position;
+        agentState.cameraRotation = agent.CharacterCamera.transform.rotation;
+        agentState.cameraPlanarDirection = agent.CharacterCamera.PlanarDirection;
+        agentState.cameraTargetDistance = agent.CharacterCamera.TargetDistance;
     }
 
     public void SaveProductionRuleObjectStates(List<ProductionRuleObject> productionRuleObjects)
