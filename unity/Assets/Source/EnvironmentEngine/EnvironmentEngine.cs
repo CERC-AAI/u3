@@ -97,9 +97,9 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         }
         mInactiveAgents.Clear();
 
+        Debug.Log("Start run");
         RunStarted();
 
-        Debug.Log("Start run");
         CheckDecisions();
     }
 
@@ -501,6 +501,11 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         }
     }
 
+    private static int ComparePriority(EnvironmentObject objectA, EnvironmentObject objectB)
+    {
+        return objectB.scriptExecutionPriority - objectA.scriptExecutionPriority;
+    }
+
     public void AddObject(EnvironmentObject newObject)
     {
         // Debug.Log($"Add object: {newObject} -> {mNextID}");
@@ -509,6 +514,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         {
             mEnvironmentObjects.Add(newObject);
             newObject.SetObjectID(mNextID++);
+            mEnvironmentObjects.Sort(ComparePriority);
         }
     }
 

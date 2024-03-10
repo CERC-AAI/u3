@@ -8,7 +8,7 @@ using System;
 using UnityEngine;
 using NUnit.Framework.Constraints;
 
-public class MetatileManager : MonoBehaviour
+public class MetatileManager : EnvironmentComponent
 {
     public static int mWidth = 10, mLength = 10, mHeight = 10;
     public static int mManyMetatileCount = 2;
@@ -230,6 +230,15 @@ public class MetatileManager : MonoBehaviour
         //Making this a coroutine enbales step by step debugging. This is not fast, and should be changed back at some point.
         StartCoroutine(GenerateEnvironment(metatilepool));
         //GenerateEnvironment(metatilepool);
+    }
+
+
+
+    public override void OnRunStarted()
+    {
+        Debug.Log("MetaTileManager");
+
+        base.OnRunStarted();
     }
 
     public void Update()

@@ -16,6 +16,7 @@ using UnityEditor;
 public class EnvironmentObject : EnvironmentComponentHolder
 {
     // Public members
+    public int scriptExecutionPriority = 0;
 
     public Vector3 Position
     {

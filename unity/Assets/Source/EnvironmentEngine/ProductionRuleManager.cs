@@ -119,6 +119,13 @@ public class ProductionRuleManager : EnvironmentComponent
 
     }
 
+    public override void OnRunStarted()
+    {
+        Debug.Log("ProductionRuleManager");
+
+        base.OnRunStarted();
+    }
+
     void Update()
     {
         CheckTrial();
