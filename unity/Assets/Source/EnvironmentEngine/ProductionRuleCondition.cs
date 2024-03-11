@@ -80,8 +80,10 @@ public class ProductionRuleCondition
 
             case CONDITION.DROP:
             case CONDITION.PICKUP:
+            case CONDITION.CONTACT:
             case CONDITION.THROW:
                 return condition == callbackCondition;
+
             // case CONDITION.USE:
             //     return CheckUse(subject, obj);
 
