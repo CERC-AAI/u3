@@ -20,14 +20,14 @@ public class TileFacePalette : MonoBehaviour
     [Serializable]
     public class MatchedFaces
     {
-        public int mA;
-        public int mB;
+        public int mIncoming;
+        public int mPlaced;
         public float mWeight = 1.0f;
 
-        public MatchedFaces(int a, int b, float weight)
+        public MatchedFaces(int incoming, int placed, float weight)
         {
-            mA = a;
-            mB = b;
+            mIncoming = incoming;
+            mPlaced = placed;
             mWeight = weight;
         }
     }
@@ -61,7 +61,12 @@ public class TileFacePalette : MonoBehaviour
     {
         for (int i = 0; i < matchingMatrix.Count; i++)
         {
-            if (matchingMatrix[i].mA == tileFace1 && matchingMatrix[i].mB == tileFace2)
+            if (matchingMatrix[i].mIncoming == tileFace1 && matchingMatrix[i].mPlaced == tileFace2)
+            {
+                return matchingMatrix[i].mWeight;
+            }
+            // Undirected
+            else if (matchingMatrix[i].mIncoming == tileFace2 && matchingMatrix[i].mPlaced == tileFace1)
             {
                 return matchingMatrix[i].mWeight;
             }
@@ -93,9 +98,15 @@ public class TileFacePalette : MonoBehaviour
 
                 for (int i = 0; i < matchingMatrix.Count; i++)
                 {
-                    if (matchingMatrix[i].mA == j && matchingMatrix[i].mWeight != 0)
+                    // Directed
+                    if (matchingMatrix[i].mPlaced == j && matchingMatrix[i].mWeight != 0)
                     {
-                        mPossibleFaces[j].Add(matchingMatrix[i].mB);
+                        mPossibleFaces[j].Add(matchingMatrix[i].mIncoming);
+                    }
+                    // Undirected
+                    else if (matchingMatrix[i].mIncoming == j && matchingMatrix[i].mWeight != 0)
+                    {
+                        mPossibleFaces[j].Add(matchingMatrix[i].mPlaced);
                     }
                 }
             }

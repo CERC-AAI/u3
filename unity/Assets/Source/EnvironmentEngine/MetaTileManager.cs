@@ -299,7 +299,7 @@ public class MetatileManager : EnvironmentComponent
                     continue;
                 }
 
-                List<ConfigurationValidity> validConfigurations = pair.Value;
+                //List<ConfigurationValidity> validConfigurations = pair.Value;
 
                 List<float> configurationFaceWeights = CalculateMetatileConfigurationFaceWeights(mPlacementPosition, metatile);
 
@@ -1072,7 +1072,7 @@ public class MetatileManager : EnvironmentComponent
             //mTempTileFaceList.AddRange(tile.faceIDs);
             for (int i = 0; i < tile.faceIDs.Length; i++)
             {
-                //If the face list as all possibilities, then we don't have to check them
+                //If the face list has all possibilities, then we don't have to check them
                 if (possibleFaces[i].Count != poolFaceCount && !possibleFaces[i].Contains(tile.faceIDs[(int)mTempPermutationList[i]]))
                 {
                     return false;

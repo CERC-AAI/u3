@@ -62,7 +62,7 @@ public class MetatilePool : IMetatileContainer
                 {
                     throw new Exception("depth count too big, something went wrong");
                 }
-                Debug.Log("is not Metatile, going one level deeper");
+                //Debug.Log("is not Metatile, going one level deeper");
                 //Debug.Log("Type: " + metatileProbabilities[i].metatileProbability.GetType());
                 MetatilePool metatilepool = (MetatilePool)metatileProbabilities[i].metatileContainer;
                 //Debug.Log("metatilepool: " + metatilepool);

@@ -83,117 +83,117 @@ MonoBehaviour:
     name: ThinGround
     weight: 0
   matchingMatrix:
-  - mA: 0
-    mB: 0
+  - mIncoming: 0
+    mPlaced: 0
     mWeight: 1
-  - mA: 0
-    mB: 1
+  - mIncoming: 0
+    mPlaced: 1
     mWeight: 1
-  - mA: 0
-    mB: 3
+  - mIncoming: 0
+    mPlaced: 3
     mWeight: 1
-  - mA: 0
-    mB: 4
+  - mIncoming: 0
+    mPlaced: 4
     mWeight: 1
-  - mA: 0
-    mB: 5
+  - mIncoming: 0
+    mPlaced: 5
     mWeight: 10
-  - mA: 0
-    mB: 6
+  - mIncoming: 0
+    mPlaced: 6
     mWeight: 10
-  - mA: 0
-    mB: 7
+  - mIncoming: 0
+    mPlaced: 7
     mWeight: 10
-  - mA: 0
-    mB: 8
+  - mIncoming: 0
+    mPlaced: 8
     mWeight: 10
-  - mA: 0
-    mB: 9
+  - mIncoming: 0
+    mPlaced: 9
     mWeight: 1
-  - mA: 0
-    mB: 10
+  - mIncoming: 0
+    mPlaced: 10
     mWeight: 10
-  - mA: 0
-    mB: 11
-    mWeight: 100
-  - mA: 1
-    mB: 0
+  - mIncoming: 0
+    mPlaced: 11
+    mWeight: 10
+  - mIncoming: 1
+    mPlaced: 0
     mWeight: 1
-  - mA: 1
-    mB: 1
+  - mIncoming: 1
+    mPlaced: 1
     mWeight: 1
-  - mA: 1
-    mB: 2
+  - mIncoming: 1
+    mPlaced: 2
     mWeight: 1
-  - mA: 1
-    mB: 5
+  - mIncoming: 1
+    mPlaced: 5
     mWeight: 1
-  - mA: 1
-    mB: 6
+  - mIncoming: 1
+    mPlaced: 6
     mWeight: 1
-  - mA: 1
-    mB: 7
+  - mIncoming: 1
+    mPlaced: 7
     mWeight: 1
-  - mA: 1
-    mB: 8
+  - mIncoming: 1
+    mPlaced: 8
     mWeight: 1
-  - mA: 1
-    mB: 10
+  - mIncoming: 1
+    mPlaced: 10
     mWeight: 1
-  - mA: 1
-    mB: 11
+  - mIncoming: 1
+    mPlaced: 11
     mWeight: 1
-  - mA: 2
-    mB: 1
+  - mIncoming: 2
+    mPlaced: 1
     mWeight: 1
-  - mA: 2
-    mB: 2
+  - mIncoming: 2
+    mPlaced: 2
     mWeight: 1
-  - mA: 2
-    mB: 10
+  - mIncoming: 2
+    mPlaced: 10
     mWeight: 5
-  - mA: 3
-    mB: 0
+  - mIncoming: 3
+    mPlaced: 0
     mWeight: 1
-  - mA: 3
-    mB: 4
+  - mIncoming: 3
+    mPlaced: 4
     mWeight: 10
-  - mA: 3
-    mB: 9
+  - mIncoming: 3
+    mPlaced: 9
     mWeight: 1
-  - mA: 4
-    mB: 0
+  - mIncoming: 4
+    mPlaced: 0
     mWeight: 1
-  - mA: 4
-    mB: 3
+  - mIncoming: 4
+    mPlaced: 3
     mWeight: 10
-  - mA: 4
-    mB: 9
+  - mIncoming: 4
+    mPlaced: 9
     mWeight: 1
-  - mA: 5
-    mB: 5
-    mWeight: 100
-  - mA: 6
-    mB: 6
-    mWeight: 100
-  - mA: 7
-    mB: 7
-    mWeight: 100
-  - mA: 8
-    mB: 8
-    mWeight: 100
-  - mA: 9
-    mB: 0
+  - mIncoming: 5
+    mPlaced: 5
+    mWeight: 10
+  - mIncoming: 6
+    mPlaced: 6
+    mWeight: 10
+  - mIncoming: 7
+    mPlaced: 7
+    mWeight: 10
+  - mIncoming: 8
+    mPlaced: 8
+    mWeight: 10
+  - mIncoming: 9
+    mPlaced: 0
     mWeight: 1
-  - mA: 9
-    mB: 3
+  - mIncoming: 9
+    mPlaced: 3
     mWeight: 1
-  - mA: 9
-    mB: 4
+  - mIncoming: 9
+    mPlaced: 4
     mWeight: 1
-  - mA: 9
-    mB: 9
+  - mIncoming: 9
+    mPlaced: 9
     mWeight: 1
-  - mA: 11
-    mB: 11
+  - mIncoming: 11
+    mPlaced: 11
     mWeight: 1
