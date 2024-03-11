@@ -184,7 +184,7 @@ public class ProductionRuleManager : EnvironmentComponent
         return NEAR_DISTANCE;
     }
 
-    private void CheckCallback(CONDITION condition, ProductionRuleObject sub, ProductionRuleObject obj, EnvironmentEngine env)
+    public void CheckCallback(CONDITION condition, ProductionRuleObject sub, ProductionRuleObject obj, EnvironmentEngine env)
     {
         foreach (ProductionRule rule in productionRules)
         {
