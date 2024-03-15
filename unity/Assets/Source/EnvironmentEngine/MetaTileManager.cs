@@ -13,8 +13,9 @@ public class MetatileManager : EnvironmentComponent
     public static int mWidth = 10, mLength = 10, mHeight = 10;
     public static int mManyMetatileCount = 2;
     public static int mMaxConfigurationCount = 20;
-
     public float voxelSize = 1;
+
+    public static int[] edgeTiles = new int[] { 0, 1, 2, 3, 4, 5 };
 
     public enum ConfigurationValidity
     {
@@ -133,7 +134,34 @@ public class MetatileManager : EnvironmentComponent
         public List<List<int>> mValidFaceTypes = new List<List<int>>();
         public Dictionary<Metatile, bool> mValidMetatileList = new Dictionary<Metatile, bool>();
 
-        public EnvironmentTileState(List<Metatile> metatiles)
+        public List<int> AddBoundaryTile(Vector3Int position)
+        {
+            List<int> boundaryTiles = new List<int>();
+
+            // Check each boundary condition and add the corresponding edge tile
+            if (position.x == 0)
+                boundaryTiles.Add(MetatileManager.edgeTiles[0]); // Left edge
+            else if (position.x == mWidth - 1)
+                boundaryTiles.Add(MetatileManager.edgeTiles[1]); // Right edge
+
+            if (position.y == 0)
+                boundaryTiles.Add(MetatileManager.edgeTiles[2]); // Bottom edge
+            else if (position.y == mLength - 1)
+                boundaryTiles.Add(MetatileManager.edgeTiles[3]); // Top edge
+
+            if (position.z == 0)
+                boundaryTiles.Add(MetatileManager.edgeTiles[4]); // Front edge
+            else if (position.z == mHeight- 1)
+                boundaryTiles.Add(MetatileManager.edgeTiles[5]); // Back edge
+
+            // check if boundaryTile is empty, and add -1 in that case
+            if (boundaryTiles.Count == 0)
+                boundaryTiles.Add(-1); 
+
+            return boundaryTiles;
+        }
+
+        public EnvironmentTileState(List<Metatile> metatiles, Vector3Int position)
         {
             if (metatiles.Count > 0)
             {
@@ -152,7 +180,14 @@ public class MetatileManager : EnvironmentComponent
                 for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
                 {
                     mValidFaceTypes.Add(new List<int>());
-                    mValidFaceTypes[(int)i] = metatiles[0].parent.palette.GetPossibleConnections(-1);
+                    List<int> boundaryTiles = AddBoundaryTile(position);
+
+                    // if position is not boundary, we get other tiles
+                    if (boundaryTiles.Count == 0)
+                        mValidFaceTypes[(int)i] = metatiles[0].parent.palette.GetPossibleConnections(-1);
+                    else // we force edge tiles in the case of boundary condition
+                        mValidFaceTypes[(int)i] = boundaryTiles;
+       
                 }
             }
         }
@@ -430,7 +465,7 @@ public class MetatileManager : EnvironmentComponent
             {
                 for (int k = 0; k < environment.GetLength(2); k++)
                 {
-                    environment[i, j, k] = new EnvironmentTileState(mMetatileList);
+                    environment[i, j, k] = new EnvironmentTileState(mMetatileList,  new Vector3Int(i, j, k));
                 }
             }
         }
@@ -817,6 +852,8 @@ public class MetatileManager : EnvironmentComponent
 
             // add the neighbors of the tile to the wavefront if their tile state is not placed
             List<Vector3Int> adjacentPositions = GetAdjacentPositions(new Vector3Int(envX, envY, envZ));
+            
+            // if its an edge case modify it to be tiles of one specific type
 
             // add the adjacent positions to the wavefront if they are not placed
             foreach (Vector3Int adjacentPosition in adjacentPositions)
