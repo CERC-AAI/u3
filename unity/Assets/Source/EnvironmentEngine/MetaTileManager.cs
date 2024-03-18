@@ -133,7 +133,46 @@ public class MetatileManager : EnvironmentComponent
         public List<List<int>> mValidFaceTypes = new List<List<int>>();
         public Dictionary<Metatile, bool> mValidMetatileList = new Dictionary<Metatile, bool>();
 
-        public EnvironmentTileState(List<Metatile> metatiles)
+        public int CheckBoundaryTile(Vector3Int position, MetatileManager metatileManager, Tile.FACETYPE face)
+        {
+
+            Debug.Log($"{position}, face = {face}");
+            switch ( face )
+            {
+                case Tile.FACETYPE.TOP:
+                    // Code for handling top boundary
+                    if (position.y == mHeight - 1)
+                        return 0;
+                    break;
+                case Tile.FACETYPE.BOTTOM:
+                    // Code for handling bottom boundary
+                    if (position.y == 0)
+                        return 1;
+                    break;
+                case Tile.FACETYPE.LEFT:
+                    if ( position.x == 0)
+                        return 2;
+                    break;
+                case Tile.FACETYPE.RIGHT:
+                    if (position.x == mLength - 1)
+                        return 3;
+                    break;
+                case Tile.FACETYPE.FRONT:
+                    if ( position.z == 0)
+                        return 4;
+                    break;
+                case Tile.FACETYPE.BACK:
+                    if (position.z == mWidth - 1)
+                        return 5;
+                    break;;
+                default:
+                    // Code to handle any other case not explicitly handled above
+                    return -1;     
+            }
+            return -1;
+        }
+
+         public EnvironmentTileState(List<Metatile> metatiles, Vector3Int position, MetatileManager metatileManager)
         {
             if (metatiles.Count > 0)
             {
@@ -152,7 +191,9 @@ public class MetatileManager : EnvironmentComponent
                 for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
                 {
                     mValidFaceTypes.Add(new List<int>());
-                    mValidFaceTypes[(int)i] = metatiles[0].parent.palette.GetPossibleConnections(-1);
+                    int tileType = CheckBoundaryTile(position, metatileManager, i);
+
+                    mValidFaceTypes[(int)i] = metatiles[0].parent.palette.GetPossibleConnections(tileType);
                 }
             }
         }
@@ -430,7 +471,7 @@ public class MetatileManager : EnvironmentComponent
             {
                 for (int k = 0; k < environment.GetLength(2); k++)
                 {
-                    environment[i, j, k] = new EnvironmentTileState(mMetatileList);
+                    environment[i, j, k] = new EnvironmentTileState(mMetatileList, new Vector3Int(i, j, k), metatileManager);
                 }
             }
         }
