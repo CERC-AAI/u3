@@ -34,10 +34,10 @@ public class TrialManager
     }
 
     public int trialCounter = 0;
-    public int maxTrials = 10;
+    public int maxTrials = 3;
     InitialAgentState agentState = new InitialAgentState();
     List<InitialProductionRuleObjectState> productionRuleObjectStates = new List<InitialProductionRuleObjectState>();
-    public int TrialResetUpdateFrequency = 500;
+    public int TrialResetUpdateFrequency = 2000;
     public int trialDurationCounter = 0;
 
     public void SaveInitialState(U3DPlayer player, List<ProductionRuleObject> productionRuleObjects)

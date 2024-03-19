@@ -201,6 +201,10 @@ public class ProductionRuleManager : EnvironmentComponent
         {
             StartNewTrial();
         }
+        else if (trialManager.IsMaxTrials())
+        {
+            Debug.Log("Max trials reached");
+        }
     }
 
     private void StartNewTrial()
