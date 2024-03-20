@@ -42,6 +42,7 @@ public class ProductionRuleGraph : MonoBehaviour
 
     Node currentNode; // points to the current state of the environment
 
+
     [Serializable]
     public class Node
     {
@@ -51,6 +52,8 @@ public class ProductionRuleGraph : MonoBehaviour
         public List<Node> parents;
         public List<ProductionRuleIdentifier> state;
     }
+
+    public List<Node> graphNodes;
 
     public List<ProductionRule> GetCurrentProductionRules()
     {
@@ -68,8 +71,6 @@ public class ProductionRuleGraph : MonoBehaviour
             currentNode = currentNode.children[childNodeIndex];
         }
     }
-
-    public List<Node> graphNodes;
 
     public void BuildProductionRuleGraph(List<ProductionRuleIdentifier> rootState, int numStates = 10, int numRules = 3)
     {
@@ -115,6 +116,80 @@ public class ProductionRuleGraph : MonoBehaviour
         graphNodes = nodes;
     }
 
+    public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState, int numRules)
+    {
+        List<ProductionRule> productionRules = new List<ProductionRule>();
+        List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
+        for (int i = 0; i < numRules; i++)
+        {
+            List<ProductionRuleIdentifier> currentState = UnityEngine.Random.Range(0, stateSpace.Count) == 0 ? initialState : stateSpace[UnityEngine.Random.Range(0, stateSpace.Count)];
+            ProductionRule productionRule = SampleForwardRule(currentState);
+
+            int numTries = 0;
+            while (OverlapsWithExistingProductionRules(productionRule, productionRules) && numTries < 10)
+            {
+                productionRule = SampleForwardRule(currentState);
+                numTries++;
+            }
+            if (numTries == 10)
+            {
+                Debug.Log("Could not sample a production rule that does not overlap with existing production rules");
+                break;
+            }
+
+            if (i - numRules == 1)
+            {
+                // Make sure there is a reward in the last production rule
+                productionRule.actions[0].action = Action.REWARD;
+            }
+
+            productionRules.Add(productionRule);
+            List<ProductionRuleIdentifier> nextState = GetNextState(currentState, productionRule);
+            stateSpace.Add(nextState);
+
+        }
+        return productionRules;
+    }
+
+    // TODO: Make sure that .Contains() works for ProductionRuleConditions
+    public bool OverlapsWithExistingProductionRules(ProductionRule productionRule, List<ProductionRule> productionRules)
+    {
+        bool productionRuleSubsumes = false;
+        bool productionRuleIsSubsumed = false;
+        // The conditions of the production rule must not subsume or be subsumed by the conditions of any existing production rules
+        foreach (ProductionRule existingProductionRule in productionRules)
+        {
+            // ProdRule A is subsumed by ProdRule B if the list of prod rule conditions of ProdRule A is a subset of the list of prod rule conditions of prodrule B
+            // ProdRule A subsumes ProdRule B if the list of prod rule conditions of ProdRule A is a superset of the list of prod rule conditions of prodrule B
+            // The productionRule can neither subsume nor be subsumed by any existing production rules
+            bool productionRuleSubsumesExistingProductionRule = true;
+            bool existingProductionRuleSubsumesProductionRule = true;
+            // First, check if the list of conditions of productionRule is a subset of the list of conditions of existingProductionRule
+            foreach (ProductionRuleCondition productionRuleCondition in productionRule.conditions)
+            {
+                if (!existingProductionRule.conditions.Contains(productionRuleCondition))
+                {
+                    productionRuleSubsumesExistingProductionRule = false;
+                    break;
+                }
+            }
+
+            // Next, check if the list of conditions of existingProductionRule is a subset of the list of conditions of productionRule
+            foreach (ProductionRuleCondition existingProductionRuleCondition in existingProductionRule.conditions)
+            {
+                if (!productionRule.conditions.Contains(existingProductionRuleCondition))
+                {
+                    existingProductionRuleSubsumesProductionRule = false;
+                    break;
+                }
+            }
+
+            productionRuleSubsumes = productionRuleSubsumes || productionRuleSubsumesExistingProductionRule;
+            productionRuleIsSubsumed = productionRuleIsSubsumed || existingProductionRuleSubsumesProductionRule;
+        }
+
+        return productionRuleSubsumes || productionRuleIsSubsumed;
+    }
 
     public List<ProductionRule> SampleForwardRules(List<ProductionRuleIdentifier> initialState, int numRules)
     {
@@ -308,21 +383,5 @@ public class ProductionRuleGraph : MonoBehaviour
         }
         return previousState;
     }
-
-    // public List<ProductionRule> SampleProductionRuleSet(List<ProductionRuleIdentifier> initialState, int numRules)
-    // {
-    //     List<ProductionRule> productionRules = new List<ProductionRule>();
-    //     List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
-    //     for (int i = 0; i < numRules; i++)
-    //     {
-    //         List<ProductionRuleIdentifier> currentState = UnityEngine.Random.Range(0, stateSpace.Count) == 0 ? initialState : stateSpace[UnityEngine.Random.Range(0, stateSpace.Count)];
-    //         ProductionRule productionRule = SampleForwardRule(currentState);
-    //         productionRules.Add(productionRule);
-    //         List<ProductionRuleIdentifier> nextState = GetNextState(currentState, productionRule);
-    //         stateSpace.Add(nextState);
-
-    //     }
-    //     return productionRules;
-    // }
 
 }
