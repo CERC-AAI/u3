@@ -17,7 +17,7 @@ public class MetatileManager : EnvironmentComponent
     public float voxelSize = 1;
 
     //TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK
-    public List<int> edgeTiles = new List<int> { 0, 2, 1, 4, 3, 5 };
+    public List<int> edgeTiles = new List<int> { 10, 2, 1, 4, 3, 5 };
     Dictionary<Tile.FACETYPE, int> boundaryTile  = new Dictionary<Tile.FACETYPE, int>();
     public enum ConfigurationValidity
     {
