@@ -203,7 +203,7 @@ public class ProductionRuleManager : EnvironmentComponent
         }
         else if (trialManager.IsMaxTrials())
         {
-            Debug.Log("Max trials reached");
+            //Debug.Log("Max trials reached");
         }
     }
 
@@ -281,8 +281,11 @@ public class ProductionRuleManager : EnvironmentComponent
 
     public void UpdateProductionRuleGraph(ProductionRule productionRule)
     {
-        productionRuleGraph.ForwardWalk(productionRule);
-        productionRules = productionRuleGraph.GetCurrentProductionRules();
+        if (productionRuleGraph)
+        {
+            productionRuleGraph.ForwardWalk(productionRule);
+            productionRules = productionRuleGraph.GetCurrentProductionRules();
+        }
     }
 
     public GameObject getPrefabFromName(string name)

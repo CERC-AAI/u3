@@ -74,7 +74,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     {
 
         CheckInitialized();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].CheckInitialized();
         }
@@ -106,7 +107,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     override public void RunStarted()
     {
         OnRunStarted();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].RunStarted();
         }
@@ -118,7 +120,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         mIsRunning = false;
 
         OnRunEnded();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].RunEnded();
         }
@@ -235,7 +238,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         mIsWaitingForActions = false;
 
         base.StepEnded();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].StepEnded();
         }
@@ -246,7 +250,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         mIsWaitingForActions = false;
 
         base.StepStarted();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].StepStarted();
         }
@@ -297,7 +302,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             if (!mIsWaitingForActions)
             {
                 OnObjectUpdate(deltaTime);
-                for (int i = 0; i < mEnvironmentObjects.Count; i++)
+                List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+                for (int i = 0; i < tempList.Count; i++)
                 {
                     mEnvironmentObjects[i].OnObjectUpdate(deltaTime);
                 }
@@ -313,7 +319,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                     //Fix the code here to be local to each environment
                     //KinematicCharacterController.KinematicCharacterSystem.LateUpdate();
                     OnObjectLateUpdate(deltaTime);
-                    for (int i = 0; i < mEnvironmentObjects.Count; i++)
+                    for (int i = 0; i < tempList.Count; i++)
                     {
                         mEnvironmentObjects[i].OnObjectLateUpdate(deltaTime);
                     }
@@ -334,9 +340,10 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         if (mIsRunning && !mIsWaitingForActions)
         {
             OnObjectFixedUpdate(GetFixedDeltaTime());
-            for (int i = 0; i < mEnvironmentObjects.Count; i++)
+            List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+            for (int i = 0; i < tempList.Count; i++)
             {
-                mEnvironmentObjects[i].OnObjectFixedUpdate(GetFixedDeltaTime());
+                tempList[i].OnObjectFixedUpdate(GetFixedDeltaTime());
             }
 
             mPhysicsScene.Simulate(GetFixedDeltaTime());
@@ -355,15 +362,16 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     public void CompleteFixedUpdate()
     {
         OnObjectLateFixedUpdate(GetFixedDeltaTime());
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
-            mEnvironmentObjects[i].OnObjectLateFixedUpdate(GetFixedDeltaTime());
+            tempList[i].OnObjectLateFixedUpdate(GetFixedDeltaTime());
         }
 
         OnObjectLateUpdate(mPhysicsQueuedUpdateDelta);
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        for (int i = 0; i < tempList.Count; i++)
         {
-            mEnvironmentObjects[i].OnObjectLateUpdate(mPhysicsQueuedUpdateDelta);
+            tempList[i].OnObjectLateUpdate(mPhysicsQueuedUpdateDelta);
         }
 
         OnFinalUpdate(mPhysicsQueuedUpdateDelta);
