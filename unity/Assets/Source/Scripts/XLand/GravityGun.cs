@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.TextCore;
 
 public class GravityGun : EnvironmentComponent
 {
@@ -51,11 +52,13 @@ public class GravityGun : EnvironmentComponent
         {
             mHadLeftClick = true;
             mHadRightClick = false;
+            getLeftMouseButton = false;
         }
         if (getRightMouseButton)
         {
             mHadRightClick = true;
             mHadLeftClick = false;
+            getRightMouseButton = false;
         }
 
         if (mHadRightClick)
@@ -74,9 +77,12 @@ public class GravityGun : EnvironmentComponent
         }
         if (mHadLeftClick)
         {
+            
+
             Debug.Log($"mHadLeftClick {Time.fixedTime}");
             if (heldObject == null)
             {
+                Debug.Log("Object PickedUp");
                 // Find the closest object with a rigidbody using a mouse raycast
                 Ray mouseRay = playerCamera.ScreenPointToRay(mousePosition);
                 RaycastHit hitInfo;
@@ -115,12 +121,15 @@ public class GravityGun : EnvironmentComponent
                 // Throw the held object away
                 Rigidbody tempHeldObject = heldObject;
                 heldObject.useGravity = true;  // Enable gravity
+             
                 heldObject.AddForce(playerCamera.transform.forward * throwingImpulse, ForceMode.Impulse);
                 heldObject = null;
-                // Debug.Log("Object thrown");
+      
+                Debug.Log("Object thrown");
                 ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
                 productionRuleManager.SendMessage("OnGravityGunThrow", tempHeldObject, SendMessageOptions.DontRequireReceiver);
                 productionRuleManager.SendMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);
+               
 
             }
         }
