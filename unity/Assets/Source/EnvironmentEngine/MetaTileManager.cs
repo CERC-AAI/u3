@@ -7,18 +7,20 @@ using System.Linq;
 using System;
 using UnityEngine;
 using NUnit.Framework.Constraints;
+using UnityEngine.UIElements;
 
 public class MetatileManager : EnvironmentComponent
 {
-    public static int mWidth = 10, mLength = 10, mHeight = 10;
+    public static int mWidth = 10, mLength = 10, mHeight = 5;
     public static int mManyMetatileCount = 2;
     public static int mMaxConfigurationCount = 20;
 
     public float voxelSize = 1;
 
     //TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK
+    [HideInInspector]
     public List<int> edgeTiles = new List<int> { 10, 2, 1, 4, 3, 5 };
-    Dictionary<Tile.FACETYPE, int> boundaryTile  = new Dictionary<Tile.FACETYPE, int>();
+    //Dictionary<Tile.FACETYPE, int> boundaryTile  = new Dictionary<Tile.FACETYPE, int>();
     public enum ConfigurationValidity
     {
         VALID,
@@ -129,7 +131,7 @@ public class MetatileManager : EnvironmentComponent
     {
         public Dictionary<Metatile, List<ConfigurationValidity>> mValidMetatiles = new Dictionary<Metatile, List<ConfigurationValidity>>();
         public Dictionary<Metatile, List<int>> mPutativeMetatileIndices = new Dictionary<Metatile, List<int>>();
-        public float mEntropy = -1;
+        //public float mEntropy = -1;
         public Tile mTile = null;
         public TileState mState = TileState.NotPlaced;
         public List<int> mFaceIndices = new List<int>() { -1, -1, -1, -1, -1, -1 };
@@ -139,7 +141,7 @@ public class MetatileManager : EnvironmentComponent
         public int CheckBoundaryTile(Vector3Int position, MetatileManager metatileManager,  Tile.FACETYPE face)
         {
 
-            Debug.Log($"{position}, face = {face}");
+            //Debug.Log($"{position}, face = {face}");
             switch ( face )
             {
                 case Tile.FACETYPE.TOP:
@@ -175,8 +177,27 @@ public class MetatileManager : EnvironmentComponent
             return -1;
         }
 
-         public EnvironmentTileState(List<Metatile> metatiles, Vector3Int position, MetatileManager metatileManager)
+        public EnvironmentTileState()
         {
+        }
+
+        public bool Initialize(List<Metatile> metatiles, Vector3Int position, MetatileManager metatileManager)
+        {
+            bool hadRestrictions = false;
+
+            for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
+            {
+                mValidFaceTypes.Add(new List<int>());
+                int tileType = CheckBoundaryTile(position, metatileManager, i);
+
+                mValidFaceTypes[(int)i] = metatiles[0].parent.palette.GetPossibleConnections(tileType);
+
+                if (tileType >= 0)
+                {
+                    hadRestrictions = true;
+                }
+            }
+
             if (metatiles.Count > 0)
             {
                 foreach (Metatile metatile in metatiles)
@@ -190,19 +211,13 @@ public class MetatileManager : EnvironmentComponent
                     }
                     mValidMetatileList[metatile] = true;
                 }
-
-                for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
-                {
-                    mValidFaceTypes.Add(new List<int>());
-                    int tileType = CheckBoundaryTile(position, metatileManager, i);
-
-                    mValidFaceTypes[(int)i] = metatiles[0].parent.palette.GetPossibleConnections(tileType);
-                }
             }
+
+            return hadRestrictions;
         }
     }
 
-    public EnvironmentTileState[,,] environment = new EnvironmentTileState[mWidth, mWidth, mWidth];
+    public EnvironmentTileState[,,] environment = new EnvironmentTileState[mWidth, mHeight, mLength];
 
     public class Wavefront
     {
@@ -295,6 +310,8 @@ public class MetatileManager : EnvironmentComponent
 
     public IEnumerator GenerateEnvironment(MetatilePool metatilepool)
     {
+        metatilepool.palette.Initialize();
+
         float startTime = Time.realtimeSinceStartup;
         mGeneratingEnvironment = true;
 
@@ -466,7 +483,10 @@ public class MetatileManager : EnvironmentComponent
         placedMetatiles.Clear();
         placedPayloads.Clear();
 
-        environment = new EnvironmentTileState[mWidth, mWidth, mWidth];
+        wavefront.entropies.Clear();
+        wavefront.positions.Clear();
+
+        environment = new EnvironmentTileState[mWidth, mHeight, mLength];
         //Intitalize tile arrays
         for (int i = 0; i < environment.GetLength(0); i++)
         {
@@ -474,15 +494,19 @@ public class MetatileManager : EnvironmentComponent
             {
                 for (int k = 0; k < environment.GetLength(2); k++)
                 {
-                    environment[i, j, k] = new EnvironmentTileState(mMetatileList, new Vector3Int(i, j, k), this);
+                    environment[i, j, k] = new EnvironmentTileState();
+
+                    if (environment[i, j, k].Initialize(mMetatileList, new Vector3Int(i, j, k), this))
+                    {
+                        AddToWavefront(new Vector3Int(i, j, k));
+                    }
                 }
             }
         }
 
-        wavefront.entropies.Clear();
-        wavefront.positions.Clear();
-
         metatilepool.ResetDynamicWeight();
+
+        CollapseWaveFunction();
     }
 
     private void InitializeMetatileList(MetatilePool metatilepool)
@@ -508,7 +532,7 @@ public class MetatileManager : EnvironmentComponent
         // The position is selected from the wavefront
         // If the wavefront is empty, select a random empty position
         // There might already be pre-placed metatiles
-        if (placedMetatiles.Count == 0)
+        if (wavefront.positions.Count == 0)
         {
             List<Vector3Int> emptyPositions = GetEmptyPositions();
 
@@ -529,7 +553,12 @@ public class MetatileManager : EnvironmentComponent
             }
 
             float minEntropyValue = wavefront.entropies.Min();
-            int minEntropyIndex = wavefront.entropies.IndexOf(minEntropyValue);
+            int startPoint = UnityEngine.Random.Range(0, wavefront.entropies.Count);
+            int minEntropyIndex = wavefront.entropies.IndexOf(minEntropyValue, startPoint);
+            if (minEntropyIndex < 0)
+            {
+                minEntropyIndex = wavefront.entropies.IndexOf(minEntropyValue, 0);
+            }
             Vector3Int minEntropyPosition = wavefront.positions[minEntropyIndex];
 
             // select the position with the minimum entropy value
@@ -665,7 +694,7 @@ public class MetatileManager : EnvironmentComponent
         // If we have a VALID index it's in the first index
 
         mUseIndicies.Clear();
-        if (potentialConfigurations.Count > mMaxConfigurationCount)
+        if (potentialConfigurations.Count < mMaxConfigurationCount)
         {
             int i = 0;
             for (i = 0; i < mMaxConfigurationCount; i++)
@@ -865,21 +894,26 @@ public class MetatileManager : EnvironmentComponent
             // add the adjacent positions to the wavefront if they are not placed
             foreach (Vector3Int adjacentPosition in adjacentPositions)
             {
-                if (environment[adjacentPosition.x, adjacentPosition.y, adjacentPosition.z].mState == TileState.NotPlaced)
-                {
-                    // update the tile state
-                    environment[adjacentPosition.x, adjacentPosition.y, adjacentPosition.z].mState = TileState.Wavefront;
-
-                    // add the position to the wavefront.positions list
-                    wavefront.positions.Add(adjacentPosition);
-
-                    // add the entropy to the wavefront.entropies list
-                    wavefront.entropies.Add(-1);
-                }
+                AddToWavefront(adjacentPosition);
             }
         }
 
 
+    }
+
+    void AddToWavefront(Vector3Int position)
+    {
+        if (environment[position.x, position.y, position.z].mState == TileState.NotPlaced)
+        {
+            // update the tile state
+            environment[position.x, position.y, position.z].mState = TileState.Wavefront;
+
+            // add the position to the wavefront.positions list
+            wavefront.positions.Add(position);
+
+            // add the entropy to the wavefront.entropies list
+            wavefront.entropies.Add(-1);
+        }
     }
 
     public void CollapseWaveFunction()
@@ -1152,7 +1186,7 @@ public class MetatileManager : EnvironmentComponent
             }
         }
 
-        return CountValidMetatiles(wavefrontPosition) * 10000 - (faceWeight + 0.001f);
+        return CountValidMetatiles(wavefrontPosition) * 10000 - (faceWeight + 0.001f) + wavefrontPosition.y * 100000;
 
     }
 

@@ -130,6 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: Assets/Resources/GameObjects/XLand/ProductionRuleObject.prefab
 --- !u!114 &1675973669787005215
 MonoBehaviour:

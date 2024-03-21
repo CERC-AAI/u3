@@ -112,6 +112,20 @@ public class TileFacePalette : MonoBehaviour
             }
         }
 
-        return mPossibleFaces[tileFace];
+        try
+        {
+            return mPossibleFaces[tileFace];
+
+        }
+        catch
+        {
+            throw new Exception("Bad face type.");
+        }
+    }
+
+    public void Initialize()
+    {
+        mAllFaces = new List<int>();
+        mPossibleFaces = new List<List<int>>();
     }
 }

@@ -44,6 +44,12 @@ public class MetatilePool : IMetatileContainer
 
     public void GetWeightedMetatiles(float weight, List<MetatileProbability> deepCopy)
     {
+        float totalWeight = 0;
+        for (int i = 0; i < metatileProbabilities.Count; i++)
+        {
+            totalWeight += metatileProbabilities[i].GetDynamicWeight();
+        }
+
         int depth_count = 0;
         for (int i = 0; i < metatileProbabilities.Count; i++)
         {
@@ -52,7 +58,7 @@ public class MetatilePool : IMetatileContainer
                 //Debug.Log("is Metatile");
                 MetatileProbability metatileprobability = new MetatileProbability();
                 metatileprobability.metatileContainer = metatileProbabilities[i].metatileContainer;
-                metatileprobability.SetDynamicWeight(metatileProbabilities[i].GetDynamicWeight() * weight);
+                metatileprobability.SetDynamicWeight(metatileProbabilities[i].GetDynamicWeight() / totalWeight * weight);
                 deepCopy.Add(metatileprobability);
             }
             else if (metatileProbabilities[i].metatileContainer is MetatilePool)
@@ -66,7 +72,7 @@ public class MetatilePool : IMetatileContainer
                 //Debug.Log("Type: " + metatileProbabilities[i].metatileProbability.GetType());
                 MetatilePool metatilepool = (MetatilePool)metatileProbabilities[i].metatileContainer;
                 //Debug.Log("metatilepool: " + metatilepool);
-                metatilepool.GetWeightedMetatiles(metatileProbabilities[i].GetDynamicWeight() * weight, deepCopy);
+                metatilepool.GetWeightedMetatiles(metatileProbabilities[i].GetDynamicWeight() / totalWeight * weight, deepCopy);
             }
 
             else

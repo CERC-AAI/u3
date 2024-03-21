@@ -49,8 +49,8 @@ public class TileFacePaletteEditor : Editor
             float topIndent = colorSize;
             int margin = 1;
 
-            string environmentString = "Placed faces";
-            string incomingString = "Incoming faces";
+            string environmentString = "";// "Placed faces";
+            string incomingString = "";//"Incoming faces";
 
             GUIStyle boldStyle = new GUIStyle(GUI.skin.label);
             boldStyle.fontStyle = FontStyle.Bold;

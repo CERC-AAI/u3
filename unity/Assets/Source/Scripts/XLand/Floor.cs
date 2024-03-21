@@ -22,8 +22,8 @@ public class Floor : MonoBehaviour
 
     void Update()
     {
-        float finalX = radiusX + .5f;
-        float finalY = radiusY + .5f;
+        float finalX = radiusX;
+        float finalY = radiusY;
 
         floor.localScale = new Vector3(finalX / 15.0f, 1, finalY / 16.0f);
         left.localPosition = new Vector3(finalY + edgeSize/2, 0, 0);
@@ -36,7 +36,7 @@ public class Floor : MonoBehaviour
         bottom.localScale = new Vector3(edgeSize, 0.02f, finalY * 2 + edgeSize * 2);
 
         material.mainTextureScale = new Vector2(finalX / 15.0f, finalY / 16.0f);
-        transform.localPosition = new Vector3(radiusX, -0.5f, radiusY);
+        transform.localPosition = new Vector3(radiusX - 0.5f, -0.5f, radiusY - 0.5f);
 
     }
 }

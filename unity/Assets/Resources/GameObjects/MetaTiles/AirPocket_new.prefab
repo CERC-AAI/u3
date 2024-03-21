@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faceIDs: 090000000000000000000000000000000000000000000000
+  faceIDs: 000000000000000000000000000000000000000000000000
 --- !u!1 &1643914372912117477
 GameObject:
   m_ObjectHideFlags: 0
@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faceIDs: 090000000000000000000000000000000000000000000000
+  faceIDs: 000000000000000000000000000000000000000000000000
 --- !u!1 &1899270602412230280
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,7 +484,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faceIDs: 090000000000000000000000000000000000000000000000
+  faceIDs: 000000000000000000000000000000000000000000000000
 --- !u!1 &6004469384907916407
 GameObject:
   m_ObjectHideFlags: 0
@@ -529,7 +529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faceIDs: 090000000000000000000000000000000000000000000000
+  faceIDs: 000000000000000000000000000000000000000000000000
 --- !u!1 &6552369819736916210
 GameObject:
   m_ObjectHideFlags: 0
@@ -576,7 +576,7 @@ GameObject:
   - component: {fileID: 6861995534644777487}
   - component: {fileID: 100174510953274016}
   m_Layer: 0
-  m_Name: AirPocket
+  m_Name: AirPocket_new
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -597,7 +597,7 @@ Transform:
   - {fileID: 371776409249493707}
   - {fileID: 9164566216550528723}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &100174510953274016
 MonoBehaviour:
@@ -611,7 +611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ccdb70b07f7a847b03eeae7ec5ad17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 4368192324598907990, guid: f49107dc9e4fa6e4382dac87214619eb, type: 3}
+  parent: {fileID: 0}
   tiles:
   - {fileID: 9108343275664428418}
   - {fileID: 5564808967243947448}

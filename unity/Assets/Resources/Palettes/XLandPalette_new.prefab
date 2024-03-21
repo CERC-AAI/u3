@@ -1,0 +1,133 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1815725709665706310
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1153103851100550116}
+  - component: {fileID: -6947243484448938200}
+  m_Layer: 0
+  m_Name: XLandPalette_new
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1153103851100550116
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815725709665706310}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-6947243484448938200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815725709665706310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eb530db6c2993c418d4ec6fde9723f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  voxelSize: 1
+  tileFaces:
+  - color: {r: 0.4745098, g: 0.972549, b: 1, a: 1}
+    name: Air
+    weight: 0
+  - color: {r: 0.3584906, g: 0.18379787, b: 0.07271271, a: 1}
+    name: Ground
+    weight: 1
+  - color: {r: 0, g: 0, b: 0, a: 1}
+    name: Bedrock
+    weight: 100
+  - color: {r: 1, g: 0.042735044, b: 0, a: 1}
+    name: Surface
+    weight: 1000
+  - color: {r: 1, g: 0.81793004, b: 0.10849059, a: 1}
+    name: InsideEdge
+    weight: 10
+  - color: {r: 0.109803915, g: 1, b: 0.114245236, a: 1}
+    name: RampTop
+    weight: 1000
+  - color: {r: 0.08624065, g: 0.3584906, b: 0.087439984, a: 1}
+    name: RampBottom
+    weight: 100
+  matchingMatrix:
+  - mIncoming: 0
+    mPlaced: 0
+    mWeight: 1
+  - mIncoming: 0
+    mPlaced: 1
+    mWeight: 1
+  - mIncoming: 0
+    mPlaced: 3
+    mWeight: 0.05
+  - mIncoming: 0
+    mPlaced: 5
+    mWeight: 0.5
+  - mIncoming: 1
+    mPlaced: 1
+    mWeight: 2
+  - mIncoming: 1
+    mPlaced: 2
+    mWeight: 1
+  - mIncoming: 1
+    mPlaced: 3
+    mWeight: 1
+  - mIncoming: 1
+    mPlaced: 4
+    mWeight: 1
+  - mIncoming: 1
+    mPlaced: 5
+    mWeight: 0.5
+  - mIncoming: 1
+    mPlaced: 6
+    mWeight: 0.5
+  - mIncoming: 2
+    mPlaced: 2
+    mWeight: 1
+  - mIncoming: 2
+    mPlaced: 3
+    mWeight: 2
+  - mIncoming: 2
+    mPlaced: 4
+    mWeight: 1
+  - mIncoming: 3
+    mPlaced: 3
+    mWeight: 1
+  - mIncoming: 3
+    mPlaced: 4
+    mWeight: 1
+  - mIncoming: 3
+    mPlaced: 5
+    mWeight: 0.5
+  - mIncoming: 3
+    mPlaced: 6
+    mWeight: 0.5
+  - mIncoming: 4
+    mPlaced: 4
+    mWeight: 10
+  - mIncoming: 4
+    mPlaced: 5
+    mWeight: 0.5
+  - mIncoming: 4
+    mPlaced: 6
+    mWeight: 0.5
+  - mIncoming: 5
+    mPlaced: 6
+    mWeight: 1

@@ -4,8 +4,8 @@ using System;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(Tile))]
-public class TileEditor : Editor
+[CustomEditor(typeof(MetatileManager))]
+public class MetatileManagerEditor : Editor
 {
     static bool isOpen = true;
 
@@ -15,49 +15,50 @@ public class TileEditor : Editor
 
         DrawDefaultInspector();
 
-        Tile selectedTile = (Tile)target;
+        MetatileManager selectedManager = (MetatileManager)target;
 
         List<int> edgeIDs = new List<int>();
 
-        SerializedProperty serializedProperty = serializedObject.FindProperty("faceIDs").Copy();
+        SerializedProperty serializedProperty = serializedObject.FindProperty("edgeTiles").Copy();
 
-        if (serializedProperty.isArray && selectedTile.GetMetatile() != null)
+        if (serializedProperty.isArray && selectedManager.metatilepool != null)
         {
-            List<TileFace> faces = selectedTile.GetMetatile().GetPalette().tileFaces;
+            List<TileFace> faces = selectedManager.metatilepool.palette.tileFaces;
 
-            string[] faceOptions = new string[faces.Count];
+            string[] faceOptions = new string[faces.Count + 1];
+            faceOptions[0] = "Any"; //Any
             for (int i = 0; i < faces.Count; i++)
             {
-                faceOptions[i] = faces[i].name;
+                faceOptions[i + 1] = faces[i].name;
             }
 
             serializedProperty.Next(true);
             serializedProperty.Next(true);
             serializedProperty.Next(true);
 
-            isOpen = EditorGUILayout.Foldout(isOpen, "Face IDs");
+            isOpen = EditorGUILayout.Foldout(isOpen, "Boundary faces");
 
             if (isOpen)
             {
-                for (int i = 0; i < selectedTile.faceIDs.Length; i++)
+                for (int i = 0; i < selectedManager.edgeTiles.Count; i++)
                 {
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.PrefixLabel($"{((Tile.FACETYPE)i).ToString()}: ");
-                    int index = EditorGUILayout.Popup(selectedTile.faceIDs[i], faceOptions);
+                    int index = EditorGUILayout.Popup(selectedManager.edgeTiles[i] + 1, faceOptions) - 1;
                     EditorGUILayout.Space(20);
                     Rect colorRect = GUILayoutUtility.GetLastRect();
                     colorRect.width -= 2;
                     colorRect.height -= 2;
                     Color color = Color.white;
-                    if (selectedTile.faceIDs[i] < faces.Count)
+                    if (selectedManager.edgeTiles[i] >= 0 && selectedManager.edgeTiles[i] < faces.Count)
                     {
-                        color = faces[selectedTile.faceIDs[i]].color;
+                        color = faces[selectedManager.edgeTiles[i]].color;
                     }
                     EditorGUI.DrawRect(colorRect, color);
                     EditorGUILayout.EndHorizontal();
 
                     serializedProperty.intValue = (int)index;
-                    if (i < selectedTile.faceIDs.Length)
+                    if (i < selectedManager.edgeTiles.Count)
                     {
                         serializedProperty.Next(false);
                     }

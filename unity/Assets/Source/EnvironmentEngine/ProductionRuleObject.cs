@@ -78,7 +78,7 @@ public class ProductionRuleObject : EnvironmentComponent
         mCurrentDisplayObject.transform.parent = this.transform;
         mCurrentDisplayObject.transform.localPosition = Vector3.zero;
         // Ref the prefab, grab the renderer, set the color
-        Debug.Log("Setting color to: " + ProductionRuleIdentifier.colorDict[color]);
+        //Debug.Log("Setting color to: " + ProductionRuleIdentifier.colorDict[color]);
         mCurrentDisplayObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
     }
 

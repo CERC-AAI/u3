@@ -8,7 +8,7 @@ public class Tile : MonoBehaviour
 {
     // TODO: rename to face?
     // TODO: reorder?
-    public enum FACETYPE { TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK };
+    public enum FACETYPE { ANY = -1, TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK };
     [HideInInspector]
     // TODO: are we not using faceIDs anymore?
     public int[] faceIDs = new int[6]; // 6 edges for a cube
@@ -133,74 +133,77 @@ public class Tile : MonoBehaviour
             Vector3 size = Vector3.zero;
 
             int faceID = faceIDs[(int)i];
-            TileFace faceData = parentMetatile.GetPalette().tileFaces[faceID];
-            switch (i)
+            if (faceID < parentMetatile.GetPalette().tileFaces.Count)
             {
-                case FACETYPE.TOP:
-                    if (parentMetatile.HasTile(thisPosition + new Vector3Int(0, 1, 0)))
-                    {
+                TileFace faceData = parentMetatile.GetPalette().tileFaces[faceID];
+                switch (i)
+                {
+                    case FACETYPE.TOP:
+                        if (parentMetatile.HasTile(thisPosition + new Vector3Int(0, 1, 0)))
+                        {
+                            break;
+                        }
+
+                        color = faceData.color;
+                        position = transform.position + transform.rotation * new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                        size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
                         break;
-                    }
 
-                    color = faceData.color;
-                    position = transform.position + transform.rotation * new Vector3(0, voxelSize / 2 * 1.01f, 0);
-                    size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
-                    break;
+                    case FACETYPE.BOTTOM:
+                        if (parentMetatile.HasTile(thisPosition - new Vector3Int(0, 1, 0)))
+                        {
+                            break;
+                        }
 
-                case FACETYPE.BOTTOM:
-                    if (parentMetatile.HasTile(thisPosition - new Vector3Int(0, 1, 0)))
-                    {
+                        color = faceData.color;
+                        position = transform.position - transform.rotation * new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                        size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
                         break;
-                    }
 
-                    color = faceData.color;
-                    position = transform.position - transform.rotation * new Vector3(0, voxelSize / 2 * 1.01f, 0);
-                    size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
-                    break;
+                    case FACETYPE.LEFT:
+                        if (parentMetatile.HasTile(thisPosition - new Vector3Int(1, 0, 0)))
+                        {
+                            break;
+                        }
 
-                case FACETYPE.LEFT:
-                    if (parentMetatile.HasTile(thisPosition - new Vector3Int(1, 0, 0)))
-                    {
+                        color = faceData.color;
+                        position = transform.position - transform.rotation * new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                        size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
                         break;
-                    }
 
-                    color = faceData.color;
-                    position = transform.position - transform.rotation * new Vector3(voxelSize / 2 * 1.01f, 0, 0);
-                    size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
-                    break;
+                    case FACETYPE.RIGHT:
+                        if (parentMetatile.HasTile(thisPosition + new Vector3Int(1, 0, 0)))
+                        {
+                            break;
+                        }
 
-                case FACETYPE.RIGHT:
-                    if (parentMetatile.HasTile(thisPosition + new Vector3Int(1, 0, 0)))
-                    {
+                        color = faceData.color;
+                        position = transform.position + transform.rotation * new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                        size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
                         break;
-                    }
 
-                    color = faceData.color;
-                    position = transform.position + transform.rotation * new Vector3(voxelSize / 2 * 1.01f, 0, 0);
-                    size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
-                    break;
+                    case FACETYPE.FRONT:
+                        if (parentMetatile.HasTile(thisPosition - new Vector3Int(0, 0, 1)))
+                        {
+                            break;
+                        }
 
-                case FACETYPE.FRONT:
-                    if (parentMetatile.HasTile(thisPosition - new Vector3Int(0, 0, 1)))
-                    {
+                        color = faceData.color;
+                        position = transform.position - transform.rotation * new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                        size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
                         break;
-                    }
 
-                    color = faceData.color;
-                    position = transform.position - transform.rotation * new Vector3(0, 0, voxelSize / 2 * 1.01f);
-                    size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
-                    break;
+                    case FACETYPE.BACK:
+                        if (parentMetatile.HasTile(thisPosition + new Vector3Int(0, 0, 1)))
+                        {
+                            break;
+                        }
 
-                case FACETYPE.BACK:
-                    if (parentMetatile.HasTile(thisPosition + new Vector3Int(0, 0, 1)))
-                    {
+                        color = faceData.color;
+                        position = transform.position + transform.rotation * new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                        size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
                         break;
-                    }
-
-                    color = faceData.color;
-                    position = transform.position + transform.rotation * new Vector3(0, 0, voxelSize / 2 * 1.01f);
-                    size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
-                    break;
+                }
             }
 
             colors.Add(color);
