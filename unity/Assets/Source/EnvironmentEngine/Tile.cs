@@ -8,6 +8,8 @@ public class Tile : MonoBehaviour
 {
     // TODO: rename to face?
     // TODO: reorder?
+
+    public string tileType = "";
     public enum FACETYPE { ANY = -1, TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK };
     [HideInInspector]
     // TODO: are we not using faceIDs anymore?

@@ -17,7 +17,7 @@ public class EnvironmentTile : MonoBehaviour
                 };
 
 
-    void Start()
+    public void OnTilePlaced()
     {       
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
 

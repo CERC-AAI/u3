@@ -245,6 +245,13 @@ public class Metatile : IMetatileContainer
             {
                 payloadCopy.transform.localScale = new Vector3(1, -1, 1);
             }
+
+            EnvironmentTile[] placedTiles = payloadCopy.GetComponentsInChildren<EnvironmentTile>();
+
+            for (int i = 0; i < placedTiles.Length; i++)
+            {
+                placedTiles[i].OnTilePlaced();
+            }
         }
 
         if (debug)

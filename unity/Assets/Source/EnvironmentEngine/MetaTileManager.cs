@@ -134,6 +134,7 @@ public class MetatileManager : EnvironmentComponent
         //public float mEntropy = -1;
         public Tile mTile = null;
         public TileState mState = TileState.NotPlaced;
+        public string mTileType = "";
         public List<int> mFaceIndices = new List<int>() { -1, -1, -1, -1, -1, -1 };
         public List<List<int>> mValidFaceTypes = new List<List<int>>();
         public Dictionary<Metatile, bool> mValidMetatileList = new Dictionary<Metatile, bool>();
@@ -887,6 +888,7 @@ public class MetatileManager : EnvironmentComponent
 
             // update the tile state
             environment[envX, envY, envZ].mState = TileState.Placed;
+            environment[envX, envY, envZ].mTileType = tile.tileType;
 
             // add the neighbors of the tile to the wavefront if their tile state is not placed
             List<Vector3Int> adjacentPositions = GetAdjacentPositions(new Vector3Int(envX, envY, envZ));
