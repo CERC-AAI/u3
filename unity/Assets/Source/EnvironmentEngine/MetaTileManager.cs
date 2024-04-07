@@ -264,7 +264,7 @@ public class MetatileManager : EnvironmentComponent
     public TileState[,,] tileState = new TileState[mWidth, mHeight, mLength];
 
     public bool timelapse = false;
-    public bool DEBUG = false;
+    public bool DEBUG = true;
     public Transform debugTile;
     public bool mGeneratingEnvironment = false;
 
@@ -790,7 +790,7 @@ public class MetatileManager : EnvironmentComponent
             //Debug.Log($"Tile face {tile.faceIDs[0]}");
             SetFaceList(new Vector3Int(envX, envY, envZ), tempIDs, DEBUG);
 
-            if (DEBUG)
+            if (DEBUG || true )
             {
                 //Draw each face
                 for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
@@ -1281,7 +1281,7 @@ public class MetatileManager : EnvironmentComponent
         SetFace(new Vector3Int(position.x, position.y, position.z - 1), Tile.FACETYPE.BACK, faceList[(int)Tile.FACETYPE.FRONT]);
         SetFace(new Vector3Int(position.x, position.y, position.z + 1), Tile.FACETYPE.FRONT, faceList[(int)Tile.FACETYPE.BACK]);
 
-        /*if (debug)
+        if (debug)
         {
             Debug.Log($"Placed faces {position}:");
             Debug.Log($"    Top: {GetFaceName(faceList[(int)Tile.FACETYPE.TOP])}");
@@ -1290,7 +1290,7 @@ public class MetatileManager : EnvironmentComponent
             Debug.Log($"    Right: {GetFaceName(faceList[(int)Tile.FACETYPE.RIGHT])}");
             Debug.Log($"    Front: {GetFaceName(faceList[(int)Tile.FACETYPE.FRONT])}");
             Debug.Log($"    Back: {GetFaceName(faceList[(int)Tile.FACETYPE.BACK])}");
-        }*/
+        }
 
     }
 
