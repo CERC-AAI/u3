@@ -22,6 +22,7 @@ public class MetatilePoolEditor : Editor
             for (int i = 0; i < selectedMetatilePool.metatileProbabilities.Count; i++)
             {
                 selectedMetatilePool.metatileProbabilities[i].metatileContainer.parent = selectedMetatilePool;
+                EditorUtility.SetDirty(selectedMetatilePool.metatileProbabilities[i].metatileContainer);
             }
 
             EditorUtility.SetDirty(selectedMetatilePool);

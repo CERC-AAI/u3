@@ -263,6 +263,9 @@ public class MetatileManager : EnvironmentComponent
     public enum TileState { NotPlaced, Wavefront, Placed };
     public TileState[,,] tileState = new TileState[mWidth, mHeight, mLength];
 
+    public int[,] heightMap = new int[mWidth, mLength];
+
+    Vector3Int maxHeight;
     public bool timelapse = false;
     public bool DEBUG = false;
     public Transform debugTile;
@@ -309,6 +312,31 @@ public class MetatileManager : EnvironmentComponent
         }
     }
 
+    public void CalculateHeightMap()
+    {
+        for (int x = 0; x < environment.GetLength(0); x++)
+        {
+            for (int z = 0; z < environment.GetLength(2); z++)
+            {
+                for (int y = environment.GetLength(1) - 1; y >= 0; y-- )
+                {
+                    if ( environment[x,y,z].mTileType.ToLower() != "empty" )
+                    {
+                        heightMap[x , z] = y;
+                        Debug.Log( $"Height Map for {x} {z} = {y}, tiletype = {environment[x,y,z].mTileType}");
+                        if ( y > maxHeight.y )
+                        {
+                            maxHeight.x = x;
+                            maxHeight.y = y;
+                            maxHeight.z = z;
+                        }
+                        break;
+                        
+                    }
+                }
+            }
+        } 
+    }
     public IEnumerator GenerateEnvironment(MetatilePool metatilepool)
     {
         metatilepool.palette.Initialize();
@@ -450,6 +478,13 @@ public class MetatileManager : EnvironmentComponent
 
         //mGeneratingEnvironment = false;
         Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to generate.");
+
+        //Calculate the heightmap for environment.
+        CalculateHeightMap();
+
+        Debug.Log($" Max Height is at coordinate {maxHeight.x}{maxHeight.z} = {maxHeight.y}");
+
+        //Graph Builder
     }
 
     private static MetatileConfigurationWeights DrawMetaTileWithConfiguration(List<MetatileConfigurationWeights> metatileConfigurationWeights)
@@ -790,7 +825,7 @@ public class MetatileManager : EnvironmentComponent
             //Debug.Log($"Tile face {tile.faceIDs[0]}");
             SetFaceList(new Vector3Int(envX, envY, envZ), tempIDs, DEBUG);
 
-            if (DEBUG)
+            if ( DEBUG ) //Display Debug Tiles 
             {
                 //Draw each face
                 for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
@@ -1281,7 +1316,7 @@ public class MetatileManager : EnvironmentComponent
         SetFace(new Vector3Int(position.x, position.y, position.z - 1), Tile.FACETYPE.BACK, faceList[(int)Tile.FACETYPE.FRONT]);
         SetFace(new Vector3Int(position.x, position.y, position.z + 1), Tile.FACETYPE.FRONT, faceList[(int)Tile.FACETYPE.BACK]);
 
-        /*if (debug)
+        if (debug)
         {
             Debug.Log($"Placed faces {position}:");
             Debug.Log($"    Top: {GetFaceName(faceList[(int)Tile.FACETYPE.TOP])}");
@@ -1290,7 +1325,7 @@ public class MetatileManager : EnvironmentComponent
             Debug.Log($"    Right: {GetFaceName(faceList[(int)Tile.FACETYPE.RIGHT])}");
             Debug.Log($"    Front: {GetFaceName(faceList[(int)Tile.FACETYPE.FRONT])}");
             Debug.Log($"    Back: {GetFaceName(faceList[(int)Tile.FACETYPE.BACK])}");
-        }*/
+        }
 
     }
 

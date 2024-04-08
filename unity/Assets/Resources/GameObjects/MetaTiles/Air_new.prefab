@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: empty
   faceIDs: 000000000000000000000000000000000000000000000000
 --- !u!1 &4953736298549603606
 GameObject:
@@ -155,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ccdb70b07f7a847b03eeae7ec5ad17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 4368192324598907990, guid: 8b0660a070f5b0f4392930fa36439313, type: 3}
+  parent: {fileID: 4368192324598907990, guid: 2e7beea980661274f85903aaccd40da9, type: 3}
   tiles:
   - {fileID: 4897082361660504531}
   payload: {fileID: 371776409249493707}

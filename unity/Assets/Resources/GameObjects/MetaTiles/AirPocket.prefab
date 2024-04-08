@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: empty
   faceIDs: 090000000000000000000000000000000000000000000000
 --- !u!1 &1643914372912117477
 GameObject:
@@ -194,6 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: empty
   faceIDs: 090000000000000000000000000000000000000000000000
 --- !u!1 &1899270602412230280
 GameObject:
@@ -484,6 +486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: empty
   faceIDs: 090000000000000000000000000000000000000000000000
 --- !u!1 &6004469384907916407
 GameObject:
@@ -529,6 +532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: empty
   faceIDs: 090000000000000000000000000000000000000000000000
 --- !u!1 &6552369819736916210
 GameObject:
@@ -597,7 +601,7 @@ Transform:
   - {fileID: 371776409249493707}
   - {fileID: 9164566216550528723}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &100174510953274016
 MonoBehaviour:

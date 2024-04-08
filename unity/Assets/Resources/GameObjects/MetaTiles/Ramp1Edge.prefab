@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: solid
   faceIDs: 050000000200000004000000010000000100000001000000
 --- !u!1 &350346599431376113
 GameObject:
@@ -89,6 +90,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: empty
   faceIDs: 000000000200000000000000000000000000000000000000
 --- !u!1 &945556581709770165
 GameObject:
@@ -134,6 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: solid
   faceIDs: 030000000200000001000000010000000100000001000000
 --- !u!1 &1233992618134932621
 GameObject:
@@ -179,6 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: empty
   faceIDs: 000000000000000000000000000000000000000000000000
 --- !u!1 &1782619420806427960
 GameObject:
@@ -224,6 +228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: empty
   faceIDs: 000000000000000000000000000000000000000000000000
 --- !u!1 &2526858017913330949
 GameObject:
@@ -269,6 +274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: solid
   faceIDs: 030000000200000001000000010000000100000001000000
 --- !u!1 &4448140023607712244
 GameObject:
@@ -314,6 +320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: ramp
   faceIDs: 000000000600000001000000010000000100000001000000
 --- !u!1 &4782072366629366078
 GameObject:
@@ -359,6 +366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: solid
   faceIDs: 050000000200000004000000010000000100000001000000
 --- !u!1 &6552369819736916210
 GameObject:
@@ -443,7 +451,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ccdb70b07f7a847b03eeae7ec5ad17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 4368192324598907990, guid: 8b0660a070f5b0f4392930fa36439313, type: 3}
+  parent: {fileID: 4368192324598907990, guid: 2e7beea980661274f85903aaccd40da9, type: 3}
   tiles:
   - {fileID: 2499566853283043604}
   - {fileID: 8489554429050307374}
@@ -502,6 +510,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: ramp
   faceIDs: 000000000600000001000000010000000100000001000000
 --- !u!1 &7552926363554527522
 GameObject:
