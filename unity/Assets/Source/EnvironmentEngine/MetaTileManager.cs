@@ -402,10 +402,13 @@ public class MetatileManager : EnvironmentComponent
         int z = node2.z;
         if( CheckNonEmpty( environment[ x, y, z ].mTileType.ToLower() ) )
         {
-
-            AddEdge( node1, node2 );
-
-            AddEdge( node2, node2 );
+            // Need to check if its not blocked
+            // for simplicity
+            if( !CheckNonEmpty( environment[x, y+1, z].mTileType.ToLower() ))
+            {
+                AddEdge( node1, node2 );
+                AddEdge( node2, node2 );
+            }
         }
         else
         {
@@ -434,7 +437,10 @@ public class MetatileManager : EnvironmentComponent
         int[] skip_cases_node1 = new int[] {0, 0, 0, 0};
         int[] skip_cases_node2 = new int[] {0, 0, 0, 0};
 
-        //unity not working..... so need to check cases.
+        // pos z, negative x // back left
+        // pos z, pos x //
+        // neg z, pos x
+        // neg z, neg z
 
         if ( getTileName( node1 ) == "corner" )
         {
@@ -448,7 +454,8 @@ public class MetatileManager : EnvironmentComponent
 
         if (skip_cases_node1[0] == 0 && skip_cases_node2[0] == 0) // front_left
         {
-
+            // node2 = new Vector3Int( Math.Max( x - 1, 0), height, Math.Max(z - 1, 0) );
+            // AddEdgeIfRequired( currentNode, node2 );
         }
 
         if( skip_cases_node1[1] == 0 && skip_cases_node2[1] == 0 ) // front right
