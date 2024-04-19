@@ -182,7 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileType: Empty
+  tileType: corner
   faceIDs: 000000000200000000000000000000000000000000000000
 --- !u!1 &5472672506236868300
 GameObject:
