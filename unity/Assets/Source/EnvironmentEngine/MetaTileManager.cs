@@ -269,7 +269,8 @@ public class MetatileManager : EnvironmentComponent
     HashSet<Vector3Int> SeenNodes;
     Queue<Vector3Int> nodeQueue = new Queue<Vector3Int>();
 
-    
+    HashSet<Vector2Int> seenNodes2d;
+    Queue<Vector2Int> nodeQueue2d = new Queue<Vector2Int>();
 
     Vector3Int maxHeight;
     public bool timelapse = false;
@@ -327,7 +328,6 @@ public class MetatileManager : EnvironmentComponent
                     if ( environment[x,y,z].mTileType.ToLower() != "empty" )
                     {
                         heightMap[x , z] = y;
-                        Debug.Log( $"Height Map for {x} {z} = {y}, tiletype = {environment[x,y,z].mTileType}");
                         if ( y > maxHeight.y )
                         {
                             maxHeight.x = x;
@@ -381,6 +381,9 @@ public class MetatileManager : EnvironmentComponent
         float y_rotate = tile.transform.rotation.y;
         // 4 cases, 0, 90, 180, 270
         int node2_y = key.y  - 1;
+        if ( node2_y < 0 ) {
+            return;
+        }
         // 0 , 1, 2, 3
         // positive x, neg z, neg x, positive z
         int[] x_cases_changes = new int[] { 1, 0, -1, 0 };
@@ -390,6 +393,10 @@ public class MetatileManager : EnvironmentComponent
         int node2_z = key.z + z_cases_changes[Mathf.RoundToInt(y_rotate / 90f)];
         
         Vector3Int node2 = new Vector3Int(node2_x, node2_y, node2_z );
+        if ( !SeenNodes.Contains( node2 ) )
+        {
+            return;
+        }
         AddEdge( key, node2 );
         AddEdge( node2, key );
 
@@ -400,11 +407,17 @@ public class MetatileManager : EnvironmentComponent
         int x = node2.x;
         int y = node2.y;
         int z = node2.z;
+        Debug.Log($"Coord: {x} {y} {z}");
+        if ( !SeenNodes.Contains( node2 ) )
+        {   
+            return; 
+        }
+
         if( CheckNonEmpty( environment[ x, y, z ].mTileType.ToLower() ) )
         {
             // Need to check if its not blocked
             // for simplicity
-            if( !CheckNonEmpty( environment[x, y+1, z].mTileType.ToLower() ))
+            if( !CheckNonEmpty( environment[x, Math.Min( y+1,environment.GetLength(1) - 1 ) , z].mTileType.ToLower() ))
             {
                 AddEdge( node1, node2 );
                 AddEdge( node2, node2 );
@@ -425,6 +438,31 @@ public class MetatileManager : EnvironmentComponent
     {
         return environment[ node.x, node.y, node.z ].mTileType.ToLower();
     }
+
+    void PrettyPrintEdges()
+    {   
+        if (Edges.Count == 0)
+        {
+            Debug.Log("No edges are available in the graph.");
+        }
+        else
+        {
+           
+            foreach (KeyValuePair<Vector3Int, HashSet<Vector3Int>> entry in Edges)
+            {
+                string edgesList = "";
+                foreach (Vector3Int edge in entry.Value)
+                {
+                    edgesList += edge.ToString() + ", ";
+                }
+                if (edgesList.Length > 0)
+                {
+                    edgesList = edgesList.Remove(edgesList.Length - 2); // Remove the last ", "
+                }
+                Debug.Log($"Node {entry.Key} is connected to: [{edgesList}] with {entry.Value.Count} connections.");
+            }
+        }
+    } 
 
     public void DiagonalCheckAndAddEdge( Vector3Int node1, Vector3Int node2 )
     {   
@@ -480,13 +518,11 @@ public class MetatileManager : EnvironmentComponent
         int x = currentNode.x;
         int height = currentNode.y;
         int z = currentNode.z; 
-
         // Need to consider corner case
         // without rotation corner skips positive z negative x
-
-        Debug.Log( environment[ x, height, Math.Min( z + 1, environment.GetLength(2) ) ].mTile.transform.rotation );
                 // front
-        Vector3Int node2 = new Vector3Int( x, height, Math.Min( z + 1, environment.GetLength(2) ) );
+        Debug.Log($"Coord Pre: {x} {height} {z}");
+        Vector3Int node2 = new Vector3Int( x, height, Math.Min( z + 1, environment.GetLength(2) - 1 ) );
         AddEdgeIfRequired( currentNode, node2 );
 
         // back
@@ -498,7 +534,7 @@ public class MetatileManager : EnvironmentComponent
         AddEdgeIfRequired( currentNode, node2 );
 
         // right
-        node2 = new Vector3Int( Math.Min( x + 1, environment.GetLength(0) ), height, z );
+        node2 = new Vector3Int( Math.Min( x + 1, environment.GetLength(0) - 1 ), height, z );
         AddEdgeIfRequired( currentNode, node2 );
 
         //front left
@@ -506,7 +542,7 @@ public class MetatileManager : EnvironmentComponent
         AddEdgeIfRequired( currentNode, node2 );
 
         // front-right
-        node2 =  new Vector3Int(  Math.Min( x + 1, environment.GetLength(0) ), height, Math.Max(z - 1, 0 ) );
+        node2 =  new Vector3Int(  Math.Min( x + 1, environment.GetLength(0) - 1 ), height, Math.Max(z - 1, 0 ) );
         AddEdgeIfRequired( currentNode, node2 );
 
         // back-left
@@ -514,7 +550,7 @@ public class MetatileManager : EnvironmentComponent
         AddEdgeIfRequired( currentNode, node2 );
         
         // back right
-        node2 = new Vector3Int( Math.Min( x + 1, environment.GetLength(0) ), height, Math.Max( z - 1, 0) );
+        node2 = new Vector3Int( Math.Min( x + 1, environment.GetLength(0) - 1 ), height, Math.Max( z - 1, 0) );
         AddEdgeIfRequired( currentNode, node2 );
 
         // down-left
@@ -530,7 +566,10 @@ public class MetatileManager : EnvironmentComponent
         if ( !SeenNodes.Contains( startNode ) )
         {
             SeenNodes.Add( startNode );
-            nodeQueue.Enqueue(startNode); // Enqueue the starting node
+            nodeQueue.Enqueue(startNode); // Enqueue the starting node   
+        }
+        else {
+            return;
         }
     
         while (nodeQueue.Count > 0)
@@ -550,30 +589,29 @@ public class MetatileManager : EnvironmentComponent
         {
             for( int z = 0; z < environment.GetLength(2); z++ )
             {   
+                Debug.Log($"Starting Search at {x}{z}");
                 // Check 
                 int height = heightMap[ x, z ];
-
                 Vector3Int key = new Vector3Int( x, height , z );
-
                 bfs( key );
-             
-                // for( int y = 0; y < environment.GetLength(1); y++ )
-                // {
-                //     // if its empty
-                    
-                //     values.Add(new Vector3Int( Math.Max( x - 1, 0 ),y , z ) );
-                //     values.Add(new Vector3Int( Math.Min( x + 1, environment.GetLength(0) - 1 ), y , z ) );
-                //     values.Add(new Vector3Int( x , y , Math.Max( z - 1, 0) ) );
-                //     values.Add(new Vector3Int( x, y , Math.Min( z + 1, environment.GetLength(2 ) ) ) );
-                    
-                //     //Add Up Tiles if it is Ramp
-                    
-                //     Edges[ key ] = values;
-                // }
             }
         }
 
     }
+    // public void create2dGraph()
+    // {
+    //     SeenNodes2d = new HashSet<Vector2Int>();
+    //     for( int x = 0; x < environment.GetLength(0); x++ )
+    //     {
+    //         for( int z = 0; z < environment.GetLength(2); z++ )
+    //         {   
+    //             // Check 
+    //             int height = heightMap[ x, z ];
+    //             Vector2Int key = new Vector2Int( x, z );
+    //             bfs2d( key );
+    //         }
+    //     } 
+    // }
 
     public IEnumerator GenerateEnvironment(MetatilePool metatilepool)
     {
@@ -724,6 +762,8 @@ public class MetatileManager : EnvironmentComponent
 
         //Graph Builder
         CreateGraph();
+        PrettyPrintEdges();
+        Debug.Log( "Abra Dabra");
     }
 
     private static MetatileConfigurationWeights DrawMetaTileWithConfiguration(List<MetatileConfigurationWeights> metatileConfigurationWeights)
