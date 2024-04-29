@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
+using UnityEditor.ShaderGraph.Legacy;
 
 
 public class MetatileManager : EnvironmentComponent
@@ -408,7 +409,7 @@ public class MetatileManager : EnvironmentComponent
         int y = node2.y;
         int z = node2.z;
         Debug.Log($"Coord: {x} {y} {z}");
-        if ( !SeenNodes.Contains( node2 ) )
+        if ( !SeenNodes.Contains( node2 ) || node1 == node2 )
         {   
             return; 
         }
