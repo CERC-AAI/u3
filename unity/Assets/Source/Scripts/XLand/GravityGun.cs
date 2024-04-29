@@ -5,7 +5,9 @@ public class GravityGun : EnvironmentComponent
 {
 
     [Header("Inputs")]
+    [ACTION]
     bool getLeftMouseButton;
+    [ACTION]
     bool getRightMouseButton;
     Vector3 mousePosition;
 
