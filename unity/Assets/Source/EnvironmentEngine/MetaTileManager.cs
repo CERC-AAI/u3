@@ -749,7 +749,6 @@ public class MetatileManager : EnvironmentComponent
 
     private void InitializeEnvironment()
     {
-
         foreach (Transform payload in placedPayloads)
         {
             returnObjectToPool(payload.gameObject);

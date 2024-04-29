@@ -56,14 +56,14 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     public float mouseLookAxisUp;
     [ACTION]
     public float mouseLookAxisRight;
-    [ACTION]
+    //[ACTION]
     public float scrollInput;
 
     [ACTION]
     public float MoveAxisForward;
     [ACTION]
     public float MoveAxisRight;
-    [ACTION]
+    //[ACTION]
     public bool JumpDown;
     [ACTION]
     public bool CrouchDown;
