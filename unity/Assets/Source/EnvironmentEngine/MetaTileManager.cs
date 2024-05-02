@@ -274,10 +274,10 @@ public class MetatileManager : EnvironmentComponent
 
     public int[,] heightMap;
 
-    Dictionary<Vector3Int, HashSet<Vector3Int>> Edges = new Dictionary<Vector3Int, HashSet<Vector3Int>>();
+    Dictionary<Vector2Int, HashSet<Vector2Int>> Edges = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
 
-    HashSet<Vector3Int> SeenNodes;
-    Queue<Vector3Int> nodeQueue = new Queue<Vector3Int>();
+    HashSet<Vector2Int> SeenNodes;
+    Queue<Vector2Int> nodeQueue = new Queue<Vector2Int>();
 
     HashSet<Vector2Int> seenNodes2d;
     Queue<Vector2Int> nodeQueue2d = new Queue<Vector2Int>();
@@ -381,15 +381,19 @@ public class MetatileManager : EnvironmentComponent
     }
 
 // need to add it to nodeQueue and need to check if it has been visited before 
-    public void AddEdge( Vector3Int key, Vector3Int value )
+    public void AddEdge( Vector2Int key, Vector2Int value )
     {
+        if ( key == value ) {
+            return;
+        }
+        
         if (Edges.ContainsKey( key ))
         {
             Edges[ key ].Add( value );
         }
         else
         {
-            HashSet<Vector3Int> values = new HashSet<Vector3Int>();
+            HashSet<Vector2Int> values = new HashSet<Vector2Int>();
             values.Add( value );
             Edges[ key ] = values;
         }
@@ -402,7 +406,7 @@ public class MetatileManager : EnvironmentComponent
 
     }
 
-    public void AddNodesIfRamp( Vector3Int key, Tile tile )
+    public void AddNodesIfRamp( Vector2Int key, Tile tile )
     {
         float y_rotate = tile.transform.rotation.y;
         // 4 cases, 0, 90, 180, 270
@@ -416,9 +420,9 @@ public class MetatileManager : EnvironmentComponent
         int[] z_cases_changes = new int[] { 0, -1, 0, 1 };
 
         int node2_x = key.x + x_cases_changes[Mathf.RoundToInt(y_rotate / 90f)];
-        int node2_z = key.z + z_cases_changes[Mathf.RoundToInt(y_rotate / 90f)];
+        int node2_z = key.y + z_cases_changes[Mathf.RoundToInt(y_rotate / 90f)];
         
-        Vector3Int node2 = new Vector3Int(node2_x, node2_y, node2_z );
+        Vector2Int node2 = new Vector2Int(node2_x, node2_z );
         if ( !SeenNodes.Contains( node2 ) )
         {
             return;
@@ -428,31 +432,32 @@ public class MetatileManager : EnvironmentComponent
 
     }
 
-    public void AddEdgeIfRequired( Vector3Int node1, Vector3Int node2 )
+    public void AddEdgeIfRequired( Vector2Int node1, Vector2Int node2 )
     {   
-        int x = node2.x;
-        int y = node2.y;
-        int z = node2.z;
-        Debug.Log($"Coord: {x} {y} {z}");
+        int x2 = node2.x;
+        int x1 = node1.x;
+        int z1 = node1.y;
+        //int y = node2.y;
+        int z2 = node2.y;
+        Debug.Log($"Coord: {x2} {z2}");
         if ( !SeenNodes.Contains( node2 ) || node1 == node2 )
         {   
             return; 
         }
 
-        if( CheckNonEmpty( environment[ x, y, z ].mTileType.ToLower() ) )
+        if( heightMap[ x2, z2 ] <= heightMap[ x1, z1 ] ) // Can walk flat and even down
         {
             // Need to check if its not blocked
             // for simplicity
-            if( !CheckNonEmpty( environment[x, Math.Min( y+1,environment.GetLength(1) - 1 ) , z].mTileType.ToLower() ))
-            {
-                AddEdge( node1, node2 );
-                AddEdge( node2, node2 );
-            }
-        }
-        else
-        {
             AddEdge( node1, node2 );
-        } 
+            AddEdge( node2, node2 );
+        }
+        // Need to consider if I need to check ramp here too. Most likely not
+
+        // else
+        // {
+        //     AddEdge( node1, node2 );
+        // } 
     }
 
     public Tile getTile( Vector3Int node )
@@ -473,11 +478,10 @@ public class MetatileManager : EnvironmentComponent
         }
         else
         {
-           
-            foreach (KeyValuePair<Vector3Int, HashSet<Vector3Int>> entry in Edges)
+            foreach (KeyValuePair<Vector2Int, HashSet<Vector2Int>> entry in Edges)
             {
                 string edgesList = "";
-                foreach (Vector3Int edge in entry.Value)
+                foreach (Vector2Int edge in entry.Value)
                 {
                     edgesList += edge.ToString() + ", ";
                 }
@@ -539,54 +543,54 @@ public class MetatileManager : EnvironmentComponent
 
     }
 
-    public void ExploreNeighbours( Vector3Int currentNode ) {
+    public void ExploreNeighbours( Vector2Int currentNode, int height ) {
 
         int x = currentNode.x;
-        int height = currentNode.y;
-        int z = currentNode.z; 
+        int z = currentNode.y; 
         // Need to consider corner case
         // without rotation corner skips positive z negative x
                 // front
-        Debug.Log($"Coord Pre: {x} {height} {z}");
-        Vector3Int node2 = new Vector3Int( x, height, Math.Min( z + 1, environment.GetLength(2) - 1 ) );
-        AddEdgeIfRequired( currentNode, node2 );
-
-        // back
-        node2 =  new Vector3Int( x, height, Math.Max( z - 1, 0) );
-        AddEdgeIfRequired( currentNode, node2 );
-
-        // left
-        node2 = new Vector3Int( Math.Max(x - 1,0), height, z );
-        AddEdgeIfRequired( currentNode, node2 );
-
-        // right
-        node2 = new Vector3Int( Math.Min( x + 1, environment.GetLength(0) - 1 ), height, z );
-        AddEdgeIfRequired( currentNode, node2 );
-
-        //front left
-        node2 = new Vector3Int( Math.Max( x - 1, 0), height, Math.Max(z - 1, 0) );
-        AddEdgeIfRequired( currentNode, node2 );
-
-        // front-right
-        node2 =  new Vector3Int(  Math.Min( x + 1, environment.GetLength(0) - 1 ), height, Math.Max(z - 1, 0 ) );
-        AddEdgeIfRequired( currentNode, node2 );
-
-        // back-left
-        node2 = new Vector3Int( Math.Max( x - 1,0), height, Math.Max( z - 1, 0 ) );
-        AddEdgeIfRequired( currentNode, node2 );
-        
-        // back right
-        node2 = new Vector3Int( Math.Min( x + 1, environment.GetLength(0) - 1 ), height, Math.Max( z - 1, 0) );
-        AddEdgeIfRequired( currentNode, node2 );
-
+        Debug.Log($"Coord Pre: {x} {z}");
         // down-left
         // Need to consider unrotated
         if ( environment[x, height, z].mTileType.ToLower() == "ramp" ) 
             AddNodesIfRamp(currentNode, environment[x, height, z].mTile );
             // Edges[ currentNode ].Add( new Vector3Int( Math.Min( x + 1, 0), height - 1, z) );
+        Vector2Int node2 = new Vector2Int( x, Math.Min( z + 1, environment.GetLength(2) - 1 ) );
+        AddEdgeIfRequired( currentNode, node2 );
+
+        // back
+        node2 =  new Vector2Int( x, Math.Max( z - 1, 0) );
+        AddEdgeIfRequired( currentNode, node2 );
+
+        // left
+        node2 = new Vector2Int( Math.Max(x - 1,0), z );
+        AddEdgeIfRequired( currentNode, node2 );
+
+        // right
+        node2 = new Vector2Int( Math.Min( x + 1, environment.GetLength(0) - 1 ),  z );
+        AddEdgeIfRequired( currentNode, node2 );
+
+        //front left
+        node2 = new Vector2Int( Math.Max( x - 1, 0), Math.Max(z - 1, 0) );
+        AddEdgeIfRequired( currentNode, node2 );
+
+        // front-right
+        node2 =  new Vector2Int(  Math.Min( x + 1, environment.GetLength(0) - 1 ),  Math.Max(z - 1, 0 ) );
+        AddEdgeIfRequired( currentNode, node2 );
+
+        // back-left
+        node2 = new Vector2Int( Math.Max( x - 1,0),  Math.Max( z - 1, 0 ) );
+        AddEdgeIfRequired( currentNode, node2 );
+        
+        // back right
+        node2 = new Vector2Int( Math.Min( x + 1, environment.GetLength(0) - 1 ),  Math.Max( z - 1, 0) );
+        AddEdgeIfRequired( currentNode, node2 );
+
+       
         
     }
-    public void bfs( Vector3Int startNode )
+    public void bfs( Vector2Int startNode, int height )
     {   
 
         if ( !SeenNodes.Contains( startNode ) )
@@ -600,17 +604,17 @@ public class MetatileManager : EnvironmentComponent
     
         while (nodeQueue.Count > 0)
         {
-            Vector3Int currentNode = nodeQueue.Dequeue(); // Dequeue the next node
+            Vector2Int currentNode = nodeQueue.Dequeue(); // Dequeue the next node
 
             // Add neighbors
-            ExploreNeighbours( currentNode );
+            ExploreNeighbours( currentNode, height );
         }
     }
 
     public void CreateGraph()
     {
         // Initialize by marking every tile except ramp at x = 0, z = 0 as 0
-        SeenNodes = new HashSet<Vector3Int>();
+        SeenNodes = new HashSet<Vector2Int>();
         for( int x = 0; x < environment.GetLength(0); x++ )
         {
             for( int z = 0; z < environment.GetLength(2); z++ )
@@ -618,8 +622,8 @@ public class MetatileManager : EnvironmentComponent
                 Debug.Log($"Starting Search at {x}{z}");
                 // Check 
                 int height = heightMap[ x, z ];
-                Vector3Int key = new Vector3Int( x, height , z );
-                bfs( key );
+                Vector2Int key = new Vector2Int( x, z );
+                bfs( key, height );
             }
         }
 
