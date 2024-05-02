@@ -7,59 +7,51 @@ using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 using Unity.Mathematics;
 
-public class TrialManager
+public class TrialManager : EnvironmentComponent
 {
-
-    public class InitialAgentState
+    public class ObjectState
     {
-        public Vector3 position;
-        public Quaternion rotation;
-        // public Vector3 velocity;
-        // public Vector3 angularVelocity;
-        public Vector3 cameraPosition;
-        public Quaternion cameraRotation;
-        public Vector3 cameraPlanarDirection;
-        public float cameraTargetDistance;
-    }
-
-    public class InitialProductionRuleObjectState
-    {
-        public string shape;
-        public string color;
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-        // public Vector3 velocity;
-        // public Vector3 angularVelocity;
+
+        public EnvironmentComponent saveObject;
     }
+
+    public EnvironmentCallback OnTrialOverCallbacks;
 
     public int trialCounter = 0;
+    [Tooltip("Total trials to use.")]
     public int maxTrials = 3;
-    InitialAgentState agentState = new InitialAgentState();
-    List<InitialProductionRuleObjectState> productionRuleObjectStates = new List<InitialProductionRuleObjectState>();
-    public int TrialResetUpdateFrequency = 2000;
-    public int trialDurationCounter = 0;
+    [Tooltip("Trial duration in seconds.")]
+    public float trialResetUpdateFrequency = 10.0f;
+    public float trialDurationCounter = 0;
 
-    public void SaveInitialState(U3DPlayer player, List<ProductionRuleObject> productionRuleObjects)
-    {
-        SaveAgentState(player);
-        SaveProductionRuleObjectStates(productionRuleObjects);
-    }
+    int mAgentCount = 0;
+    List<ObjectState> mObjectStates = new List<ObjectState>();
 
-    public InitialAgentState GetInitialAgentState()
-    {
-        return agentState;
-    }
 
-    public List<InitialProductionRuleObjectState> GetInitialProductionRuleObjectStates()
+    public override void OnRunStarted()
     {
-        return productionRuleObjectStates;
+        Debug.Log("TrialManager");
+
+        base.OnRunStarted();
+
+        EnvironmentComponent[] components = GetEngine().GetEnvironmentComponents();
+        for (int i = 0; i < components.Length; i++)
+        {
+            ObjectState objectState = components[i].SaveTrialData();
+
+            if (objectState != null)
+            {
+                mObjectStates.Add(objectState);
+            }
+        }
     }
 
     public bool IsTrialOver()
     {
-        trialDurationCounter++;
-        if (trialDurationCounter >= TrialResetUpdateFrequency)
+        if (trialDurationCounter >= trialResetUpdateFrequency)
         {
             return true;
         }
@@ -70,6 +62,7 @@ public class TrialManager
     {
         return trialCounter >= maxTrials;
     }
+
     public void IncrementTrialCounter()
     {
         trialCounter++;
@@ -80,38 +73,74 @@ public class TrialManager
         trialDurationCounter = 0;
     }
 
-    public void IncrementTrialDurationCounter()
+    public override void OnUpdate(float deltaTime)
     {
-        trialDurationCounter++;
-    }
-    public void SaveAgentState(U3DPlayer agent)
-    {
-        // Save the agent's position, rotation, velocity, angular velocity, etc.
-        // Save the agent's position, rotation, velocity, angular velocity, etc.
-        agentState.position = agent.transform.position;
-        agentState.rotation = agent.transform.rotation;
-        agentState.cameraPosition = agent.CharacterCamera.transform.position;
-        agentState.cameraRotation = agent.CharacterCamera.transform.rotation;
-        agentState.cameraPlanarDirection = agent.CharacterCamera.PlanarDirection;
-        agentState.cameraTargetDistance = agent.CharacterCamera.TargetDistance;
+        trialDurationCounter += deltaTime;
+        CheckTrial();
+
+        base.OnUpdate(deltaTime);
     }
 
-    public void SaveProductionRuleObjectStates(List<ProductionRuleObject> productionRuleObjects)
+    private void CheckTrial()
     {
-        // Save the ProductionRuleObject's position, rotation, velocity, angular velocity, etc.
-        // Save the ProductionRuleObject's position, rotation, velocity, angular velocity, etc.
-        foreach (ProductionRuleObject productionRuleObject in productionRuleObjects)
+        if (IsTrialOver())
         {
-            InitialProductionRuleObjectState productionRuleObjectState = new InitialProductionRuleObjectState
+            if (OnTrialOverCallbacks != null)
             {
-                shape = productionRuleObject.GetIdentifier().ObjectShape,
-                color = productionRuleObject.GetIdentifier().ObjectColor,
-                position = productionRuleObject.transform.position,
-                rotation = productionRuleObject.transform.rotation,
-                scale = productionRuleObject.transform.localScale
-            };
-            productionRuleObjectStates.Add(productionRuleObjectState);
+                OnTrialOverCallbacks();
+            }
+
+            if (!IsMaxTrials())
+            {
+                StartNewTrial();
+            }
+            else if (IsMaxTrials())
+            {
+                //Debug.Log("Max trials reached");
+            }
         }
     }
 
+    public void OnTrialOverCallback()
+    {
+
+    }
+
+    private void StartNewTrial()
+    {
+        IncrementTrialCounter();
+        ResetTrialDurationCounter();
+        ResetState();
+    }
+
+    public void ResetState()
+    {
+        foreach (ObjectState objectState in mObjectStates)
+        {
+            EnvironmentComponent resetObject = GetObject(objectState);
+
+            if (resetObject != null)
+            {
+                resetObject.LoadTrialData(objectState);
+            }
+        }
+    }
+
+    EnvironmentComponent GetObject(ObjectState objectState)
+    {
+        EnvironmentComponent resetObject = null;
+
+        // Create object is it's a prefab
+        if (objectState.saveObject.GetEngine() == null)
+        {
+            EnvironmentObject productionRuleEnvironmentObject = GetEngine().CreateEnvironmentObject(objectState.saveObject.gameObject);
+            resetObject = (EnvironmentComponent)productionRuleEnvironmentObject.GetComponent(objectState.saveObject.GetType());
+        }
+        else
+        {
+            resetObject = objectState.saveObject;
+        }
+
+        return resetObject;
+    }
 }

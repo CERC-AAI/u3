@@ -27,6 +27,10 @@ public class GravityGun : EnvironmentComponent
     bool mHadLeftClick = false;
     bool mHadRightClick = false;
 
+    public EnvironmentCallback<Rigidbody> OnGravityGunPickup;
+    public EnvironmentCallback<Rigidbody> OnGravityGunDrop;
+    public EnvironmentCallback<Rigidbody> OnGravityGunThrow;
+
     protected override void Start()
     {
         base.Start();
@@ -45,6 +49,27 @@ public class GravityGun : EnvironmentComponent
     public Rigidbody GetHeldObject()
     {
         return heldObject;
+    }
+
+    protected override void DoRegisterCallbacks()
+    {
+        TrialManager trialManager = GetEngine().GetEnvironmentComponent<TrialManager>();
+        if (trialManager)
+        {
+            RegisterCallback(ref trialManager.OnTrialOverCallbacks, OnTrialOver);
+        }
+
+        base.DoRegisterCallbacks();
+    }
+
+    void OnTrialOver()
+    {
+        if (heldObject != null)
+        {
+            Rigidbody tempHeldObject = heldObject;
+            heldObject.useGravity = true;  // Enable gravity
+            heldObject = null;
+        }
     }
 
     public override void OnFixedUpdate(float fixedDeltaTime)
@@ -70,8 +95,12 @@ public class GravityGun : EnvironmentComponent
                 heldObject.useGravity = true;  // Enable gravity
                 heldObject = null;
                 // Debug.Log("Dropped object");
-                ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
-                productionRuleManager.SendMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);
+                if (OnGravityGunDrop != null)
+                {
+                    OnGravityGunDrop(tempHeldObject);
+                }
+                //ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+                //productionRuleManager.SendMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);
             }
         }
         if (mHadLeftClick)
@@ -107,8 +136,12 @@ public class GravityGun : EnvironmentComponent
                     heldObject = closestObject;
                     heldObject.useGravity = false; // Disable gravity
                                                    // Debug.Log("Object picked up");
-                    ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
-                    productionRuleManager.SendMessage("OnGravityGunPickup", heldObject, SendMessageOptions.DontRequireReceiver);
+                    if (OnGravityGunPickup != null)
+                    {
+                        OnGravityGunPickup(heldObject);
+                    }
+                    //ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+                    //productionRuleManager.SendMessage("OnGravityGunPickup", heldObject, SendMessageOptions.DontRequireReceiver);
 
                 }
             }
@@ -117,12 +150,20 @@ public class GravityGun : EnvironmentComponent
                 // Throw the held object away
                 Rigidbody tempHeldObject = heldObject;
                 heldObject.useGravity = true;  // Enable gravity
-                heldObject.AddForce(playerCamera.transform.forward * throwingImpulse, ForceMode.Impulse);
+                heldObject.AddForce(playerCamera.transform.forward * throwingImpulse * heldObject.mass, ForceMode.Impulse);
                 heldObject = null;
                 // Debug.Log("Object thrown");
-                ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+                if (OnGravityGunThrow != null)
+                {
+                    OnGravityGunThrow(tempHeldObject);
+                }
+                if (OnGravityGunDrop != null)
+                {
+                    OnGravityGunDrop(tempHeldObject);
+                }
+                /*ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
                 productionRuleManager.SendMessage("OnGravityGunThrow", tempHeldObject, SendMessageOptions.DontRequireReceiver);
-                productionRuleManager.SendMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);
+                productionRuleManager.SendMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);*/
 
             }
         }
@@ -148,14 +189,14 @@ public class GravityGun : EnvironmentComponent
 
                     heldObject.AddForce(-heldObject.velocity * 0.2f, ForceMode.VelocityChange);
 
-                    heldObject.AddForce(forceDirection.normalized * forceMagnitude, ForceMode.Force);
+                    heldObject.AddForce(forceDirection.normalized * forceMagnitude * heldObject.mass, ForceMode.Force);
                 }
             }
             else
             {
                 heldObject.AddForce(-heldObject.velocity * 0.05f, ForceMode.VelocityChange);
 
-                heldObject.AddForce(forceDirection.normalized * forceMagnitude, ForceMode.Force);
+                heldObject.AddForce(forceDirection.normalized * forceMagnitude * heldObject.mass, ForceMode.Force);
             }
 
             heldObject.angularVelocity *= 0.99f;

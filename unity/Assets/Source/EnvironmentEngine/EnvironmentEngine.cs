@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using Unity.MLAgents;
+using UnityEditor.Rendering;
 
 
 public class EnvironmentEngine : EnvironmentComponentHolder
@@ -20,6 +21,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     // Private members
     protected List<EnvironmentObject> mEnvironmentObjects = new List<EnvironmentObject>();
+    protected List<EnvironmentComponent> mEnvironmentComponents = new List<EnvironmentComponent>();
     List<EnvironmentAgent> mActiveAgents = new List<EnvironmentAgent>();
     List<EnvironmentAgent> mDecisionRequests = new List<EnvironmentAgent>();
     List<EnvironmentAgent> mBlockingAgents = new List<EnvironmentAgent>();
@@ -47,6 +49,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     Dictionary<Type, EnvironmentObject> mCachedObjects = new Dictionary<Type, EnvironmentObject>();
     Dictionary<Type, EnvironmentComponent> mCachedComponents = new Dictionary<Type, EnvironmentComponent>();
+    Dictionary<Type, List<EnvironmentComponent>> mCachedComponentLists = new Dictionary<Type, List<EnvironmentComponent>>();
 
     protected JSONObject mGameEvents = new JSONObject();
 
@@ -523,6 +526,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             mEnvironmentObjects.Add(newObject);
             newObject.SetObjectID(mNextID++);
             mEnvironmentObjects.Sort(ComparePriority);
+
+            mEnvironmentComponents.AddRange(newObject.GetEnvironmentComponents());
         }
     }
 
@@ -530,8 +535,20 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     {
         if (mEnvironmentObjects.Contains(removeObject))
         {
+            if (removeObject != this)
+            {
+                EnvironmentComponent[] components = removeObject.GetEnvironmentComponents();
+                foreach (EnvironmentComponent component in components)
+                {
+                    mEnvironmentComponents.Remove(component);
+                }
+            }
             mEnvironmentObjects.Remove(removeObject);
         }
+    }
+    override public EnvironmentComponent[] GetEnvironmentComponents()
+    {
+        return mEnvironmentComponents.ToArray();
     }
 
     public void HadCollision(EnvironmentObject object1, EnvironmentObject object2)
@@ -653,11 +670,11 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         return null;
     }
 
-    public T GetCachedEnvironmentComponent<T>(string name = null) where T : EnvironmentComponent
+    public T GetCachedEnvironmentComponent<T>() where T : EnvironmentComponent
     {
         if (!mCachedComponents.ContainsKey(typeof(T)))
         {
-            mCachedComponents[typeof(T)] = GetEnvironmentComponent<T>(name);
+            mCachedComponents[typeof(T)] = GetEnvironmentComponent<T>(null);
         }
         return (T)mCachedComponents[typeof(T)];
     }
@@ -678,6 +695,21 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         }
 
         return null;
+    }
+
+    public List<T> GetEnvironmentComponents<T>(string name = null) where T : EnvironmentComponent
+    {
+        List<T> components = new List<T>();
+
+        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        {
+            if ((name == null || mEnvironmentObjects[i].name == name))
+            {
+                components.AddRange(mEnvironmentObjects[i].GetComponents<T>());
+            }
+        }
+
+        return components;
     }
 
     /*public void OnObjectMoved(EnvironmentObject movedObject)

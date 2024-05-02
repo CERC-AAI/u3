@@ -37,8 +37,10 @@ public class EnvironmentComponentHolder : EnvironmentComponent
         }
     }
 
-    public EnvironmentComponent[] GetEnvironmentComponents()
+    virtual public EnvironmentComponent[] GetEnvironmentComponents()
     {
+        CheckComponents();
+
         return (EnvironmentComponent[])mComponents.Clone();
     }
 

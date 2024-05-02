@@ -7,15 +7,22 @@ using System.Linq;
 using System;
 using UnityEngine;
 using UnityEditor.ShaderGraph.Legacy;
+using NUnit.Framework;
+using System.Reflection;
+using System.IO;
+using static MetaTile;
 
 
 public class MetatileManager : EnvironmentComponent
 {
-    public static int mWidth = 10, mLength = 10, mHeight = 5;
-    public static int mManyMetatileCount = 2;
-    public static int mMaxConfigurationCount = 20;
+    public int mWidth = 10, mLength = 10, mHeight = 5;
+    public int mManyMetatileCount = 2;
+    public int mMaxConfigurationCount = 20;
 
     public float voxelSize = 1;
+
+    public string saveFile = "";
+    public string loadFile = "";
 
     //TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK
     [HideInInspector]
@@ -129,15 +136,15 @@ public class MetatileManager : EnvironmentComponent
 
     public class EnvironmentTileState
     {
-        public Dictionary<Metatile, List<ConfigurationValidity>> mValidMetatiles = new Dictionary<Metatile, List<ConfigurationValidity>>();
-        public Dictionary<Metatile, List<int>> mPutativeMetatileIndices = new Dictionary<Metatile, List<int>>();
+        public Dictionary<MetaTile, List<ConfigurationValidity>> mValidMetatiles = new Dictionary<MetaTile, List<ConfigurationValidity>>();
+        public Dictionary<MetaTile, List<int>> mPutativeMetatileIndices = new Dictionary<MetaTile, List<int>>();
         //public float mEntropy = -1;
         public Tile mTile = null;
         public TileState mState = TileState.NotPlaced;
         public string mTileType = "";
         public List<int> mFaceIndices = new List<int>() { -1, -1, -1, -1, -1, -1 };
         public List<List<int>> mValidFaceTypes = new List<List<int>>();
-        public Dictionary<Metatile, bool> mValidMetatileList = new Dictionary<Metatile, bool>();
+        public Dictionary<MetaTile, bool> mValidMetatileList = new Dictionary<MetaTile, bool>();
 
         public int CheckBoundaryTile(Vector3Int position, MetatileManager metatileManager,  Tile.FACETYPE face)
         {
@@ -147,7 +154,7 @@ public class MetatileManager : EnvironmentComponent
             {
                 case Tile.FACETYPE.TOP:
                     // Code for handling top boundary
-                    if (position.y == mHeight - 1)
+                    if (position.y == metatileManager.mHeight - 1)
                         return metatileManager.edgeTiles[0];
                     break;
                 case Tile.FACETYPE.BOTTOM:
@@ -160,7 +167,7 @@ public class MetatileManager : EnvironmentComponent
                         return metatileManager.edgeTiles[2];
                     break;
                 case Tile.FACETYPE.RIGHT:
-                    if (position.x == mLength - 1)
+                    if (position.x == metatileManager.mLength - 1)
                         return metatileManager.edgeTiles[3];
                     break;
                 case Tile.FACETYPE.FRONT:
@@ -168,7 +175,7 @@ public class MetatileManager : EnvironmentComponent
                         return metatileManager.edgeTiles[4];
                     break;
                 case Tile.FACETYPE.BACK:
-                    if (position.z == mWidth - 1)
+                    if (position.z == metatileManager.mWidth - 1)
                         return metatileManager.edgeTiles[5];
                     break;;
                 default:
@@ -182,7 +189,7 @@ public class MetatileManager : EnvironmentComponent
         {
         }
 
-        public bool Initialize(List<Metatile> metatiles, Vector3Int position, MetatileManager metatileManager)
+        public bool Initialize(List<MetaTile> metatiles, Vector3Int position, MetatileManager metatileManager)
         {
             bool hadRestrictions = false;
 
@@ -201,7 +208,7 @@ public class MetatileManager : EnvironmentComponent
 
             if (metatiles.Count > 0)
             {
-                foreach (Metatile metatile in metatiles)
+                foreach (MetaTile metatile in metatiles)
                 {
                     mValidMetatiles[metatile] = new List<ConfigurationValidity>();
                     mPutativeMetatileIndices[metatile] = new List<int>();
@@ -218,7 +225,7 @@ public class MetatileManager : EnvironmentComponent
         }
     }
 
-    public EnvironmentTileState[,,] environment = new EnvironmentTileState[mWidth, mHeight, mLength];
+    public EnvironmentTileState[,,] environment;
 
     public class Wavefront
     {
@@ -230,17 +237,19 @@ public class MetatileManager : EnvironmentComponent
 
     public class placedMetatile
     {
-        public Metatile metatile;
+        public MetaTile metatile;
         public Vector3Int position;
         public Quaternion rotation;
+        public Orientation orientation;
         public bool flipped;
         public Transform payload;
 
-        public placedMetatile(Metatile metatile, Vector3Int position, Quaternion rotation, bool flipped)
+        public placedMetatile(MetaTile metatile, Vector3Int position, Quaternion rotation, Orientation orientation, bool flipped)
         {
             this.metatile = metatile;
             this.position = position;
             this.rotation = rotation;
+            this.orientation = orientation;
             this.flipped = flipped;
         }
 
@@ -256,14 +265,14 @@ public class MetatileManager : EnvironmentComponent
 
     public MetatilePool metatilepool;
 
-    private List<Metatile> mMetatileList = new List<Metatile>();
+    private List<MetaTile> mMetatileList = new List<MetaTile>();
 
     public List<Transform> placedPayloads = new List<Transform>();
 
     public enum TileState { NotPlaced, Wavefront, Placed };
-    public TileState[,,] tileState = new TileState[mWidth, mHeight, mLength];
+    public TileState[,,] tileState;
 
-    public int[,] heightMap = new int[mWidth, mLength];
+    public int[,] heightMap;
 
     Dictionary<Vector3Int, HashSet<Vector3Int>> Edges = new Dictionary<Vector3Int, HashSet<Vector3Int>>();
 
@@ -272,6 +281,8 @@ public class MetatileManager : EnvironmentComponent
 
     HashSet<Vector2Int> seenNodes2d;
     Queue<Vector2Int> nodeQueue2d = new Queue<Vector2Int>();
+
+    List<Vector3> mPermissibleSpawns = new List<Vector3>();
 
     Vector3Int maxHeight;
     public bool timelapse = false;
@@ -285,7 +296,7 @@ public class MetatileManager : EnvironmentComponent
 
     struct MetatileConfigurationWeights
     {
-        public Metatile metatile;
+        public MetaTile metatile;
         public int configurationIndex;
         public float weight;
     }
@@ -295,24 +306,38 @@ public class MetatileManager : EnvironmentComponent
     List<float> mFinalWeights = new List<float>();
     List<bool> mUseIndicies = new List<bool>();
 
-    public void Awake()
-    {
-
-        //Making this a coroutine enbales step by step debugging. This is not fast, and should be changed back at some point.
-        StartCoroutine(GenerateEnvironment(metatilepool));
-        //GenerateEnvironment(metatilepool);
-    }
-
     public override void OnRunStarted()
     {
-        Debug.Log("MetaTileManager");
+        Debug.Log("MetaTileManager"); 
+        
+        metatilepool.palette.Initialize();
+
+        InitializeMetatileList(metatilepool);
+        InitializeEnvironment();
+
+        if (loadFile != "")
+        {
+            float startTime = Time.realtimeSinceStartup;
+
+            LoadPayloads(loadFile);
+
+            Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to load.");
+
+            OnMapLoaded();
+        }
+        else
+        {
+            while (GenerateEnvironment(metatilepool).MoveNext())
+            {
+            }
+        }
 
         base.OnRunStarted();
     }
 
     public void Update()
     {
-        if (!mGeneratingEnvironment)
+        if (DEBUG && !mGeneratingEnvironment)
         {
             StartCoroutine(GenerateEnvironment(metatilepool));
         }
@@ -616,13 +641,13 @@ public class MetatileManager : EnvironmentComponent
 
     public IEnumerator GenerateEnvironment(MetatilePool metatilepool)
     {
-        metatilepool.palette.Initialize();
+        // Uncomment this for the same environment each time
+        //UnityEngine.Random.InitState(1);
 
-        float startTime = Time.realtimeSinceStartup;
+
         mGeneratingEnvironment = true;
 
-        InitializeMetatileList(metatilepool);
-        InitializeEnvironment();
+        float startTime = Time.realtimeSinceStartup;
         GameObject placementIndicator = InitializePlacementIndicator();
 
         MetatilePool.RESULTTYPE resultType = MetatilePool.RESULTTYPE.SUCCESS;
@@ -649,9 +674,9 @@ public class MetatileManager : EnvironmentComponent
 
             List<MetatileConfigurationWeights> metatileConfigurationWeights = new List<MetatileConfigurationWeights>();
 
-            foreach (KeyValuePair<Metatile, List<ConfigurationValidity>> pair in tileState.mValidMetatiles)
+            foreach (KeyValuePair<MetaTile, List<ConfigurationValidity>> pair in tileState.mValidMetatiles)
             {
-                Metatile metatile = pair.Key;
+                MetaTile metatile = pair.Key;
                 float metatileWeight = 0;
                 foreach (MetatileProbability metatileprobability in filteredMetatiles)
                 {
@@ -704,9 +729,9 @@ public class MetatileManager : EnvironmentComponent
             if (metatileConfigurationWeights.Count > 0)
             {
                 MetatileConfigurationWeights chosenMetatileConfiguration = DrawMetaTileWithConfiguration(metatileConfigurationWeights);
-                Metatile candidateMetatile = chosenMetatileConfiguration.metatile;
+                MetaTile candidateMetatile = chosenMetatileConfiguration.metatile;
                 int selectedConfigurationIndex = chosenMetatileConfiguration.configurationIndex;
-                Metatile.Configuration configuration = candidateMetatile.GetConfiguration(selectedConfigurationIndex);
+                MetaTile.Configuration configuration = candidateMetatile.GetConfiguration(selectedConfigurationIndex);
 
                 Quaternion rotation = OrientationToQuaternion[configuration.orientation];
                 Vector3Int rotatedOffset = RotateOffset(configuration);
@@ -714,7 +739,7 @@ public class MetatileManager : EnvironmentComponent
 
                 PlaceMetatile(candidateMetatile, mPlacementPosition, configuration);
                 CollapseWaveFunction();
-                placedMetatiles.Add(new placedMetatile(candidateMetatile, placementPositionOriginOffset, rotation, configuration.flipped));
+                placedMetatiles.Add(new placedMetatile(candidateMetatile, placementPositionOriginOffset, rotation, configuration.orientation, configuration.flipped));
 
                 resultType = MetatilePool.RESULTTYPE.SUCCESS;
 
@@ -756,6 +781,24 @@ public class MetatileManager : EnvironmentComponent
         //mGeneratingEnvironment = false;
         Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to generate.");
 
+        OnGenerationComplete();
+    }
+
+    //Returns a shallow copy
+    public List<Vector3> GetPermissibleSpawnLocations()
+    {
+        List<Vector3> SpawnLocations = new List<Vector3>(mPermissibleSpawns);
+
+        return SpawnLocations;
+    }
+
+    void OnGenerationComplete()
+    {
+        OnMapLoaded();
+    }
+
+    void OnMapLoaded()
+    {
         //Calculate the heightmap for environment.
         CalculateHeightMap();
 
@@ -764,7 +807,23 @@ public class MetatileManager : EnvironmentComponent
         //Graph Builder
         CreateGraph();
         PrettyPrintEdges();
-        Debug.Log( "Abra Dabra");
+        Debug.Log("Abra Dabra");
+
+        //TODO: Vedant, add code to populate this list
+        for (int x = 0; x < heightMap.GetLength(0); x++)
+        {
+            for (int z = 0; z < heightMap.GetLength(1); z++)
+            {
+                int height = heightMap[x, z];
+
+                EnvironmentTileState thisTile = environment[x, height, z];
+
+                if (thisTile.mTile != null)
+                {
+                    mPermissibleSpawns.Add(new Vector3(x, height, z) * voxelSize);// + new Vector3(0, voxelSize/2, 0));
+                }
+            }
+        }
     }
 
     private static MetatileConfigurationWeights DrawMetaTileWithConfiguration(List<MetatileConfigurationWeights> metatileConfigurationWeights)
@@ -826,8 +885,12 @@ public class MetatileManager : EnvironmentComponent
 
     private void InitializeMetatileList(MetatilePool metatilepool)
     {
+        environment = new EnvironmentTileState[mWidth, mHeight, mLength];
+        tileState = new TileState[mWidth, mHeight, mLength];
+        heightMap = new int[mWidth, mLength];
+
         mMetatileList = metatilepool.GetMetatiles();
-        mMetatileList.Sort((Metatile a, Metatile b) => a.GetConfigurations().Count.CompareTo(b.GetConfigurations().Count));
+        mMetatileList.Sort((MetaTile a, MetaTile b) => a.GetConfigurations().Count.CompareTo(b.GetConfigurations().Count));
     }
 
     private GameObject InitializePlacementIndicator()
@@ -902,7 +965,7 @@ public class MetatileManager : EnvironmentComponent
         EnvironmentTileState tileState = environment[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z];
 
         int validCount = 0;
-        foreach (Metatile metatile in tileState.mValidMetatiles.Keys)
+        foreach (MetaTile metatile in tileState.mValidMetatiles.Keys)
         {
             if (!tileState.mValidMetatileList[metatile])
             {
@@ -924,7 +987,7 @@ public class MetatileManager : EnvironmentComponent
             // If we have a VALID index it's in the first index
             if (validConfigurations[potentialConfigurations[0]] == ConfigurationValidity.VALID)
             {
-                Metatile.Configuration configTuple = metatile.GetConfiguration(potentialConfigurations[0]);
+                MetaTile.Configuration configTuple = metatile.GetConfiguration(potentialConfigurations[0]);
                 bool canPlace = CanPlaceMetatile(
                     wavefrontPosition, metatile, configTuple);
                 if (!canPlace)
@@ -944,7 +1007,7 @@ public class MetatileManager : EnvironmentComponent
                 {
                     if (validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.UNKNOWN)
                     {
-                        Metatile.Configuration configTuple = metatile.GetConfiguration(potentialConfigurations[i]);
+                        MetaTile.Configuration configTuple = metatile.GetConfiguration(potentialConfigurations[i]);
                         bool canPlace = CanPlaceMetatile(
                             wavefrontPosition, metatile, configTuple);
                         if (!canPlace)
@@ -982,7 +1045,7 @@ public class MetatileManager : EnvironmentComponent
 
     }
 
-    public List<float> CalculateMetatileConfigurationFaceWeights(Vector3Int wavefrontPosition, Metatile metatile)
+    public List<float> CalculateMetatileConfigurationFaceWeights(Vector3Int wavefrontPosition, MetaTile metatile)
     {
         // Recalculates the validity of all metatiles at a position
         EnvironmentTileState tileState = environment[wavefrontPosition.x, wavefrontPosition.y, wavefrontPosition.z];
@@ -1039,7 +1102,7 @@ public class MetatileManager : EnvironmentComponent
             if ((i == 0 || shouldUseConfiguration) && (validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.VALID || validConfigurations[potentialConfigurations[i]] == ConfigurationValidity.UNKNOWN))
             {
                 List<float> faceWeights = new List<float>();
-                Metatile.Configuration configTuple = metatile.GetConfiguration(potentialConfigurations[i]);
+                MetaTile.Configuration configTuple = metatile.GetConfiguration(potentialConfigurations[i]);
                 bool canPlace = CanPlaceMetatile(
                     wavefrontPosition, metatile, configTuple, faceWeights);
                 if (!canPlace)
@@ -1062,7 +1125,7 @@ public class MetatileManager : EnvironmentComponent
     }
 
 
-    public void PlaceMetatile(Metatile metatile, Vector3Int placementPosition, Metatile.Configuration configTuple)
+    public void PlaceMetatile(MetaTile metatile, Vector3Int placementPosition, MetaTile.Configuration configTuple)
     {
         //Debug.Log("placing metatile " + this.name);
 
@@ -1093,124 +1156,131 @@ public class MetatileManager : EnvironmentComponent
 
             environment[envX, envY, envZ].mTile = tile;
 
-            List<int> tempIDs = new List<int>();
-            for (int i = 0; i < permutation.Count && i < tile.faceIDs.Length; i++)
+
+            if (mGeneratingEnvironment)
             {
-                tempIDs.Add(tile.faceIDs[(int)permutation[i]]);
-            }
-
-            Vector3Int position = new Vector3Int(envX, envY, envZ);
-
-            //Debug.Log($"Tile face {tile.faceIDs[0]}");
-            SetFaceList(new Vector3Int(envX, envY, envZ), tempIDs, DEBUG);
-
-            if ( DEBUG ) //Display Debug Tiles 
-            {
-                //Draw each face
-                for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
+                List<int> tempIDs = new List<int>();
+                for (int i = 0; i < permutation.Count && i < tile.faceIDs.Length; i++)
                 {
-                    Color color = Color.clear;
-                    Vector3 facePosition = Vector3.zero;
-                    Vector3 size = Vector3.zero;
-                    string name = "";
-
-                    int faceID = tempIDs[(int)i];
-                    TileFace faceData = metatilepool.palette.tileFaces[faceID];
-                    switch (i)
-                    {
-                        case Tile.FACETYPE.TOP:
-                            color = faceData.color;
-                            facePosition = (Vector3)position + new Vector3(0, voxelSize / 2 * 1.01f, 0);
-                            size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
-                            name = $"{permutation[(int)i]}";
-                            break;
-
-                        case Tile.FACETYPE.BOTTOM:
-                            color = faceData.color;
-                            facePosition = (Vector3)position - new Vector3(0, voxelSize / 2 * 1.01f, 0);
-                            size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
-                            name = $"{permutation[(int)i]}";
-                            break;
-
-                        case Tile.FACETYPE.LEFT:
-                            color = faceData.color;
-                            facePosition = (Vector3)position - new Vector3(voxelSize / 2 * 1.01f, 0, 0);
-                            size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
-                            name = $"{permutation[(int)i]}";
-                            break;
-
-                        case Tile.FACETYPE.RIGHT:
-                            color = faceData.color;
-                            facePosition = (Vector3)position + new Vector3(voxelSize / 2 * 1.01f, 0, 0);
-                            size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
-                            name = $"{permutation[(int)i]}";
-                            break;
-
-                        case Tile.FACETYPE.FRONT:
-                            color = faceData.color;
-                            facePosition = (Vector3)position - new Vector3(0, 0, voxelSize / 2 * 1.01f);
-                            size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
-                            name = $"{permutation[(int)i]}";
-                            break;
-
-                        case Tile.FACETYPE.BACK:
-                            color = faceData.color;
-                            facePosition = (Vector3)position + new Vector3(0, 0, voxelSize / 2 * 1.01f);
-                            size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
-                            name = $"{permutation[(int)i]}";
-                            break;
-                    }
-
-                    Transform tempObject = GameObject.Instantiate(debugTile);
-                    tempObject.GetComponent<Renderer>().material.SetColor("_Color", color);
-                    tempObject.position = facePosition;
-                    tempObject.localScale = size;
-                    tempObject.name = $"Tile_{name}_{position}";
+                    tempIDs.Add(tile.faceIDs[(int)permutation[i]]);
                 }
-            }
 
-            if (DEBUG)
-            {
-                Debug.Log($"Placed faces {new Vector3Int(envX, envY, envZ)} - {orientation} - flipped? {flipped}:");
-                Debug.Log($"    Top: {GetFaceName(tempIDs[(int)Tile.FACETYPE.TOP])}");
-                Debug.Log($"    Bottom: {GetFaceName(tempIDs[(int)Tile.FACETYPE.BOTTOM])}");
-                Debug.Log($"    Left: {GetFaceName(tempIDs[(int)Tile.FACETYPE.LEFT])}");
-                Debug.Log($"    Right: {GetFaceName(tempIDs[(int)Tile.FACETYPE.RIGHT])}");
-                Debug.Log($"    Front: {GetFaceName(tempIDs[(int)Tile.FACETYPE.FRONT])}");
-                Debug.Log($"    Back: {GetFaceName(tempIDs[(int)Tile.FACETYPE.BACK])}");
-            }
+                Vector3Int position = new Vector3Int(envX, envY, envZ);
 
-            if (environment[envX, envY, envZ].mState == TileState.Placed)
-            {
-                // throw an error and stop the program
-                Debug.Log("envX: " + envX + " envY: " + envY + " envZ: " + envZ);
-                Debug.Log("environment[envX, envY, envZ] :" + environment[envX, envY, envZ]);
-                Debug.Log("tileState[envX, envY, envZ] :" + environment[envX, envY, envZ].mState);
-                throw new Exception("OverWriteError: tileState[envX, envY, envZ] == TileState.Placed");
-            }
-            else if (environment[envX, envY, envZ].mState == TileState.Wavefront)
-            {
-                // get the index of the position in the wavefront.positions list
-                int wavefrontIndex = wavefront.positions.IndexOf(new Vector3Int(envX, envY, envZ));
+                //Debug.Log($"Tile face {tile.faceIDs[0]}");
+                SetFaceList(new Vector3Int(envX, envY, envZ), tempIDs, DEBUG);
 
-                // remove the position from the wavefront.positions list
-                wavefront.positions.RemoveAt(wavefrontIndex);
+                if (DEBUG) //Display Debug Tiles 
+                {
+                    //Draw each face
+                    for (Tile.FACETYPE i = Tile.FACETYPE.TOP; i <= Tile.FACETYPE.BACK; i++)
+                    {
+                        Color color = Color.clear;
+                        Vector3 facePosition = Vector3.zero;
+                        Vector3 size = Vector3.zero;
+                        string name = "";
 
-                // remove the entropy from the wavefront.entropies list
-                wavefront.entropies.RemoveAt(wavefrontIndex);
+                        int faceID = tempIDs[(int)i];
+                        TileFace faceData = metatilepool.palette.tileFaces[faceID];
+                        switch (i)
+                        {
+                            case Tile.FACETYPE.TOP:
+                                color = faceData.color;
+                                facePosition = (Vector3)position + new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                                size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
+                                name = $"{permutation[(int)i]}";
+                                break;
+
+                            case Tile.FACETYPE.BOTTOM:
+                                color = faceData.color;
+                                facePosition = (Vector3)position - new Vector3(0, voxelSize / 2 * 1.01f, 0);
+                                size = transform.rotation * new Vector3(voxelSize / 2, 0, voxelSize / 2);
+                                name = $"{permutation[(int)i]}";
+                                break;
+
+                            case Tile.FACETYPE.LEFT:
+                                color = faceData.color;
+                                facePosition = (Vector3)position - new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                                size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
+                                name = $"{permutation[(int)i]}";
+                                break;
+
+                            case Tile.FACETYPE.RIGHT:
+                                color = faceData.color;
+                                facePosition = (Vector3)position + new Vector3(voxelSize / 2 * 1.01f, 0, 0);
+                                size = transform.rotation * new Vector3(0, voxelSize / 2, voxelSize / 2);
+                                name = $"{permutation[(int)i]}";
+                                break;
+
+                            case Tile.FACETYPE.FRONT:
+                                color = faceData.color;
+                                facePosition = (Vector3)position - new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                                size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
+                                name = $"{permutation[(int)i]}";
+                                break;
+
+                            case Tile.FACETYPE.BACK:
+                                color = faceData.color;
+                                facePosition = (Vector3)position + new Vector3(0, 0, voxelSize / 2 * 1.01f);
+                                size = transform.rotation * new Vector3(voxelSize / 2, voxelSize / 2, 0);
+                                name = $"{permutation[(int)i]}";
+                                break;
+                        }
+
+                        Transform tempObject = GameObject.Instantiate(debugTile);
+                        tempObject.GetComponent<Renderer>().material.SetColor("_Color", color);
+                        tempObject.position = facePosition;
+                        tempObject.localScale = size;
+                        tempObject.name = $"Tile_{name}_{position}";
+                    }
+                }
+
+                if (DEBUG)
+                {
+                    Debug.Log($"Placed faces {new Vector3Int(envX, envY, envZ)} - {orientation} - flipped? {flipped}:");
+                    Debug.Log($"    Top: {GetFaceName(tempIDs[(int)Tile.FACETYPE.TOP])}");
+                    Debug.Log($"    Bottom: {GetFaceName(tempIDs[(int)Tile.FACETYPE.BOTTOM])}");
+                    Debug.Log($"    Left: {GetFaceName(tempIDs[(int)Tile.FACETYPE.LEFT])}");
+                    Debug.Log($"    Right: {GetFaceName(tempIDs[(int)Tile.FACETYPE.RIGHT])}");
+                    Debug.Log($"    Front: {GetFaceName(tempIDs[(int)Tile.FACETYPE.FRONT])}");
+                    Debug.Log($"    Back: {GetFaceName(tempIDs[(int)Tile.FACETYPE.BACK])}");
+                }
+
+                if (environment[envX, envY, envZ].mState == TileState.Placed)
+                {
+                    // throw an error and stop the program
+                    Debug.Log("envX: " + envX + " envY: " + envY + " envZ: " + envZ);
+                    Debug.Log("environment[envX, envY, envZ] :" + environment[envX, envY, envZ]);
+                    Debug.Log("tileState[envX, envY, envZ] :" + environment[envX, envY, envZ].mState);
+                    throw new Exception("OverWriteError: tileState[envX, envY, envZ] == TileState.Placed");
+                }
+                else if (environment[envX, envY, envZ].mState == TileState.Wavefront)
+                {
+                    // get the index of the position in the wavefront.positions list
+                    int wavefrontIndex = wavefront.positions.IndexOf(new Vector3Int(envX, envY, envZ));
+
+                    // remove the position from the wavefront.positions list
+                    wavefront.positions.RemoveAt(wavefrontIndex);
+
+                    // remove the entropy from the wavefront.entropies list
+                    wavefront.entropies.RemoveAt(wavefrontIndex);
+                }
             }
 
             // update the tile state
             environment[envX, envY, envZ].mState = TileState.Placed;
             environment[envX, envY, envZ].mTileType = tile.tileType;
 
-            // add the neighbors of the tile to the wavefront if their tile state is not placed
-            List<Vector3Int> adjacentPositions = GetAdjacentPositions(new Vector3Int(envX, envY, envZ));
-
-            // add the adjacent positions to the wavefront if they are not placed
-            foreach (Vector3Int adjacentPosition in adjacentPositions)
+            if (mGeneratingEnvironment)
             {
-                AddToWavefront(adjacentPosition);
+                // add the neighbors of the tile to the wavefront if their tile state is not placed
+                List<Vector3Int> adjacentPositions = GetAdjacentPositions(new Vector3Int(envX, envY, envZ));
+
+                // add the adjacent positions to the wavefront if they are not placed
+                foreach (Vector3Int adjacentPosition in adjacentPositions)
+                {
+                    AddToWavefront(adjacentPosition);
+                }
             }
         }
 
@@ -1241,7 +1311,7 @@ public class MetatileManager : EnvironmentComponent
         }
     }
 
-    private static Vector3Int RotateOffset(Metatile.Configuration configTuple)
+    private static Vector3Int RotateOffset(MetaTile.Configuration configTuple)
     {
         Vector3 unrotatedOrigin = configTuple.origin;
         if (configTuple.flipped)
@@ -1370,7 +1440,7 @@ public class MetatileManager : EnvironmentComponent
 
     // }
 
-    public bool CanPlaceMetatile(Vector3Int placementPosition, Metatile metatile, Metatile.Configuration configTuple, List<float> faceWeights = null)
+    public bool CanPlaceMetatile(Vector3Int placementPosition, MetaTile metatile, MetaTile.Configuration configTuple, List<float> faceWeights = null)
     {
 
         Vector3 currentOrigin = configTuple.origin;
@@ -1509,7 +1579,7 @@ public class MetatileManager : EnvironmentComponent
     public int CountValidMetatiles(Vector3Int position)
     {
         int count = 0;
-        foreach (KeyValuePair<Metatile, bool> pair in environment[position.x, position.y, position.z].mValidMetatileList)
+        foreach (KeyValuePair<MetaTile, bool> pair in environment[position.x, position.y, position.z].mValidMetatileList)
         {
             if (pair.Value)
             {
@@ -1737,7 +1807,7 @@ public class MetatileManager : EnvironmentComponent
         }
     }
 
-    private int SelectConfiguration(List<ConfigurationValidity> validConfigurations, Metatile candidateMetatile, Vector3Int placementPosition, EnvironmentTileState tileState)
+    private int SelectConfiguration(List<ConfigurationValidity> validConfigurations, MetaTile candidateMetatile, Vector3Int placementPosition, EnvironmentTileState tileState)
     {
         while (mPotentialConfigurationList.Count > 0)
         {
@@ -1760,9 +1830,9 @@ public class MetatileManager : EnvironmentComponent
         return -1; // return -1 if no valid configuration is found
     }
 
-    private bool CheckAndSetConfigurationValidity(int configurationIndex, Metatile candidateMetatile, Vector3Int placementPosition, EnvironmentTileState tileState)
+    private bool CheckAndSetConfigurationValidity(int configurationIndex, MetaTile candidateMetatile, Vector3Int placementPosition, EnvironmentTileState tileState)
     {
-        Metatile.Configuration configTuple = candidateMetatile.GetConfiguration(configurationIndex);
+        MetaTile.Configuration configTuple = candidateMetatile.GetConfiguration(configurationIndex);
         bool placeable = CanPlaceMetatile(placementPosition, candidateMetatile, configTuple);
         tileState.mValidMetatiles[candidateMetatile][configurationIndex] = placeable ? ConfigurationValidity.VALID : ConfigurationValidity.INVALID;
         return placeable;
@@ -1788,10 +1858,93 @@ public class MetatileManager : EnvironmentComponent
     {
         for (int i = 0; i < placedMetatiles.Count; i++)
         {
-            placedPayloads.Add(placedMetatiles[i].metatile.DepositPayload(
+            placedPayloads.AddRange(placedMetatiles[i].metatile.DepositPayload(
                 placedMetatiles[i].position,
                 placedMetatiles[i].rotation,
                 placedMetatiles[i].flipped,
+                this
+            ));
+        }
+
+        SavePayloads();
+    }
+
+    void SavePayloads()
+    {
+        JSONObject fullComponent = new JSONObject();
+
+        fullComponent.AddField("w", mWidth);
+        fullComponent.AddField("h", mHeight);
+        fullComponent.AddField("l", mLength);
+        fullComponent.AddField("v", voxelSize);
+
+        JSONObject componentList = new JSONObject();
+
+        for (int i = 0; i < placedMetatiles.Count; i++)
+        {
+            JSONObject componentJSON = new JSONObject();
+            componentJSON.AddField("p_x", placedMetatiles[i].position.x);
+            componentJSON.AddField("p_y", placedMetatiles[i].position.y);
+            componentJSON.AddField("p_z", placedMetatiles[i].position.z);
+            componentJSON.AddField("o", (int)placedMetatiles[i].orientation);
+            componentJSON.AddField("f", placedMetatiles[i].flipped);
+            componentJSON.AddField("t", placedMetatiles[i].metatile.name);
+
+            componentList.Add(componentJSON);
+        }
+        fullComponent.AddField("d", componentList);
+
+        string path = Path.Combine(Application.persistentDataPath, "test.json");
+
+        // Write the JSON string to a file
+        File.WriteAllText(path, fullComponent.ToString());
+    }
+    void LoadPayloads(string fileName)
+    {
+        string path = Path.Combine(Application.persistentDataPath, $"{fileName}.json");
+
+        string jsonData = File.ReadAllText(path);
+
+        JSONObject jSONObject = new JSONObject(jsonData);
+
+        mWidth = (int)jSONObject["w"].i;
+        mHeight = (int)jSONObject["h"].i;
+        mLength = (int)jSONObject["l"].i;
+
+        voxelSize = jSONObject["v"].n;
+
+        List<JSONObject> placedTiles = jSONObject["d"].list;
+
+        Dictionary<string, MetaTile> metaTileMap = new Dictionary<string, MetaTile>();
+        List<MetaTile> metaTiles = metatilepool.GetMetatiles();
+
+        foreach (MetaTile metaTile in metaTiles)
+        {
+            metaTileMap[metaTile.name] = metaTile;
+        }
+
+        placedMetatiles.Clear();
+        for (int i = 0; i < placedTiles.Count; i++)
+        {
+            Vector3Int position = new Vector3Int((int)placedTiles[i]["p_x"].i, (int)placedTiles[i]["p_y"].i, (int)placedTiles[i]["p_z"].i);
+            Orientation orientation = (Orientation)placedTiles[i]["o"].n;
+            bool flipped = placedTiles[i]["f"].b;
+
+            string metaTileName = placedTiles[i]["t"].str;
+
+            MetaTile metaTile = metaTileMap[metaTileName];
+
+            Configuration configuration = new Configuration();
+            configuration.orientation = orientation;
+            configuration.flipped = flipped;
+            configuration.origin = new Vector3();
+
+            PlaceMetatile(metaTile, position, configuration);
+
+            placedPayloads.AddRange(metaTile.DepositPayload(
+                position,
+                OrientationToQuaternion[configuration.orientation],
+                flipped,
                 this
             ));
         }

@@ -5,6 +5,8 @@ using UnityEngine;
 using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
+using static UnityEngine.Rendering.ProbeTouchupVolume;
+using System.Drawing;
 
 public class ProductionRuleObject : EnvironmentComponent
 {
@@ -131,5 +133,41 @@ public class ProductionRuleObject : EnvironmentComponent
     //     // Example: ProductionRuleComponent.Instance.EvaluateRules(this, otherObj);
     // }
 
+
+    public class ProductionRuleObjectState : TrialManager.ObjectState
+    {
+        public string shape;
+        public string color;
+    }
+
+    override public TrialManager.ObjectState SaveTrialData()
+    {
+        ProductionRuleObjectState objectState = new ProductionRuleObjectState();
+
+        objectState.shape = GetIdentifier().ObjectShape;
+        objectState.color = GetIdentifier().ObjectColor;
+        objectState.position = transform.position;
+        objectState.rotation = transform.rotation;
+        objectState.scale = transform.localScale;
+
+        objectState.saveObject = GetProductionRuleManager().productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
+
+        return objectState;
+    }
+
+    override public void LoadTrialData(TrialManager.ObjectState objectState)
+    {
+        if (objectState is ProductionRuleObjectState)
+        {
+            ProductionRuleObjectState productionObjectState = (ProductionRuleObjectState)objectState;
+
+            ProductionRuleObjectInitialize(
+                productionObjectState.shape,
+                productionObjectState.color);
+            transform.position = productionObjectState.position;
+            transform.rotation = productionObjectState.rotation;
+            transform.localScale = productionObjectState.scale;
+        }
+    }
 
 }

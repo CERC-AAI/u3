@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using System.Linq;
+using System.Xml;
 
 
 // Initialize an empty 3D array of null values 10 by 10 by 10
@@ -9,7 +11,7 @@ using UnityEngine;
 // Tile is just a definitional thing now
 
 [ExecuteInEditMode]
-public class Metatile : IMetatileContainer
+public class MetaTile : IMetatileContainer
 {
     public List<Tile> tiles;
     public Transform payload;
@@ -43,6 +45,23 @@ public class Metatile : IMetatileContainer
         return mConfigurationMap.FindIndex((Configuration configMap) => { return origin == configMap.origin && orientation == configMap.orientation && flipped == configMap.flipped; });
     }
 
+    public int GetConfiguration(Vector3 origin, Quaternion rotation, bool flipped)
+    {
+        Initialization();
+
+        MetatileManager.Orientation orientation = MetatileManager.Orientation.UpFront;
+        foreach (KeyValuePair<MetatileManager.Orientation, Quaternion> pair in MetatileManager.OrientationToQuaternion)
+        {
+            if (pair.Value == rotation)
+            {
+                orientation = pair.Key;
+                break;
+            }
+        }
+
+        return mConfigurationMap.FindIndex((Configuration configMap) => { return origin == configMap.origin && orientation == configMap.orientation && flipped == configMap.flipped; });
+    }
+
     public List<Configuration> GetConfigurations()
     {
         Initialization();
@@ -54,20 +73,20 @@ public class Metatile : IMetatileContainer
         return tags;
     }
 
-    public override Metatile DrawMetatile()
+    public override MetaTile DrawMetatile()
     {
         // TODO: do we need to instantiate a game object here?
         return this;
     }
 
-    public override List<Metatile> GetMetatiles()
+    public override List<MetaTile> GetMetatiles()
     {
-        List<Metatile> metatiles = new List<Metatile>();
+        List<MetaTile> metatiles = new List<MetaTile>();
         metatiles.Add(this);
         return metatiles;
     }
 
-    public override Metatile GetMetatile()
+    public override MetaTile GetMetatile()
     {
         return this;
     }
@@ -230,12 +249,14 @@ public class Metatile : IMetatileContainer
         return false;
     }
 
-    public Transform DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileManager metatileEnvironment, bool debug = false)
+    public List<Transform> DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileManager metatileEnvironment, bool debug = false)
     {
-        Transform payloadCopy = null;
+        List<Transform> payloads = new List<Transform>();
 
         if (payload != null)
         {
+            Transform payloadCopy = null;
+
             payloadCopy = MetatileManager.instantiateNewObject(payload);
             payloadCopy.transform.position = position;
             payloadCopy.transform.localRotation = rotation;
@@ -252,6 +273,14 @@ public class Metatile : IMetatileContainer
             {
                 placedTiles[i].OnTilePlaced();
             }
+
+            foreach (Transform payloadPart in payloadCopy)
+            {
+                payloadPart.transform.parent = metatileEnvironment.transform;
+
+                payloads.Add(payloadPart);
+            }
+            //Destroy(payloadCopy.gameObject);
         }
 
         if (debug)
@@ -272,7 +301,7 @@ public class Metatile : IMetatileContainer
             tempParent.transform.localRotation = rotation;
         }
 
-        return payloadCopy;
+        return payloads;
     }
 
     private void Initialization()
