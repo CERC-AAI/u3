@@ -104,33 +104,60 @@ public class ProductionRuleManager : EnvironmentComponent
         // LoadDefaultProductionRules();
     }
 
-    protected override void Initialize()
-    {
-        base.Initialize();
-        // productionRuleGraph = new ProductionRuleGraph(); // TODO: make a prefab
-        // productionRuleGraph.BuildProductionRuleGraph(GetCurrentState());
-        // productionRules = productionRuleGraph.GetCurrentProductionRules();
-        LoadDefaultProductionRules();
-        trialManager = new TrialManager(); // TODO: make a prefab
-        trialManager.SaveInitialState(
-            GetEngine().GetEnvironmentComponent<U3DPlayer>(),
-            allProdRuleObjects
-        );
-
-    }
-
     public override void OnRunStarted()
     {
+        base.OnRunStarted();
+
         Debug.Log("ProductionRuleManager");
 
-        base.OnRunStarted();
+        LoadDefaultProductionRules();
     }
 
-    void Update()
+    protected override void DoRegisterCallbacks()
     {
-        CheckTrial();
+        TrialManager trialManager = GetEngine().GetEnvironmentComponent<TrialManager>();
+        if (trialManager)
+        {
+            RegisterCallback(ref trialManager.OnTrialOverCallbacks, OnTrialOver);
+        }
+
+        if (GetGravityGun() != null)
+        {
+            RegisterCallback(ref GetGravityGun().OnGravityGunDrop, OnGravityGunDrop);
+            RegisterCallback(ref GetGravityGun().OnGravityGunThrow, OnGravityGunThrow);
+            RegisterCallback(ref GetGravityGun().OnGravityGunPickup, OnGravityGunPickup);
+        }
+
+        base.DoRegisterCallbacks();
+    }
+
+    public override void OnUpdate(float deltaTime)
+    {
         CheckAndExecuteRules(GetEngine());
-        trialManager.IncrementTrialDurationCounter();
+
+        base.OnUpdate(deltaTime);
+    }
+
+    void OnTrialOver()
+    {
+        int numProdRuleObjects = allProdRuleObjects.Count;
+        for (int i = 0; i < numProdRuleObjects; i++)
+        {
+            ProductionRuleObject productionRuleObject = allProdRuleObjects[0];
+            productionRuleObject.Remove();
+        }
+    }
+
+    public override void OnEpisodeEnded()
+    {
+        int numProdRuleObjects = allProdRuleObjects.Count;
+        for (int i = 0; i < numProdRuleObjects; i++)
+        {
+            ProductionRuleObject productionRuleObject = allProdRuleObjects[0];
+            productionRuleObject.Remove();
+        }
+
+        base.OnEpisodeEnded();
     }
 
     public void AddRule(ProductionRule rule)
@@ -195,79 +222,18 @@ public class ProductionRuleManager : EnvironmentComponent
         }
     }
 
-    private void CheckTrial()
-    {
-        if (trialManager.IsTrialOver() && !trialManager.IsMaxTrials())
-        {
-            StartNewTrial();
-        }
-        else if (trialManager.IsMaxTrials())
-        {
-            //Debug.Log("Max trials reached");
-        }
-    }
-
-    private void StartNewTrial()
-    {
-        trialManager.IncrementTrialCounter();
-        trialManager.ResetTrialDurationCounter();
-        ResetState();
-    }
-
-    public void ResetState()
-    {
-        ResetAgentState();
-        ResetProductionRuleObjectStates();
-    }
-
-    public void ResetAgentState()
-    {
-        U3DPlayer agent = GetEngine().GetCachedEnvironmentComponent<U3DPlayer>();
-        U3CharacterMotor motor = agent.Motor;
-        U3DCamera camera = agent.CharacterCamera;
-        motor.SetPosition(trialManager.GetInitialAgentState().position);
-        motor.SetRotation(trialManager.GetInitialAgentState().rotation);
-        camera.ResetFacingDistance(
-            trialManager.GetInitialAgentState().cameraPlanarDirection,
-            trialManager.GetInitialAgentState().cameraTargetDistance
-        );
-
-    }
-
-    public void ResetProductionRuleObjectStates()
-    {
-        int numProdRuleObjects = allProdRuleObjects.Count;
-        for (int i = 0; i < numProdRuleObjects; i++)
-        {
-            ProductionRuleObject productionRuleObject = allProdRuleObjects[0];
-            productionRuleObject.Remove();
-        }
-
-        ProductionRuleObject productionRuleObjectPrefab = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>().productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
-
-        for (int i = 0; i < trialManager.GetInitialProductionRuleObjectStates().Count; i++)
-        {
-            EnvironmentObject productionRuleEnvironmentObject = GetEngine().CreateEnvironmentObject(productionRuleObjectPrefab.gameObject);
-            ProductionRuleObject productionRuleObject = productionRuleEnvironmentObject.GetComponent<ProductionRuleObject>();
-
-            productionRuleObject.ProductionRuleObjectInitialize(
-                trialManager.GetInitialProductionRuleObjectStates()[i].shape,
-                trialManager.GetInitialProductionRuleObjectStates()[i].color);
-            productionRuleObject.transform.position = trialManager.GetInitialProductionRuleObjectStates()[i].position;
-            productionRuleObject.transform.rotation = trialManager.GetInitialProductionRuleObjectStates()[i].rotation;
-            productionRuleObject.transform.localScale = trialManager.GetInitialProductionRuleObjectStates()[i].scale;
-        }
-    }
-
     private void CheckAndExecuteRules(EnvironmentEngine env) //TODO: remove coupling with updating ProductionRuleGraph in ExecuteRule. Split into check and execute
     {
         // Shuffle the production rules
-        ShuffleUtility.ShuffleList(productionRules);
-        foreach (ProductionRule rule in productionRules) // TODO: foreach error with collection is correct because you're modifying the underlying collection: figure this out. Snapshot?
+        List<ProductionRule> currentRules = new List<ProductionRule>(productionRules);
+        ShuffleUtility.ShuffleList(currentRules);
+        foreach (ProductionRule rule in currentRules) // TODO: foreach error with collection is correct because you're modifying the underlying collection: figure this out. Snapshot?
         {
-            foreach (ProductionRuleObject subject in allProdRuleObjects)
+            List<ProductionRuleObject> currentObjects = new List<ProductionRuleObject>(allProdRuleObjects);
+
+            foreach (ProductionRuleObject subject in currentObjects)
             {
-                foreach (ProductionRuleObject obj in allProdRuleObjects)
+                foreach (ProductionRuleObject obj in currentObjects)
                 {
                     if (subject != obj && rule.CheckRule(subject, obj, env))
                     {

@@ -6,6 +6,8 @@ using System;
 using KinematicCharacterController.Examples;
 using Unity.MLAgents.Actuators;
 using UnityEngine.InputSystem;
+using static TrialManager;
+using Unity.MLAgents;
 
 public enum CharacterState
 {
@@ -697,8 +699,51 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     public override bool ShouldRequestDecision(long fixedUdpateNumber)
     {
-        return (fixedUdpateNumber + 1) % (GetObjectID() + 1) == 0;
+        //Test staggered requests
+        //return (fixedUdpateNumber + 1) % (GetObjectID() + 1) == 0;
 
         return base.ShouldRequestDecision(fixedUdpateNumber);
+    }
+
+    public class AgentState : ObjectState
+    {
+        public Vector3 cameraPosition;
+        public Quaternion cameraRotation;
+        public Vector3 cameraPlanarDirection;
+        public float cameraTargetDistance;
+    }
+
+    override public TrialManager.ObjectState SaveTrialData()
+    {
+        AgentState objectState = new AgentState();
+
+        objectState.position = transform.position;
+        objectState.rotation = transform.rotation;
+        objectState.cameraPosition = CharacterCamera.transform.position;
+        objectState.cameraRotation = CharacterCamera.transform.rotation;
+        objectState.cameraPlanarDirection = CharacterCamera.PlanarDirection;
+        objectState.cameraTargetDistance = CharacterCamera.TargetDistance;
+
+        objectState.saveObject = this;
+
+        return objectState;
+    }
+
+    override public void LoadTrialData(TrialManager.ObjectState objectState)
+    {
+        if (objectState is AgentState)
+        {
+            AgentState agentState = (AgentState)objectState;
+
+            transform.position = agentState.position;
+            U3CharacterMotor motor = Motor;
+            U3DCamera camera = CharacterCamera;
+            motor.SetPosition(agentState.position);
+            motor.SetRotation(agentState.rotation);
+            camera.ResetFacingDistance(
+                agentState.cameraPlanarDirection,
+                agentState.cameraTargetDistance
+            );
+        }
     }
 }

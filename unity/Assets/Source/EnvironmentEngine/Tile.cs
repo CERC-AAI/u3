@@ -14,7 +14,7 @@ public class Tile : MonoBehaviour
     [HideInInspector]
     // TODO: are we not using faceIDs anymore?
     public int[] faceIDs = new int[6]; // 6 edges for a cube
-    Metatile mParentMetatile;
+    MetaTile mParentMetatile;
 
     Vector3 mCachedPosition = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
 
@@ -59,10 +59,10 @@ public class Tile : MonoBehaviour
 
     void OnEnable()
     {
-        mParentMetatile = GetComponentInParent<Metatile>();
+        mParentMetatile = GetComponentInParent<MetaTile>();
     }
 
-    public void SetParent(Metatile parent)
+    public void SetParent(MetaTile parent)
     {
         mParentMetatile = parent;
     }
@@ -109,10 +109,10 @@ public class Tile : MonoBehaviour
     // Draw a semitransparent red cube at the transforms position
     void OnDrawGizmos()
     {
-        Metatile parentMetatile = mParentMetatile;
+        MetaTile parentMetatile = mParentMetatile;
         if (parentMetatile == null)
         {
-            parentMetatile = GetComponentInParent<Metatile>();
+            parentMetatile = GetComponentInParent<MetaTile>();
         }
 
         float voxelSize = parentMetatile.GetPalette().voxelSize;
@@ -240,11 +240,11 @@ public class Tile : MonoBehaviour
     }
 #endif
 
-    public Metatile GetMetatile()
+    public MetaTile GetMetatile()
     {
         if (mParentMetatile == null)
         {
-            mParentMetatile = GetComponentInParent<Metatile>();
+            mParentMetatile = GetComponentInParent<MetaTile>();
         }
 
         return mParentMetatile;

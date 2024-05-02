@@ -695,6 +695,16 @@ public class EnvironmentComponent : MonoBehaviour
         OnPostLoadState();
     }
 
+    virtual public TrialManager.ObjectState SaveTrialData()
+    {
+        return null;
+    }
+
+    virtual public void LoadTrialData(TrialManager.ObjectState objectState)
+    {
+
+    }
+
     virtual public void OnPreGetState()
     {
     }

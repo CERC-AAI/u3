@@ -16,6 +16,7 @@ using UnityEditor;
 public class EnvironmentObject : EnvironmentComponentHolder
 {
     // Public members
+    [Tooltip("Higher values go first. Default is 0")]
     public int scriptExecutionPriority = 0;
 
     public Vector3 Position
