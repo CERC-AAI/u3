@@ -274,13 +274,13 @@ public class MetaTile : IMetatileContainer
                 placedTiles[i].OnTilePlaced();
             }
 
-            foreach (Transform payloadPart in payloadCopy)
+            foreach (EnvironmentTile payloadPart in placedTiles)
             {
                 payloadPart.transform.parent = metatileEnvironment.transform;
 
-                payloads.Add(payloadPart);
+                payloads.Add(payloadPart.transform);
             }
-            //Destroy(payloadCopy.gameObject);
+            Destroy(payloadCopy.gameObject);
         }
 
         if (debug)

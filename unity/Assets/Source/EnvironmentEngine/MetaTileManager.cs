@@ -439,7 +439,7 @@ public class MetatileManager : EnvironmentComponent
         int z1 = node1.y;
         //int y = node2.y;
         int z2 = node2.y;
-        Debug.Log($"Coord: {x2} {z2}");
+        //Debug.Log($"Coord: {x2} {z2}");
         if ( !SeenNodes.Contains( node2 ) || node1 == node2 )
         {   
             return; 
@@ -489,7 +489,7 @@ public class MetatileManager : EnvironmentComponent
                 {
                     edgesList = edgesList.Remove(edgesList.Length - 2); // Remove the last ", "
                 }
-                Debug.Log($"Node {entry.Key} is connected to: [{edgesList}] with {entry.Value.Count} connections.");
+                //Debug.Log($"Node {entry.Key} is connected to: [{edgesList}] with {entry.Value.Count} connections.");
             }
         }
     } 
@@ -550,7 +550,7 @@ public class MetatileManager : EnvironmentComponent
         // Need to consider corner case
         // without rotation corner skips positive z negative x
                 // front
-        Debug.Log($"Coord Pre: {x} {z}");
+        //Debug.Log($"Coord Pre: {x} {z}");
         // down-left
         // Need to consider unrotated
         if ( environment[x, height, z].mTileType.ToLower() == "ramp" ) 
@@ -619,7 +619,7 @@ public class MetatileManager : EnvironmentComponent
         {
             for( int z = 0; z < environment.GetLength(2); z++ )
             {   
-                Debug.Log($"Starting Search at {x}{z}");
+                //Debug.Log($"Starting Search at {x}{z}");
                 // Check 
                 int height = heightMap[ x, z ];
                 Vector2Int key = new Vector2Int( x, z );
@@ -814,6 +814,7 @@ public class MetatileManager : EnvironmentComponent
         Debug.Log("Abra Dabra");
 
         //TODO: Vedant, add code to populate this list
+        mPermissibleSpawns.Clear();
         for (int x = 0; x < heightMap.GetLength(0); x++)
         {
             for (int z = 0; z < heightMap.GetLength(1); z++)

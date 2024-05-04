@@ -6,6 +6,9 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 using Unity.Mathematics;
+using NUnit;
+using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
+using static TrialManager;
 
 public class TrialManager : EnvironmentComponent
 {
@@ -20,16 +23,24 @@ public class TrialManager : EnvironmentComponent
 
     public EnvironmentCallback OnTrialOverCallbacks;
 
+
     public int trialCounter = 0;
     [Tooltip("Total trials to use.")]
     public int maxTrials = 3;
     [Tooltip("Trial duration in seconds.")]
     public float trialResetUpdateFrequency = 10.0f;
     public float trialDurationCounter = 0;
+    public float trialRealTimeCounter = 0.0f;
+
+    float mStartTime;
 
     int mAgentCount = 0;
     List<ObjectState> mObjectStates = new List<ObjectState>();
 
+    protected override void DoRegisterCallbacks()
+    {
+        base.DoRegisterCallbacks();
+    }
 
     public override void OnRunStarted()
     {
@@ -37,6 +48,7 @@ public class TrialManager : EnvironmentComponent
 
         base.OnRunStarted();
 
+        mObjectStates.Clear();
         EnvironmentComponent[] components = GetEngine().GetEnvironmentComponents();
         for (int i = 0; i < components.Length; i++)
         {
@@ -47,6 +59,10 @@ public class TrialManager : EnvironmentComponent
                 mObjectStates.Add(objectState);
             }
         }
+
+        trialCounter = 0;
+        mStartTime = Time.realtimeSinceStartup;
+        ResetTrialDurationCounter();
     }
 
     public bool IsTrialOver()
@@ -77,6 +93,9 @@ public class TrialManager : EnvironmentComponent
     {
         trialDurationCounter += deltaTime;
         CheckTrial();
+        //Debug.Log(deltaTime);
+
+        trialRealTimeCounter = Time.realtimeSinceStartup - mStartTime;
 
         base.OnUpdate(deltaTime);
     }
@@ -90,13 +109,17 @@ public class TrialManager : EnvironmentComponent
                 OnTrialOverCallbacks();
             }
 
+            IncrementTrialCounter();
+
             if (!IsMaxTrials())
             {
                 StartNewTrial();
             }
             else if (IsMaxTrials())
             {
-                //Debug.Log("Max trials reached");
+                var playerObject = GetEngine().GetEnvironmentComponent<U3DPlayer>("Player");
+                playerObject.DoEndEpisode();
+                Debug.Log("Max trials reached");
             }
         }
     }
@@ -108,7 +131,7 @@ public class TrialManager : EnvironmentComponent
 
     private void StartNewTrial()
     {
-        IncrementTrialCounter();
+        mStartTime = Time.realtimeSinceStartup;
         ResetTrialDurationCounter();
         ResetState();
     }

@@ -120,6 +120,8 @@ public class EnvironmentComponent : MonoBehaviour
     List<Type> mCallbackTypes = new List<Type>();
     bool mCallbacksInitialized = false;
 
+    protected bool mIsBeingDestroyed = false;
+
     Dictionary<Type, object> mCachedComponents = new Dictionary<Type, object>();
 
 
@@ -154,6 +156,7 @@ public class EnvironmentComponent : MonoBehaviour
         }
 
         mInitialized = true;
+        mIsBeingDestroyed = false;
 
         DoRegisterCallbacks();
     }
@@ -192,6 +195,8 @@ public class EnvironmentComponent : MonoBehaviour
 
     private void OnDestroy()
     {
+        mIsBeingDestroyed = true;
+
         if (mEngine && this is EnvironmentObject)
         {
             mEngine.RemoveObject((EnvironmentObject)this);
