@@ -51,6 +51,8 @@ public class EnvironmentObject : EnvironmentComponentHolder
     [HideInInspector]
     public string mPrefabPath;
 
+    bool mIsValid = false;
+
     protected PlayerInput mInput;
     protected Dictionary<string, InputStates> mInputStates;
 
@@ -90,6 +92,8 @@ public class EnvironmentObject : EnvironmentComponentHolder
             }
         }
 
+        mIsValid = true;
+
         base.Initialize();
     }
 
@@ -113,17 +117,38 @@ public class EnvironmentObject : EnvironmentComponentHolder
         }
     }
 
+    public bool CheckRemove()
+    {
+        if (!mIsValid)
+        {
+            GetEngine().RemoveObject(this);
+
+            return true;
+        }
+
+        return false;
+    }
+
     override public void Remove()
     {
-        base.Remove();
+        if (mIsValid)
+        {
+            base.Remove();
 
-        transform.parent = mEngine.recycleBin;
-        gameObject.SetActive(false);
+            if (!mIsBeingDestroyed)
+            {
+                transform.parent = mEngine.recycleBin;
+            }
+            gameObject.SetActive(false);
+
+            mIsValid = false;
+        }
     }
 
     public override void WakeUp()
     {
         gameObject.SetActive(true);
+        mIsValid = true;
 
         base.WakeUp();
     }

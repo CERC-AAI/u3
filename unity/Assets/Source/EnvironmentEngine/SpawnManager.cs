@@ -7,6 +7,10 @@ using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 using Unity.Mathematics;
 using static U3DPlayer;
+using NUnit;
+using UnityEngine.UIElements;
+using UnityEngine.Assertions.Must;
+using System.Linq;
 
 public class SpawnManager : EnvironmentComponent
 {
@@ -27,11 +31,27 @@ public class SpawnManager : EnvironmentComponent
 
             U3DPlayer.AgentState agentState = (U3DPlayer.AgentState)agent.SaveTrialData();
 
-            agentState.position = randomLocation;
+            agentState.position = randomLocation + new Vector3(0f, 0.5f);
             agentState.rotation = Quaternion.Euler(0.0f, UnityEngine.Random.Range(0.0f, 360.0f), 0.0f);
             agentState.cameraPlanarDirection = agentState.rotation * Vector3.forward;
 
             agent.LoadTrialData(agentState);
+        }
+
+        ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+        for (int i = 0; i < 3; i++)
+        {
+            EnvironmentObject prodRuleObject = GetEngine().CreateEnvironmentObject(productionRuleManager.productionRuleObjectPrefab.gameObject);
+            ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
+
+            int shape = UnityEngine.Random.Range(0, productionRuleManager.productionRulePrefabs.Count);
+            int color = UnityEngine.Random.Range(0, ProductionRuleIdentifier.colorDict.Count);
+
+            prodRuleObj.ProductionRuleObjectInitialize(productionRuleManager.productionRulePrefabs[shape].name, ProductionRuleIdentifier.colorDict.Keys.ToArray()[color]);
+
+            Vector3 randomLocation = spawnLocations[UnityEngine.Random.Range(0, spawnLocations.Count)];
+            prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f);
+            prodRuleObj.transform.rotation = Quaternion.Euler(UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f));
         }
 
         base.OnRunStarted();

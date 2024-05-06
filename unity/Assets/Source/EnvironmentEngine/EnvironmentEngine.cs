@@ -118,6 +118,11 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     }
 
+    public void EndRun()
+    {
+        RunEnded();
+    }
+
     override public void RunEnded()
     {
         mIsRunning = false;
@@ -191,6 +196,13 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             }
 
             mLastDecisionTime = mFixedTime;
+
+            //Debug.Log($"mDecisionRequests.Count: {mDecisionRequests.Count}");
+            if (mDecisionRequests.Count == 0)
+            {
+                //No agents require decisions, continue the simulation
+                mIsWaitingForActions = false;
+            }
         }
     }
 
@@ -302,7 +314,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                 }
             }
 
-            if (!mIsWaitingForActions)
+            if (!mIsWaitingForActions || !IsPython())
             {
                 OnObjectUpdate(deltaTime);
                 List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
@@ -311,18 +323,33 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                     mEnvironmentObjects[i].OnObjectUpdate(deltaTime);
                 }
 
+                for (int i = 0; i < tempList.Count; i++)
+                {
+                    if (tempList[i].CheckRemove())
+                    {
+                        EnvironmentObject removeObject = tempList[i];
+
+                        if (removeObject != this)
+                        {
+                            EnvironmentComponent[] components = removeObject.GetEnvironmentComponents();
+                            foreach (EnvironmentComponent component in components)
+                            {
+                                mEnvironmentComponents.Remove(component);
+                            }
+                        }
+                        mEnvironmentObjects.Remove(removeObject);
+                    }
+                }
+
                 if (mEnvironmentTimer >= mNextFixedUpdate)
                 {
-
                     DoFixedUpdate(deltaTime);
                 }
 
                 if (!WaitingForPhysics())
                 {
-                    //Fix the code here to be local to each environment
-                    //KinematicCharacterController.KinematicCharacterSystem.LateUpdate();
                     OnObjectLateUpdate(deltaTime);
-                    for (int i = 0; i < tempList.Count; i++)
+                    for (int i = 0; i < mEnvironmentObjects.Count; i++)
                     {
                         mEnvironmentObjects[i].OnObjectLateUpdate(deltaTime);
                     }
@@ -533,19 +560,14 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     public void RemoveObject(EnvironmentObject removeObject)
     {
-        if (mEnvironmentObjects.Contains(removeObject))
-        {
-            if (removeObject != this)
-            {
-                EnvironmentComponent[] components = removeObject.GetEnvironmentComponents();
-                foreach (EnvironmentComponent component in components)
-                {
-                    mEnvironmentComponents.Remove(component);
-                }
-            }
-            mEnvironmentObjects.Remove(removeObject);
-        }
+        removeObject.Remove();
     }
+
+    public void RemoveObject(EnvironmentComponent removeObject)
+    {
+        RemoveObject(removeObject.GetParentObject());
+    }
+
     override public EnvironmentComponent[] GetEnvironmentComponents()
     {
         return mEnvironmentComponents.ToArray();
@@ -559,7 +581,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     }
 
 
-    //FIX ME: Loading and savning needs to include the environmentengine components
+    //FIX ME: Loading and saving needs to include the environmentengine components
     public JSONObject SaveEnvironmentState()
     {
         JSONObject fullEnvironment = new JSONObject();

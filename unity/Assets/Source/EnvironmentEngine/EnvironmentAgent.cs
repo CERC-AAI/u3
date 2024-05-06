@@ -195,7 +195,7 @@ public class EnvironmentAgent : EnvironmentComponent
         {
             environmentComponents[i].StoreUserInputs();
         }
-        // Debug.Log("Heuristic is called.");
+        //Debug.Log("Heuristic is called.");
     }
 
     virtual public void DoEndEpisode(bool timedOut = false)

@@ -119,7 +119,7 @@ public class ProductionRuleAction
     public void Reward(EnvironmentEngine env)
     {
         // Get the agent from the environment engine
-        var playerObject = GameObject.Find("Player");
+        var playerObject = env.GetEnvironmentComponent<U3DPlayer>("Player");
         U3Agent u3Agent = playerObject.GetComponent<U3Agent>();
         u3Agent.AddReward(reward);
     }
@@ -135,7 +135,7 @@ public class ProductionRuleAction
 
     public void Remove(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
     {
-        productionRuleObject.Remove();
+        env.RemoveObject(productionRuleObject);
     }
 
     public void CheckParameterValidity(ProductionRuleObject productionRuleObject, EnvironmentEngine env)

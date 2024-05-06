@@ -101,7 +101,7 @@ public class ProductionRuleManager : EnvironmentComponent
 
     void Awake()
     {
-        // LoadDefaultProductionRules();
+        LoadDefaultProductionRules();
     }
 
     public override void OnRunStarted()
@@ -110,7 +110,7 @@ public class ProductionRuleManager : EnvironmentComponent
 
         Debug.Log("ProductionRuleManager");
 
-        LoadDefaultProductionRules();
+        //LoadDefaultProductionRules();
     }
 
     protected override void DoRegisterCallbacks()
