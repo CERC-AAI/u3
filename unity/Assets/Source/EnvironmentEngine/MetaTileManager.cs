@@ -11,7 +11,8 @@ using NUnit.Framework;
 using System.Reflection;
 using System.IO;
 using static MetaTile;
-
+using QuickGraph;
+using QuickGraph.Algorithms;
 
 public class MetatileManager : EnvironmentComponent
 {
@@ -351,9 +352,10 @@ public class MetatileManager : EnvironmentComponent
             {
                 for (int y = environment.GetLength(1) - 1; y >= 0; y-- )
                 {
-                    if ( environment[x,y,z].mTileType.ToLower() != "empty" )
+                    if ( environment[x,y,z].mTileType.ToLower() != "empty"  &&
+                         environment[x,y,z].mTileType.ToLower() != "" )
                     {
-                        heightMap[x , z] = y;
+                        heightMap[x , z] = y+1;
                         if ( y > maxHeight.y )
                         {
                             maxHeight.x = x;
@@ -364,8 +366,52 @@ public class MetatileManager : EnvironmentComponent
                         
                     }
                 }
+                Debug.Log($"Height at {x} {z} = {heightMap[x, z]}");
             }
         } 
+    }
+
+    List<HashSet<Vector2Int>> FindConnectedComponents(Dictionary<Vector2Int, HashSet<Vector2Int>> graph)
+    {
+        // Convert the graph to a QuickGraph graph
+        var qGraph = ConvertToQuickGraph(Edges);
+
+        //var components = new List<HashSet<Vector2Int>>();
+        var algo =  new QuickGraph.Algorithms.ConnectedComponents.StronglyConnectedComponentsAlgorithm<Vector2Int, Edge<Vector2Int>> (qGraph);
+        algo.Compute();
+
+        // Convert the strongly connected components to the desired format
+        // Group the vertices by their component index
+        var components = algo.Components
+            .GroupBy(kv => kv.Value)
+            .Select(group => new HashSet<Vector2Int>(group.Select(kv => kv.Key)))
+            .ToList();
+
+        return components;
+    }
+
+    // Method to convert the graph to a QuickGraph graph
+   IVertexListGraph<Vector2Int, Edge<Vector2Int>> ConvertToQuickGraph(Dictionary<Vector2Int, HashSet<Vector2Int>> graph)
+    {
+        var qGraph = new UndirectedGraph<Vector2Int, Edge<Vector2Int>>();
+
+        // Add vertices to the QuickGraph graph
+        foreach (var vertex in graph.Keys)
+        {
+            qGraph.AddVertex(vertex);
+        }
+
+        // Add edges to the QuickGraph graph
+        foreach (var kvp in graph)
+        {
+            var v1 = kvp.Key;
+            foreach (var v2 in kvp.Value)
+            {
+                qGraph.AddEdge(new Edge<Vector2Int>(v1, v2));
+            }
+        }
+
+        return (IVertexListGraph<Vector2Int, Edge<Vector2Int>>)qGraph; // Explicit cast
     }
 
     public bool CheckNonEmpty( string mTileType )
@@ -812,6 +858,17 @@ public class MetatileManager : EnvironmentComponent
         CreateGraph();
         PrettyPrintEdges();
         Debug.Log("Abra Dabra");
+        // Find the connected components
+        var components = FindConnectedComponents(Edges);
+
+        // Find the maximum connected component
+        var maxComponent = components.OrderByDescending(comp => comp.Count).First();
+
+        Debug.Log("Maximum Connected Component:");
+        foreach (var vertex in maxComponent)
+        {
+            Debug.Log(vertex);
+        }
 
         //TODO: Vedant, add code to populate this list
         for (int x = 0; x < heightMap.GetLength(0); x++)
