@@ -50,7 +50,7 @@ public class SpawnManager : EnvironmentComponent
             prodRuleObj.ProductionRuleObjectInitialize(productionRuleManager.productionRulePrefabs[shape].name, ProductionRuleIdentifier.colorDict.Keys.ToArray()[color]);
 
             Vector3 randomLocation = spawnLocations[UnityEngine.Random.Range(0, spawnLocations.Count)];
-            prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f);
+            prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f); 
             prodRuleObj.transform.rotation = Quaternion.Euler(UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f));
         }
 

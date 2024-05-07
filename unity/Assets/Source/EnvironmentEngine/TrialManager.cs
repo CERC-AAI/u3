@@ -89,7 +89,7 @@ public class TrialManager : EnvironmentComponent
         trialDurationCounter = 0;
     }
 
-    public override void OnUpdate(float deltaTime)
+    public override void OnFixedUpdate(float deltaTime)
     {
         trialDurationCounter += deltaTime;
         CheckTrial();
@@ -97,7 +97,7 @@ public class TrialManager : EnvironmentComponent
 
         trialRealTimeCounter = Time.realtimeSinceStartup - mStartTime;
 
-        base.OnUpdate(deltaTime);
+        base.OnFixedUpdate(deltaTime);
     }
 
     private void CheckTrial()

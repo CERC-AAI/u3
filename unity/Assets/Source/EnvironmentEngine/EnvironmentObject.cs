@@ -65,6 +65,8 @@ public class EnvironmentObject : EnvironmentComponentHolder
 
     bool mHadInput = false;
 
+    GameObject mBaseObject;
+
     override protected void Initialize()
     {
         mColliders2D = GetComponentsInChildren<Collider2D>();
@@ -97,6 +99,16 @@ public class EnvironmentObject : EnvironmentComponentHolder
         base.Initialize();
     }
 
+    public void InitalizeBaseObject(GameObject baseObject)
+    {
+        mBaseObject = baseObject;
+    }
+
+    public GameObject GetBaseObject()
+    {
+        return mBaseObject;
+    }
+
     public override void OnRunStarted()
     {
         base.OnRunStarted();
@@ -121,8 +133,6 @@ public class EnvironmentObject : EnvironmentComponentHolder
     {
         if (!mIsValid)
         {
-            GetEngine().RemoveObject(this);
-
             return true;
         }
 
@@ -137,11 +147,15 @@ public class EnvironmentObject : EnvironmentComponentHolder
 
             if (!mIsBeingDestroyed)
             {
+                //TODO: Make this use a recycle bin for less memory allocation
+                //Destroy(gameObject);
                 transform.parent = mEngine.recycleBin;
             }
-            gameObject.SetActive(false);
 
+            gameObject.SetActive(false);
             mIsValid = false;
+
+            //InvalidateEngine();
         }
     }
 
@@ -149,6 +163,10 @@ public class EnvironmentObject : EnvironmentComponentHolder
     {
         gameObject.SetActive(true);
         mIsValid = true;
+        if (mEngine != null)
+        {
+            mEngine.AddObject(this);
+        }
 
         base.WakeUp();
     }

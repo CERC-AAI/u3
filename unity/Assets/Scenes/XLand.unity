@@ -372,7 +372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trialCounter: 0
   maxTrials: 3
-  trialResetUpdateFrequency: 3
+  trialResetUpdateFrequency: 2
   trialDurationCounter: 0
   trialRealTimeCounter: 0
 --- !u!114 &607219979
@@ -1048,8 +1048,8 @@ MonoBehaviour:
   debugMode: 1
   forceSaveData: 0
   scenes:
-  - environmentID: key
-    sceneName: KeyGame
+  - environmentID: xland
+    sceneName: XLand
     physicsType: 2
 --- !u!4 &1361217341
 Transform:

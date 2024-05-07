@@ -87,6 +87,19 @@ public class EnvironmentComponentHolder : EnvironmentComponent
         }
     }
 
+    /*override public void InvalidateEngine()
+    {
+        base.InvalidateEngine();
+
+        for (int i = 0; i < mComponents.Length; i++)
+        {
+            if (mComponents[i] != this)
+            {
+                mComponents[i].InvalidateEngine();
+            }
+        }
+    }*/
+
     virtual public void OnObjectUpdate(float deltaTime)
     {
         for (int i = 0; i < mComponents.Length; i++)

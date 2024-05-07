@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
-using UnityEditor.ShaderGraph.Legacy;
 using NUnit.Framework;
 using System.Reflection;
 using System.IO;
@@ -885,6 +884,11 @@ public class MetatileManager : EnvironmentComponent
                     mPermissibleSpawns.Add(new Vector3(x, height, z) * voxelSize);// + new Vector3(0, voxelSize/2, 0));
                 }
             }
+        }
+
+        if (mPermissibleSpawns.Count == 0)
+        {
+            Debug.Log("No spawn locations added");
         }
     }
 
