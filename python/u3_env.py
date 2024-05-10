@@ -41,7 +41,7 @@ from mlagents_envs.exception import (
 from mlagents_envs.base_env import BaseEnv
 
 # from mlagents_envs.envs.unity_gym_env import UnityToGymWrapper
-from unity_gym_env_pettingzoo_rewrite import UnityToPettingzooWrapper
+from .unity_gym_env_pettingzoo_rewrite import UnityToPettingzooWrapper
 
 
 FLAGS = flags.FLAGS
@@ -218,7 +218,32 @@ def create_environment(task):
     # modeOffset = FLAGS.run_mode == 'actor'
     # path = Path(__file__).parent.absolute()
     environmentChannel = U3SideChannel()
-    unity_env = U3Environment(side_channels=[environmentChannel])
+    unity_env = U3Environment(side_channels=[environmentChannel], no_graphics=True)
+    env = U3Wrapper(
+        unity_env, environmentChannel, flatten_branched=True, uint8_visual=True
+    )
+    env.seed(task)
+
+    return env
+
+
+def create_environment_by_name(name, task):
+    # logging.info('Creating environment: %s', FLAGS.game)
+
+    # print(FLAGS)
+    # print(task)
+    # print(FLAGS.run_mode)
+
+    # full_game_name = '{}'.format(FLAGS.game)
+    # import os
+    # modeOffset = FLAGS.run_mode == 'actor'
+    # path = Path(__file__).parent.absolute()
+    environmentChannel = U3SideChannel()
+    unity_env = U3Environment(
+        file_name=name,
+        side_channels=[environmentChannel],
+        no_graphics=True
+    )
     env = U3Wrapper(
         unity_env, environmentChannel, flatten_branched=True, uint8_visual=True
     )
