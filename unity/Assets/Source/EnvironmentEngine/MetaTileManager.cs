@@ -379,22 +379,41 @@ public class MetatileManager : EnvironmentComponent
         var algo =  new QuickGraph.Algorithms.ConnectedComponents.StronglyConnectedComponentsAlgorithm<Vector2Int, Edge<Vector2Int>> (qGraph);
         algo.Compute();
 
+        var algoComponents = algo.Components;
+
+        // First, print algo.Components to see the initial state
+        Debug.Log("Initial Components:");
+        foreach (var kv in algoComponents)
+        {
+            Debug.Log($"Key: {kv.Key.x}, {kv.Key.y}, Value: {kv.Value}");
+        }
         // Convert the strongly connected components to the desired format
         // Group the vertices by their component index
-        var components = algo.Components
+        var components = algoComponents
             .GroupBy(kv => kv.Value)
             .Select(group => new HashSet<Vector2Int>(group.Select(kv => kv.Key)))
             .ToList();
+
+        // Iterate over each component (HashSet of Vector2Int)
+        for (int i = 0; i < components.Count; i++)
+        {
+            Debug.Log($"Component {i + 1}:"); // Label each component with a number for easier tracking
+
+            // Iterate over each Vector2Int in the current HashSet
+            foreach (Vector2Int vertex in components[i])
+            {
+                Debug.Log($"{vertex.x} {vertex.y}"); // Print x and y coordinates of the vertex
+            }
+        }
 
         return components;
     }
 
     // Method to convert the graph to a QuickGraph graph
-   IVertexListGraph<Vector2Int, Edge<Vector2Int>> ConvertToQuickGraph(Dictionary<Vector2Int, HashSet<Vector2Int>> graph)
+   BidirectionalGraph<Vector2Int, Edge<Vector2Int>> ConvertToQuickGraph(Dictionary<Vector2Int, HashSet<Vector2Int>> graph)
     {
-        var qGraph = new UndirectedGraph<Vector2Int, Edge<Vector2Int>>();
+        var qGraph = new BidirectionalGraph<Vector2Int, Edge<Vector2Int>>();
 
-        // Add vertices to the QuickGraph graph
         foreach (var vertex in graph.Keys)
         {
             qGraph.AddVertex(vertex);
@@ -404,13 +423,15 @@ public class MetatileManager : EnvironmentComponent
         foreach (var kvp in graph)
         {
             var v1 = kvp.Key;
+            qGraph.AddVertex(v1);
             foreach (var v2 in kvp.Value)
-            {
+            {   
+                
                 qGraph.AddEdge(new Edge<Vector2Int>(v1, v2));
             }
         }
 
-        return (IVertexListGraph<Vector2Int, Edge<Vector2Int>>)qGraph; // Explicit cast
+        return qGraph; // Explicit cast
     }
 
     public bool CheckNonEmpty( string mTileType )
@@ -534,7 +555,6 @@ public class MetatileManager : EnvironmentComponent
                 {
                     edgesList = edgesList.Remove(edgesList.Length - 2); // Remove the last ", "
                 }
-                //Debug.Log($"Node {entry.Key} is connected to: [{edgesList}] with {entry.Value.Count} connections.");
             }
         }
     } 
@@ -595,7 +615,6 @@ public class MetatileManager : EnvironmentComponent
         // Need to consider corner case
         // without rotation corner skips positive z negative x
                 // front
-        //Debug.Log($"Coord Pre: {x} {z}");
         // down-left
         // Need to consider unrotated
         if ( environment[x, height, z].mTileType.ToLower() == "ramp" ) 
@@ -652,7 +671,7 @@ public class MetatileManager : EnvironmentComponent
             Vector2Int currentNode = nodeQueue.Dequeue(); // Dequeue the next node
 
             // Add neighbors
-            ExploreNeighbours( currentNode, height );
+            ExploreNeighbours( currentNode, Math.Max( 0, height - 1 ) );
         }
     }
 
@@ -856,18 +875,25 @@ public class MetatileManager : EnvironmentComponent
         //Graph Builder
         CreateGraph();
         PrettyPrintEdges();
-        Debug.Log("Abra Dabra");
         // Find the connected components
         var components = FindConnectedComponents(Edges);
 
         // Find the maximum connected component
         var maxComponent = components.OrderByDescending(comp => comp.Count).First();
-
+    
         Debug.Log("Maximum Connected Component:");
-        foreach (var vertex in maxComponent)
+        int count = 0;
+        foreach (var component in components)
         {
-            Debug.Log(vertex);
+            count += 1; 
+            foreach (Vector2Int vertex in component)
+            {
+
+                Debug.Log($"CC {count}: {vertex.x} {vertex.y}");
+            }
+     
         }
+       
 
         //TODO: Vedant, add code to populate this list
         mPermissibleSpawns.Clear();
@@ -877,11 +903,11 @@ public class MetatileManager : EnvironmentComponent
             {
                 int height = heightMap[x, z];
 
-                EnvironmentTileState thisTile = environment[x, height, z];
+                EnvironmentTileState thisTile = environment[x, Math.Max( height-1, 0 ), z];
 
                 if (thisTile.mTile != null)
                 {
-                    mPermissibleSpawns.Add(new Vector3(x, height, z) * voxelSize);// + new Vector3(0, voxelSize/2, 0));
+                    mPermissibleSpawns.Add(new Vector3(x, Math.Max( height-1, 0 ), z) * voxelSize);// + new Vector3(0, voxelSize/2, 0));
                 }
             }
         }
