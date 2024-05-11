@@ -25,7 +25,9 @@ public class SpawnManager : EnvironmentComponent
 
         foreach (U3DPlayer agent in agents)
         {
-            Vector3 randomLocation = spawnLocations[UnityEngine.Random.Range(0, spawnLocations.Count)];
+            int spawnRandom = UnityEngine.Random.Range(0, spawnLocations.Count);
+            Vector3 randomLocation = spawnLocations[spawnRandom];
+            spawnLocations.RemoveAt(spawnRandom);
 
             Debug.Log($"Spawn at: {randomLocation}");
 
@@ -49,7 +51,10 @@ public class SpawnManager : EnvironmentComponent
 
             prodRuleObj.ProductionRuleObjectInitialize(productionRuleManager.productionRulePrefabs[shape].name, ProductionRuleIdentifier.colorDict.Keys.ToArray()[color]);
 
-            Vector3 randomLocation = spawnLocations[UnityEngine.Random.Range(0, spawnLocations.Count)];
+            int spawnRandom = UnityEngine.Random.Range(0, spawnLocations.Count);
+            Vector3 randomLocation = spawnLocations[spawnRandom];
+            spawnLocations.RemoveAt(spawnRandom);
+
             prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f); 
             prodRuleObj.transform.rotation = Quaternion.Euler(UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f));
         }

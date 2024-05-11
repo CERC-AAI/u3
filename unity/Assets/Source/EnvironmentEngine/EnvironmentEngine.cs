@@ -374,7 +374,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         mEnvironmentObjects.Remove(removeObject);
         AddToPool(removeObject);
 
-        Debug.Log($"Remove mEnvironmentObjects: {mEnvironmentObjects.Count}");
+        //Debug.Log($"Remove mEnvironmentObjects: {mEnvironmentObjects.Count}");
     }
 
     public float GetTime()
@@ -573,7 +573,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
             mEnvironmentComponents.AddRange(newObject.GetEnvironmentComponents());
 
-            Debug.Log($"Add mEnvironmentObjects: {mEnvironmentObjects.Count}");
+            //Debug.Log($"Add mEnvironmentObjects: {mEnvironmentObjects.Count}");
         }
     }
 
@@ -795,7 +795,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         EnvironmentObject newObject = null;
         if (mUnusedObjects[baseObject].Count > 0)
         {
-            Debug.Log($"WAKEUP GetNewObject: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
+            //Debug.Log($"WAKEUP GetNewObject: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
 
             newObject = mUnusedObjects[baseObject][0];
             mUnusedObjects[baseObject].RemoveAt(0);
@@ -807,7 +807,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             newObject = ((GameObject)GameObject.Instantiate(baseObject)).GetComponent<EnvironmentObject>();
 
 
-            Debug.Log($"CREATE GetNewObject: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
+            //Debug.Log($"CREATE GetNewObject: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
         }
 
         newObject.InitalizeBaseObject(baseObject);

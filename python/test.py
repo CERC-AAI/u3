@@ -8,7 +8,8 @@ set_log_level(_log_level)
 
 import u3_env
 
-env = u3_env.create_environment(0)
+#env = u3_env.create_environment(0)
+env = u3_env.create_environment_by_name("H:/Git/u3/python/XLand/unitylearning2", 0)
 
 for t in range(100):
     # Render the environment (optional, for visualization)

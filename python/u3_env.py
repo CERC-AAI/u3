@@ -225,3 +225,23 @@ def create_environment(task):
     env.seed(task)
 
     return env
+
+def create_environment_by_name(name, task):
+    # logging.info('Creating environment: %s', FLAGS.game)
+
+    # print(FLAGS)
+    # print(task)
+    # print(FLAGS.run_mode)
+
+    # full_game_name = '{}'.format(FLAGS.game)
+    # import os
+    # modeOffset = FLAGS.run_mode == 'actor'
+    # path = Path(__file__).parent.absolute()
+    environmentChannel = U3SideChannel()
+    unity_env = U3Environment(no_graphics=True, file_name=name, side_channels=[environmentChannel])
+    env = U3Wrapper(
+        unity_env, environmentChannel, flatten_branched=True, uint8_visual=True
+    )
+    env.seed(task)
+
+    return env

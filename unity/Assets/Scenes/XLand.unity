@@ -1632,6 +1632,11 @@ MonoBehaviour:
   voxelSize: 1
   saveFile: 
   loadFile: 
+  VISUALIZE_GRAPH: 0
+  debugArrow: {fileID: 6767979993923170774, guid: 0a87a0185df628240a362c4f57b4dcbf,
+    type: 3}
+  debugNode: {fileID: 6767979993923170774, guid: 3da53670c0bf37f4abe573831139315d,
+    type: 3}
   edgeTiles: ffffffff03000000ffffffffffffffffffffffffffffffff
   metatilepool: {fileID: 4368192324598907990, guid: 8b0660a070f5b0f4392930fa36439313,
     type: 3}

@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileType: 
+  tileType: solid
   faceIDs: 030000000200000001000000010000000100000004000000
 --- !u!1 &4448140023607712244
 GameObject:
@@ -90,7 +90,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileType: 
+  tileType: solid
   faceIDs: 030000000200000001000000040000000100000001000000
 --- !u!1 &4782072366629366078
 GameObject:
@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileType: 
+  tileType: solid
   faceIDs: 030000000200000001000000010000000100000001000000
 --- !u!1 &6552369819736916210
 GameObject:
@@ -273,7 +273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe31722c51a8f48448fa903795c8a699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileType: 
+  tileType: solid
   faceIDs: 030000000200000001000000040000000100000004000000
 --- !u!1 &7552926363554527522
 GameObject:
