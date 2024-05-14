@@ -241,25 +241,25 @@ public class ProductionRuleGraph : MonoBehaviour
         return productionRuleSubsumes || productionRuleIsSubsumed;
     }
 
-    public List<ProductionRule> SampleForwardRules(List<ProductionRuleIdentifier> initialState, int numRules)
+    public List<ProductionRule> SampleForwardRules(List<ProductionRuleIdentifier> initialState, int numRules, bool actionIsReward = false, bool actionNotReward = false)
     {
         // Samples multiple forward rules from the same initial state
         List<ProductionRule> productionRules = new List<ProductionRule>();
         for (int i = 0; i < numRules; i++)
         {
-            ProductionRule productionRule = SampleForwardRule(initialState);
+            ProductionRule productionRule = SampleForwardRule(initialState, actionIsReward, actionNotReward);
             productionRules.Add(productionRule);
         }
         return productionRules;
     }
-    public ProductionRule SampleForwardRule(List<ProductionRuleIdentifier> initialState)
+    public ProductionRule SampleForwardRule(List<ProductionRuleIdentifier> initialState, bool actionIsReward = false, bool actionNotReward = false)
     {
         List<ProductionRuleCondition> conditions = new List<ProductionRuleCondition>();
         ProductionRuleCondition productionRuleCondition = sampleForwardProductionRuleCondition(initialState);
         conditions.Add(productionRuleCondition);
 
         List<ProductionRuleAction> actions = new List<ProductionRuleAction>();
-        ProductionRuleAction productionRuleAction = SampleForwardProductionRuleAction(initialState);
+        ProductionRuleAction productionRuleAction = SampleForwardProductionRuleAction(initialState, actionIsReward, actionNotReward);
         actions.Add(productionRuleAction);
 
         ProductionRule productionRule = new ProductionRule(conditions, actions);
@@ -313,9 +313,26 @@ public class ProductionRuleGraph : MonoBehaviour
 
         return productionRuleCondition;
     }
-    public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> initialState)
+    public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> initialState, bool isReward = false, bool notReward = false)
     {
         Action action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+        if (isReward && notReward)
+        {
+            throw new ArgumentException("isReward and notReward cannot both be true");
+        }
+        if (isReward)
+        {
+            action = Action.REWARD;
+        }
+        else if (notReward)
+        {
+            action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+            while (action == Action.REWARD)
+            {
+                action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+            }
+        }
+
         while (initialState.Count - necessaryObjectCountForAction[action] < 0)
         {
             Debug.Log($"Not enough objects for action {action}, sampling again.");
