@@ -129,70 +129,12 @@ public class ProductionRuleManager : EnvironmentComponent
     void Update()
     {
         CheckTrial();
-        CheckAndExecuteRules(GetEngine());
+        // CheckAndExecuteRules(GetEngine());
+        // rulesToExecute.Clear();
+        List<Tuple<ProductionRule, ProductionRuleObject, ProductionRuleObject>> rulesToExecute = CheckRules(GetEngine());
+        ExecuteRules(rulesToExecute);
+        rulesToExecute.Clear();
         trialManager.IncrementTrialDurationCounter();
-    }
-
-    public void AddRule(ProductionRule rule)
-    {
-        productionRules.Add(rule);
-    }
-
-    public void RemoveRule(ProductionRule rule)
-    {
-        productionRules.Remove(rule);
-    }
-
-    public void AddProdRuleObject(ProductionRuleObject obj)
-    {
-        allProdRuleObjects.Add(obj);
-    }
-
-    public ProductionRuleObject GetProductionRuleObjectByIdentifier(ProductionRuleIdentifier identifier)
-    {
-        foreach (ProductionRuleObject obj in allProdRuleObjects)
-        {
-            if (obj.GetIdentifier().CompareTo(identifier))
-            {
-                return obj;
-            }
-        }
-        return null;
-    }
-
-    public void RemoveProdRuleObject(ProductionRuleObject obj)
-    {
-        allProdRuleObjects.Remove(obj);
-    }
-
-    // Update is called once per frame
-
-    void LoadDefaultProductionRules()
-    {
-        for (int i = 0; i < defaultProductionRules.Count; i++)
-        {
-            ProductionRule rule = new ProductionRule(defaultProductionRules[i].conditions, defaultProductionRules[i].actions);
-            AddRule(rule);
-        }
-
-        // ProductionRule newProductionRule = SampleNewForwardRule(allProdRuleObjects);
-        // AddRule(newProductionRule);
-    }
-
-    public float GetNearDistance()
-    {
-        return NEAR_DISTANCE;
-    }
-
-    public void CheckCallback(CONDITION condition, ProductionRuleObject sub, ProductionRuleObject obj, EnvironmentEngine env)
-    {
-        foreach (ProductionRule rule in productionRules)
-        {
-            if (rule.CheckCallback(condition, sub, obj, env))
-            {
-                rule.ExecuteRule(sub, obj, env);
-            }
-        }
     }
 
     private void CheckTrial()
@@ -260,11 +202,12 @@ public class ProductionRuleManager : EnvironmentComponent
         }
     }
 
-    private void CheckAndExecuteRules(EnvironmentEngine env) //TODO: remove coupling with updating ProductionRuleGraph in ExecuteRule. Split into check and execute
+
+    private List<Tuple<ProductionRule, ProductionRuleObject, ProductionRuleObject>> CheckRules(EnvironmentEngine env)
     {
-        // Shuffle the production rules
-        ShuffleUtility.ShuffleList(productionRules);
-        foreach (ProductionRule rule in productionRules) // TODO: foreach error with collection is correct because you're modifying the underlying collection: figure this out. Snapshot?
+        List<Tuple<ProductionRule, ProductionRuleObject, ProductionRuleObject>> rulesToExecute = new List<Tuple<ProductionRule, ProductionRuleObject, ProductionRuleObject>>();
+
+        foreach (ProductionRule rule in productionRules)
         {
             foreach (ProductionRuleObject subject in allProdRuleObjects)
             {
@@ -272,13 +215,58 @@ public class ProductionRuleManager : EnvironmentComponent
                 {
                     if (subject != obj && rule.CheckRule(subject, obj, env))
                     {
-                        rule.ExecuteRule(subject, obj, env);
-
+                        rulesToExecute.Add(Tuple.Create(rule, subject, obj));
                     }
                 }
             }
         }
+
+        return rulesToExecute;
     }
+
+
+    private void ExecuteRules(List<Tuple<ProductionRule, ProductionRuleObject, ProductionRuleObject>> rulesToExecute)
+    {
+        foreach (var ruleToExecute in rulesToExecute)
+        {
+            ruleToExecute.Item1.ExecuteRule(ruleToExecute.Item2, ruleToExecute.Item3, GetEngine());
+        }
+    }
+
+    // private void CheckAndExecuteRules(EnvironmentEngine env)
+    // {
+    //     // Shuffle the production rules
+    //     ShuffleUtility.ShuffleList(productionRules);
+
+    //     // // Create a snapshot of the production rules
+    //     // List<ProductionRule> rulesSnapshot = new List<ProductionRule>(productionRules);
+
+    //     // // Create a snapshot of the production rule objects
+    //     // List<ProductionRuleObject> objectsSnapshot = new List<ProductionRuleObject>(allProdRuleObjects);
+
+    //     List<Tuple<ProductionRule, ProductionRuleObject, ProductionRuleObject>> rulesToExecute = new List<Tuple<ProductionRule, ProductionRuleObject, ProductionRuleObject>>();
+
+    //     // Check rules and collect those that need to be executed
+    //     foreach (ProductionRule rule in productionRules)
+    //     {
+    //         foreach (ProductionRuleObject subject in allProdRuleObjects)
+    //         {
+    //             foreach (ProductionRuleObject obj in allProdRuleObjects)
+    //             {
+    //                 if (subject != obj && rule.CheckRule(subject, obj, env))
+    //                 {
+    //                     rulesToExecute.Add(Tuple.Create(rule, subject, obj));
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     // Execute the collected rules
+    //     foreach (var ruleToExecute in rulesToExecute)
+    //     {
+    //         ruleToExecute.Item1.ExecuteRule(ruleToExecute.Item2, ruleToExecute.Item3, env);
+    //     }
+    // }
 
     public void UpdateProductionRuleGraph(ProductionRule productionRule)
     {
