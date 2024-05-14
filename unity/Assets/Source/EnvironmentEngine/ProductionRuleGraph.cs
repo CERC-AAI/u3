@@ -231,6 +231,11 @@ public class ProductionRuleGraph : MonoBehaviour
 
             productionRuleSubsumes = productionRuleSubsumes || productionRuleSubsumesExistingProductionRule;
             productionRuleIsSubsumed = productionRuleIsSubsumed || existingProductionRuleSubsumesProductionRule;
+
+            if (productionRuleSubsumes || productionRuleIsSubsumed)
+            {
+                break;
+            }
         }
 
         return productionRuleSubsumes || productionRuleIsSubsumed;
