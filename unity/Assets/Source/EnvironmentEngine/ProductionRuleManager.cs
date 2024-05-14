@@ -107,9 +107,8 @@ public class ProductionRuleManager : EnvironmentComponent
     protected override void Initialize()
     {
         base.Initialize();
-        // productionRuleGraph = new ProductionRuleGraph(); // TODO: make a prefab
-        // productionRuleGraph.BuildProductionRuleGraph(GetCurrentState());
-        // productionRules = productionRuleGraph.GetCurrentProductionRules();
+        // ProductionRuleGraph productionRuleSet = new ProductionRuleGraph(); // TODO: make a prefab
+        // productionRules = productionRuleSet.BuildProductionRuleSet(GetCurrentState());
         LoadDefaultProductionRules();
         trialManager = new TrialManager(); // TODO: make a prefab
         trialManager.SaveInitialState(
