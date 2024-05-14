@@ -309,6 +309,47 @@ public class ProductionRuleManager : EnvironmentComponent
     }
 
 
+    public ProductionRuleObject GetProductionRuleObjectByIdentifier(ProductionRuleIdentifier identifier)
+    {
+        foreach (ProductionRuleObject obj in allProdRuleObjects)
+        {
+            if (obj.GetIdentifier().CompareTo(identifier))
+            {
+                return obj;
+            }
+        }
+        return null;
+    }
+
+    // Update is called once per frame
+
+    void LoadDefaultProductionRules()
+    {
+        productionRules = new List<ProductionRule>();
+        for (int i = 0; i < defaultProductionRules.Count; i++)
+        {
+            ProductionRule rule = new ProductionRule(defaultProductionRules[i].conditions, defaultProductionRules[i].actions);
+            AddRule(rule);
+        }
+
+    }
+
+    public float GetNearDistance()
+    {
+        return NEAR_DISTANCE;
+    }
+
+    public void CheckCallback(CONDITION condition, ProductionRuleObject sub, ProductionRuleObject obj, EnvironmentEngine env)
+    {
+        foreach (ProductionRule rule in productionRules)
+        {
+            if (rule.CheckCallback(condition, sub, obj, env))
+            {
+                rule.ExecuteRule(sub, obj, env);
+            }
+        }
+    }
+
     public GameObject getPrefabFromName(string name)
     {
         for (int i = 0; i < productionRulePrefabs.Count; i++)
