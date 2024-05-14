@@ -132,37 +132,67 @@ public class ProductionRuleGraph : MonoBehaviour
         return initialState;
     }
 
+    public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState, int numRules = 10, int numDeadEnds = 5)
     {
         List<ProductionRule> productionRules = new List<ProductionRule>();
         List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
+        List<ProductionRuleIdentifier> currentState = initialState;
+
+        // Step 1: Create a linear path of production rules
         for (int i = 0; i < numRules; i++)
         {
-            List<ProductionRuleIdentifier> currentState = UnityEngine.Random.Range(0, stateSpace.Count) == 0 ? initialState : stateSpace[UnityEngine.Random.Range(0, stateSpace.Count)];
             ProductionRule productionRule = SampleForwardRule(currentState);
 
             int numTries = 0;
-            while (OverlapsWithExistingProductionRules(productionRule, productionRules) && numTries < 10)
+            while (OverlapsWithExistingProductionRules(productionRule, productionRules) && numTries < 100)
             {
                 productionRule = SampleForwardRule(currentState);
                 numTries++;
             }
-            if (numTries == 10)
+            if (numTries == 100)
             {
                 Debug.Log("Could not sample a production rule that does not overlap with existing production rules");
                 break;
             }
 
-            if (i - numRules == 1)
+            if (i == numRules - 1)
             {
                 // Make sure there is a reward in the last production rule
-                productionRule.actions[0].action = Action.REWARD;
+                productionRule = SampleForwardRule(currentState, actionIsReward: true);
             }
 
             productionRules.Add(productionRule);
             List<ProductionRuleIdentifier> nextState = GetNextState(currentState, productionRule);
             stateSpace.Add(nextState);
-
+            currentState = nextState;
         }
+
+        // Step 2: Add "dead ends" at random points along the linear path
+        for (int j = 0; j < numDeadEnds; j++)
+        {
+            // Randomly choose a point along the linear path to add a dead end
+            int linearPathIndex = UnityEngine.Random.Range(0, numRules);
+            List<ProductionRuleIdentifier> deadEndState = stateSpace[linearPathIndex];
+
+            ProductionRule deadEndRule = SampleForwardRule(deadEndState, actionNotReward: true);
+
+            int numTries = 0;
+            while (OverlapsWithExistingProductionRules(deadEndRule, productionRules) && numTries < 100)
+            {
+                deadEndRule = SampleForwardRule(deadEndState, actionNotReward: true);
+                numTries++;
+            }
+            if (numTries == 100)
+            {
+                Debug.Log("Could not sample a dead-end rule that does not overlap with existing production rules");
+                continue;
+            }
+
+            productionRules.Add(deadEndRule);
+            List<ProductionRuleIdentifier> nextState = GetNextState(deadEndState, deadEndRule);
+            stateSpace.Add(nextState);
+        }
+
         return productionRules;
     }
 
