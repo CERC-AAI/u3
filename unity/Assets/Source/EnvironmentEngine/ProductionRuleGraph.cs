@@ -116,7 +116,22 @@ public class ProductionRuleGraph : MonoBehaviour
         graphNodes = nodes;
     }
 
-    public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState, int numRules)
+    public List<ProductionRuleIdentifier> GetRandomInitialState()
+    {
+        List<ProductionRuleIdentifier> initialState = new List<ProductionRuleIdentifier>();
+        int numObjects = UnityEngine.Random.Range(1, 5); // TODO: change this to a parameter
+        for (int i = 0; i < numObjects; i++)
+        {
+            List<string> shapeKeys = new List<string>(ProductionRuleIdentifier.shapeDict.Keys);
+            List<string> colorKeys = new List<string>(ProductionRuleIdentifier.colorDict.Keys);
+            string shape = shapeKeys[UnityEngine.Random.Range(0, shapeKeys.Count)];
+            string color = colorKeys[UnityEngine.Random.Range(0, colorKeys.Count)];
+            ProductionRuleIdentifier productionRuleIdentifier = new ProductionRuleIdentifier(shape, color);
+            initialState.Add(productionRuleIdentifier);
+        }
+        return initialState;
+    }
+
     {
         List<ProductionRule> productionRules = new List<ProductionRule>();
         List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
