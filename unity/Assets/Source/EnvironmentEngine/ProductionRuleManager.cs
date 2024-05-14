@@ -288,6 +288,27 @@ public class ProductionRuleManager : EnvironmentComponent
         }
     }
 
+    public void AddRule(ProductionRule rule)
+    {
+        productionRules.Add(rule);
+    }
+
+    public void RemoveRule(ProductionRule rule)
+    {
+        productionRules.Remove(rule);
+    }
+
+    public void AddProdRuleObject(ProductionRuleObject obj)
+    {
+        allProdRuleObjects.Add(obj);
+    }
+
+    public void RemoveProdRuleObject(ProductionRuleObject obj)
+    {
+        allProdRuleObjects.Remove(obj);
+    }
+
+
     public GameObject getPrefabFromName(string name)
     {
         for (int i = 0; i < productionRulePrefabs.Count; i++)
