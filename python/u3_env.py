@@ -14,33 +14,20 @@
 
 """Atari env factory."""
 
-import tempfile
 from mlagents_envs.environment import UnityEnvironment
 from absl import flags
-from absl import logging
-import gymnasium as gym
-from pathlib import Path
 import uuid
 
 
-import subprocess
 from typing import Dict, List, Optional, Any, Tuple
 from mlagents_envs.side_channel.side_channel import (
     SideChannel,
     IncomingMessage,
     OutgoingMessage,
 )
-import mlagents_envs
-from mlagents_envs.logging_util import get_logger
-from mlagents_envs.exception import (
-    UnityEnvironmentException,
-    UnityActionException,
-    UnityTimeOutException,
-    UnityCommunicatorStoppedException,
-)
 from mlagents_envs.base_env import BaseEnv
 
-# from mlagents_envs.envs.unity_gym_env import UnityToGymWrapper
+from .gym_wrapper import UnityToGymWrapper
 from .unity_gym_env_pettingzoo_rewrite import UnityToPettingzooWrapper
 
 
@@ -207,18 +194,8 @@ class U3Wrapper(UnityToPettingzooWrapper):
 
 
 def create_environment(task):
-    # logging.info('Creating environment: %s', FLAGS.game)
-
-    # print(FLAGS)
-    # print(task)
-    # print(FLAGS.run_mode)
-
-    # full_game_name = '{}'.format(FLAGS.game)
-    # import os
-    # modeOffset = FLAGS.run_mode == 'actor'
-    # path = Path(__file__).parent.absolute()
     environmentChannel = U3SideChannel()
-    unity_env = U3Environment(side_channels=[environmentChannel], no_graphics=True)
+    unity_env = U3Environment(file_name="xland", side_channels=[environmentChannel])
     env = U3Wrapper(
         unity_env, environmentChannel, flatten_branched=True, uint8_visual=True
     )
@@ -228,25 +205,8 @@ def create_environment(task):
 
 
 def create_environment_by_name(name, task):
-    # logging.info('Creating environment: %s', FLAGS.game)
-
-    # print(FLAGS)
-    # print(task)
-    # print(FLAGS.run_mode)
-
-    # full_game_name = '{}'.format(FLAGS.game)
-    # import os
-    # modeOffset = FLAGS.run_mode == 'actor'
-    # path = Path(__file__).parent.absolute()
-    environmentChannel = U3SideChannel()
-    unity_env = U3Environment(
-        file_name=name,
-        side_channels=[environmentChannel],
-        no_graphics=True
-    )
-    env = U3Wrapper(
-        unity_env, environmentChannel, flatten_branched=True, uint8_visual=True
-    )
+    unity_env = U3Environment(file_name=name)
+    env = UnityToGymWrapper(unity_env, uint8_visual=True)
     env.seed(task)
 
     return env

@@ -1,6 +1,5 @@
 from mlagents_envs.logging_util import *
 import cv2
-import numpy as np
 
 _log_level = INFO
 set_log_level(_log_level)
