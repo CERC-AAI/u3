@@ -256,6 +256,7 @@ public class ProductionRuleManager : EnvironmentComponent
             productionRuleObject.transform.position = trialManager.GetInitialProductionRuleObjectStates()[i].position;
             productionRuleObject.transform.rotation = trialManager.GetInitialProductionRuleObjectStates()[i].rotation;
             productionRuleObject.transform.localScale = trialManager.GetInitialProductionRuleObjectStates()[i].scale;
+            allProdRuleObjects.Add(productionRuleObject);
         }
     }
 
