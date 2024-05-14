@@ -155,6 +155,40 @@ public class ProductionRuleManager : EnvironmentComponent
         ResetState();
     }
 
+    private void StartNewTask()
+    {
+        // New ProductionRuleGraph
+        ProductionRuleGraph productionRuleSet = new ProductionRuleGraph();
+        List<ProductionRuleIdentifier> initialState = productionRuleSet.GetRandomInitialState();
+        productionRuleSet.BuildProductionRuleSet(initialState);
+        productionRules = productionRuleSet.GetCurrentProductionRules();
+
+        List<ProductionRuleObject> newProductionRuleObjects = NewProductionRuleObjectsFromIdentifiers(initialState);
+
+        trialManager = new TrialManager();
+        trialManager.SaveInitialState(
+            // TODO: this saves agentPosition from previous trial
+            GetEngine().GetEnvironmentComponent<U3DPlayer>(),
+            newProductionRuleObjects
+        );
+
+        ResetState();
+    }
+
+    private List<ProductionRuleObject> NewProductionRuleObjectsFromIdentifiers(List<ProductionRuleIdentifier> initialState)
+    {
+        List<ProductionRuleObject> newProductionRuleObjects = new List<ProductionRuleObject>();
+        foreach (ProductionRuleIdentifier identifier in initialState)
+        {
+            EnvironmentObject productionRuleEnvironmentObject = GetEngine().CreateEnvironmentObject(productionRuleObjectPrefab.gameObject);
+            ProductionRuleObject productionRuleObject = productionRuleEnvironmentObject.GetComponent<ProductionRuleObject>();
+            productionRuleObject.ProductionRuleObjectInitialize(identifier.ObjectShape, identifier.ObjectColor);
+            newProductionRuleObjects.Add(productionRuleObject);
+        }
+
+        return newProductionRuleObjects;
+    }
+
     public void ResetState()
     {
         ResetAgentState();
