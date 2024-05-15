@@ -6,9 +6,10 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 using Unity.Mathematics;
+using static ProductionRuleManager;
 
 [Serializable]
-public class ProductionRuleGraph : MonoBehaviour
+public class ProductionRuleGraph : EnvironmentComponent
 {
 
     public Dictionary<CONDITION, int> necessaryObjectCountForCondition = new Dictionary<CONDITION, int>()
@@ -40,10 +41,17 @@ public class ProductionRuleGraph : MonoBehaviour
         {Action.PRINT, new List<PredicateObjects>(){PredicateObjects.NONE}}
     };
 
-    Node currentNode; // points to the current state of the environment
+    //Node currentNode; // points to the current state of the environment
+
+    public int minInitialObjects = 1;
+    public int maxInitialObjects = 3;
+    public int minRules = 1;
+    public int maxRules = 3;
+    public int minDeadends = 1;
+    public int maxDeadends = 1;
 
 
-    [Serializable]
+    /*[Serializable]
     public class Node
     {
         public string nodeID;
@@ -51,15 +59,16 @@ public class ProductionRuleGraph : MonoBehaviour
         public List<Node> children;
         public List<Node> parents;
         public List<ProductionRuleIdentifier> state;
-    }
+    }*/
 
-    public List<Node> graphNodes;
+    //public List<Node> graphNodes;
 
-    public List<ProductionRule> GetCurrentProductionRules()
+    /*public List<ProductionRule> GetCurrentProductionRules()
     {
         return currentNode.productionRules;
-    }
-    public void ForwardWalk(ProductionRule productionRule)
+    }*/
+
+    /*public void ForwardWalk(ProductionRule productionRule)
     {
         int childNodeIndex = currentNode.productionRules.IndexOf(productionRule);
         if (childNodeIndex == -1)
@@ -70,10 +79,13 @@ public class ProductionRuleGraph : MonoBehaviour
         {
             currentNode = currentNode.children[childNodeIndex];
         }
-    }
+    }*/
 
-    public void BuildProductionRuleGraph(List<ProductionRuleIdentifier> rootState, int numStates = 10, int numRules = 3)
+    /*public void BuildProductionRuleGraph(List<ProductionRuleIdentifier> rootState, int numStates = 10, int numRules = 3)
     {
+        numStates = UnityEngine.Random.Range(minRules, maxRules);
+        numRules = UnityEngine.Random.Range()
+
         List<Node> nodes = new List<Node>();
         Node rootNode = new Node();
         rootNode.nodeID = "node0";
@@ -114,15 +126,24 @@ public class ProductionRuleGraph : MonoBehaviour
             }
         }
         graphNodes = nodes;
-    }
+    }*/
 
     public List<ProductionRuleIdentifier> GetRandomInitialState()
     {
+        ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+
+        List<string> shapeKeys = new List<string>();
+
+        foreach (ProductionRulePrefab prefab in productionRuleManager.productionRulePrefabs)
+        {
+            shapeKeys.Add(prefab.name);
+        }
+
         List<ProductionRuleIdentifier> initialState = new List<ProductionRuleIdentifier>();
-        int numObjects = UnityEngine.Random.Range(1, 5); // TODO: change this to a parameter
+        int numObjects = UnityEngine.Random.Range(minInitialObjects, maxInitialObjects + 1);
+        numObjects = Mathf.Max(numObjects, 1);
         for (int i = 0; i < numObjects; i++)
         {
-            List<string> shapeKeys = new List<string>(ProductionRuleIdentifier.shapeDict.Keys);
             List<string> colorKeys = new List<string>(ProductionRuleIdentifier.colorDict.Keys);
             string shape = shapeKeys[UnityEngine.Random.Range(0, shapeKeys.Count)];
             string color = colorKeys[UnityEngine.Random.Range(0, colorKeys.Count)];
@@ -132,8 +153,11 @@ public class ProductionRuleGraph : MonoBehaviour
         return initialState;
     }
 
-    public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState, int numRules = 10, int numDeadEnds = 5)
+    public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState)
     {
+        int numRules = UnityEngine.Random.Range(minRules, maxRules + 1);
+        int numDeadEnds = UnityEngine.Random.Range(minDeadends, maxDeadends + 1);
+
         List<ProductionRule> productionRules = new List<ProductionRule>();
         List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
         List<ProductionRuleIdentifier> currentState = initialState;
@@ -196,6 +220,11 @@ public class ProductionRuleGraph : MonoBehaviour
         return productionRules;
     }
 
+    /*public void UpdateProductionRuleGraph(ProductionRule productionRule)
+    {
+        ForwardWalk(productionRule);
+    }*/
+
     // TODO: Make sure that .Contains() works for ProductionRuleConditions
     public bool OverlapsWithExistingProductionRules(ProductionRule productionRule, List<ProductionRule> productionRules)
     {
@@ -252,6 +281,7 @@ public class ProductionRuleGraph : MonoBehaviour
         }
         return productionRules;
     }
+
     public ProductionRule SampleForwardRule(List<ProductionRuleIdentifier> initialState, bool actionIsReward = false, bool actionNotReward = false)
     {
         List<ProductionRuleCondition> conditions = new List<ProductionRuleCondition>();
@@ -266,9 +296,10 @@ public class ProductionRuleGraph : MonoBehaviour
 
         return productionRule;
     }
+
     public ProductionRuleCondition sampleForwardProductionRuleCondition(List<ProductionRuleIdentifier> initialState)
     {
-        CONDITION condition = (CONDITION)UnityEngine.Random.Range(0, Enum.GetValues(typeof(CONDITION)).Length);
+        CONDITION condition = (CONDITION)UnityEngine.Random.Range(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
         int neededObjectCount = necessaryObjectCountForCondition[condition];
 
         while (condition == CONDITION.NONE || neededObjectCount > initialState.Count)
@@ -281,7 +312,7 @@ public class ProductionRuleGraph : MonoBehaviour
             {
                 Debug.Log($"Not enough objects for condition {condition}, sampling again.");
             }
-            condition = (CONDITION)UnityEngine.Random.Range(0, Enum.GetValues(typeof(CONDITION)).Length);
+            condition = (CONDITION)UnityEngine.Random.Range(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
             neededObjectCount = necessaryObjectCountForCondition[condition];
         }
 

@@ -6,6 +6,7 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 
+[Serializable]
 public class ProductionRule
 {
     public List<ProductionRuleCondition> conditions; // may contain multiple CONDITION

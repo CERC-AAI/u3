@@ -11,9 +11,13 @@ using NUnit;
 using UnityEngine.UIElements;
 using UnityEngine.Assertions.Must;
 using System.Linq;
+using static UnityEngine.Rendering.ProbeTouchupVolume;
+using System.Drawing;
 
 public class SpawnManager : EnvironmentComponent
 {
+    private List<ProductionRuleIdentifier> mProductionRuleObjectsToSpawn = new List<ProductionRuleIdentifier>();
+
     public override void OnRunStarted()
     {
         Debug.Log("SpawnManager");
@@ -41,24 +45,32 @@ public class SpawnManager : EnvironmentComponent
         }
 
         ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
-        for (int i = 0; i < 3; i++)
+        foreach (ProductionRuleIdentifier productionRuleIdentifier in mProductionRuleObjectsToSpawn)
         {
             EnvironmentObject prodRuleObject = GetEngine().CreateEnvironmentObject(productionRuleManager.productionRuleObjectPrefab.gameObject);
             ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
-
-            int shape = UnityEngine.Random.Range(0, productionRuleManager.productionRulePrefabs.Count);
-            int color = UnityEngine.Random.Range(0, ProductionRuleIdentifier.colorDict.Count);
-
-            prodRuleObj.ProductionRuleObjectInitialize(productionRuleManager.productionRulePrefabs[shape].name, ProductionRuleIdentifier.colorDict.Keys.ToArray()[color]);
+            prodRuleObj.ProductionRuleObjectInitialize(productionRuleIdentifier.ObjectShape, productionRuleIdentifier.ObjectColor);
 
             int spawnRandom = UnityEngine.Random.Range(0, spawnLocations.Count);
             Vector3 randomLocation = spawnLocations[spawnRandom];
             spawnLocations.RemoveAt(spawnRandom);
 
-            prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f); 
+            prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f);
             prodRuleObj.transform.rotation = Quaternion.Euler(UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f));
         }
 
         base.OnRunStarted();
+    }
+
+    public override void OnRunEnded()
+    {
+        mProductionRuleObjectsToSpawn.Clear();
+
+        base.OnRunEnded();
+    }
+
+    public void AddProductionRuleObjectToSpawn(ProductionRuleIdentifier productionRuleIndentifier)
+    {
+        mProductionRuleObjectsToSpawn.Add(productionRuleIndentifier);
     }
 }

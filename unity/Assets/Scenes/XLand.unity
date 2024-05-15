@@ -1113,6 +1113,7 @@ GameObject:
   - component: {fileID: 1447110061}
   - component: {fileID: 1447110063}
   - component: {fileID: 1447110062}
+  - component: {fileID: 1447110064}
   m_Layer: 0
   m_Name: ProductionRuleManager
   m_TagString: Untagged
@@ -1147,11 +1148,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26ddbb52241a5ec4b981bab6f45ab6a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  productionRules: []
   productionRuleObjectPrefab: {fileID: 7393287890859856584, guid: 08cd0431f661e3448b2eafbdabbe3740,
     type: 3}
   NEAR_DISTANCE: 2
-  productionRuleGraph: {fileID: 0}
-  trialManager: {fileID: 0}
+  productionRuleGraph: {fileID: 1447110064}
   productionRulePrefabs:
   - name: sphere
     prefab: {fileID: 3537155083289241935, guid: db217135fbe986a43a04352498e1c61c,
@@ -1240,6 +1241,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scriptExecutionPriority: 999
   mPrefabPath: 
+--- !u!114 &1447110064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447110060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceead997d5f8ac94690fea53adbdbe71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minInitialObjects: 1
+  maxInitialObjects: 3
+  minRules: 1
+  maxRules: 2
+  minDeadends: 0
+  maxDeadends: 0
 --- !u!1 &1532024477
 GameObject:
   m_ObjectHideFlags: 0
