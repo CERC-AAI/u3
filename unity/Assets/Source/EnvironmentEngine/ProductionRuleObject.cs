@@ -42,29 +42,6 @@ public class ProductionRuleObject : EnvironmentComponent
 
     }
 
-    public override void OnRemoved()
-    {
-        GetProductionRuleManager().RemoveProdRuleObject(this);
-        base.OnRemoved();
-
-    }
-
-    public override void OnCollision(EnvironmentObject otherObject)
-    {
-        
-        ProductionRuleObject productionRuleObject = otherObject.GetComponentInParent<ProductionRuleObject>();
-        GetProductionRuleManager().CheckCallback(CONDITION.CONTACT, this, productionRuleObject, GetEngine());
-        base.OnCollision(otherObject);
-        //Debug.Log("Object Collided");
-    }
-
-    // public override void OnCreated()
-    // {
-    //     GetProductionRuleManager().AddProdRuleObject(this);
-    //     base.OnCreated();
-    // }
-
-    // Initialize the object with a shape and color, defaulting to a red sphere
     public void ProductionRuleObjectInitialize(string shape, string color)
     {
         identifier = new ProductionRuleIdentifier(shape.ToLower(), color.ToLower());
@@ -84,6 +61,30 @@ public class ProductionRuleObject : EnvironmentComponent
         mCurrentDisplayObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
     }
 
+
+    public override void OnRemoved()
+    {
+        GetProductionRuleManager().RemoveProdRuleObject(this);
+        base.OnRemoved();
+
+    }
+
+    public override void OnCollision(EnvironmentObject otherObject)
+    {
+
+        ProductionRuleObject productionRuleObject = otherObject.GetComponentInParent<ProductionRuleObject>();
+        GetProductionRuleManager().CheckCallback(CONDITION.CONTACT, this, productionRuleObject, GetEngine());
+        base.OnCollision(otherObject);
+        //Debug.Log("Object Collided");
+    }
+
+    // public override void OnCreated()
+    // {
+    //     GetProductionRuleManager().AddProdRuleObject(this);
+    //     base.OnCreated();
+    // }
+
+    // Initialize the object with a shape and color, defaulting to a red sphere
 
     public ProductionRuleIdentifier GetIdentifier()
     {

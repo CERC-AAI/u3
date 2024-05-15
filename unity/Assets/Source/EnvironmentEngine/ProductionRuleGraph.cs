@@ -116,38 +116,83 @@ public class ProductionRuleGraph : MonoBehaviour
         graphNodes = nodes;
     }
 
-    public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState, int numRules)
+    public List<ProductionRuleIdentifier> GetRandomInitialState()
+    {
+        List<ProductionRuleIdentifier> initialState = new List<ProductionRuleIdentifier>();
+        int numObjects = UnityEngine.Random.Range(1, 5); // TODO: change this to a parameter
+        for (int i = 0; i < numObjects; i++)
+        {
+            List<string> shapeKeys = new List<string>(ProductionRuleIdentifier.shapeDict.Keys);
+            List<string> colorKeys = new List<string>(ProductionRuleIdentifier.colorDict.Keys);
+            string shape = shapeKeys[UnityEngine.Random.Range(0, shapeKeys.Count)];
+            string color = colorKeys[UnityEngine.Random.Range(0, colorKeys.Count)];
+            ProductionRuleIdentifier productionRuleIdentifier = new ProductionRuleIdentifier(shape, color);
+            initialState.Add(productionRuleIdentifier);
+        }
+        return initialState;
+    }
+
+    public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState, int numRules = 10, int numDeadEnds = 5)
     {
         List<ProductionRule> productionRules = new List<ProductionRule>();
         List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
+        List<ProductionRuleIdentifier> currentState = initialState;
+
+        // Step 1: Create a linear path of production rules
         for (int i = 0; i < numRules; i++)
         {
-            List<ProductionRuleIdentifier> currentState = UnityEngine.Random.Range(0, stateSpace.Count) == 0 ? initialState : stateSpace[UnityEngine.Random.Range(0, stateSpace.Count)];
             ProductionRule productionRule = SampleForwardRule(currentState);
 
             int numTries = 0;
-            while (OverlapsWithExistingProductionRules(productionRule, productionRules) && numTries < 10)
+            while (OverlapsWithExistingProductionRules(productionRule, productionRules) && numTries < 100)
             {
                 productionRule = SampleForwardRule(currentState);
                 numTries++;
             }
-            if (numTries == 10)
+            if (numTries == 100)
             {
                 Debug.Log("Could not sample a production rule that does not overlap with existing production rules");
                 break;
             }
 
-            if (i - numRules == 1)
+            if (i == numRules - 1)
             {
                 // Make sure there is a reward in the last production rule
-                productionRule.actions[0].action = Action.REWARD;
+                productionRule = SampleForwardRule(currentState, actionIsReward: true);
             }
 
             productionRules.Add(productionRule);
             List<ProductionRuleIdentifier> nextState = GetNextState(currentState, productionRule);
             stateSpace.Add(nextState);
-
+            currentState = nextState;
         }
+
+        // Step 2: Add "dead ends" at random points along the linear path
+        for (int j = 0; j < numDeadEnds; j++)
+        {
+            // Randomly choose a point along the linear path to add a dead end
+            int linearPathIndex = UnityEngine.Random.Range(0, numRules);
+            List<ProductionRuleIdentifier> deadEndState = stateSpace[linearPathIndex];
+
+            ProductionRule deadEndRule = SampleForwardRule(deadEndState, actionNotReward: true);
+
+            int numTries = 0;
+            while (OverlapsWithExistingProductionRules(deadEndRule, productionRules) && numTries < 100)
+            {
+                deadEndRule = SampleForwardRule(deadEndState, actionNotReward: true);
+                numTries++;
+            }
+            if (numTries == 100)
+            {
+                Debug.Log("Could not sample a dead-end rule that does not overlap with existing production rules");
+                continue;
+            }
+
+            productionRules.Add(deadEndRule);
+            List<ProductionRuleIdentifier> nextState = GetNextState(deadEndState, deadEndRule);
+            stateSpace.Add(nextState);
+        }
+
         return productionRules;
     }
 
@@ -186,30 +231,35 @@ public class ProductionRuleGraph : MonoBehaviour
 
             productionRuleSubsumes = productionRuleSubsumes || productionRuleSubsumesExistingProductionRule;
             productionRuleIsSubsumed = productionRuleIsSubsumed || existingProductionRuleSubsumesProductionRule;
+
+            if (productionRuleSubsumes || productionRuleIsSubsumed)
+            {
+                break;
+            }
         }
 
         return productionRuleSubsumes || productionRuleIsSubsumed;
     }
 
-    public List<ProductionRule> SampleForwardRules(List<ProductionRuleIdentifier> initialState, int numRules)
+    public List<ProductionRule> SampleForwardRules(List<ProductionRuleIdentifier> initialState, int numRules, bool actionIsReward = false, bool actionNotReward = false)
     {
         // Samples multiple forward rules from the same initial state
         List<ProductionRule> productionRules = new List<ProductionRule>();
         for (int i = 0; i < numRules; i++)
         {
-            ProductionRule productionRule = SampleForwardRule(initialState);
+            ProductionRule productionRule = SampleForwardRule(initialState, actionIsReward, actionNotReward);
             productionRules.Add(productionRule);
         }
         return productionRules;
     }
-    public ProductionRule SampleForwardRule(List<ProductionRuleIdentifier> initialState)
+    public ProductionRule SampleForwardRule(List<ProductionRuleIdentifier> initialState, bool actionIsReward = false, bool actionNotReward = false)
     {
         List<ProductionRuleCondition> conditions = new List<ProductionRuleCondition>();
         ProductionRuleCondition productionRuleCondition = sampleForwardProductionRuleCondition(initialState);
         conditions.Add(productionRuleCondition);
 
         List<ProductionRuleAction> actions = new List<ProductionRuleAction>();
-        ProductionRuleAction productionRuleAction = SampleForwardProductionRuleAction(initialState);
+        ProductionRuleAction productionRuleAction = SampleForwardProductionRuleAction(initialState, actionIsReward, actionNotReward);
         actions.Add(productionRuleAction);
 
         ProductionRule productionRule = new ProductionRule(conditions, actions);
@@ -263,9 +313,26 @@ public class ProductionRuleGraph : MonoBehaviour
 
         return productionRuleCondition;
     }
-    public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> initialState)
+    public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> initialState, bool isReward = false, bool notReward = false)
     {
         Action action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+        if (isReward && notReward)
+        {
+            throw new ArgumentException("isReward and notReward cannot both be true");
+        }
+        if (isReward)
+        {
+            action = Action.REWARD;
+        }
+        else if (notReward)
+        {
+            action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+            while (action == Action.REWARD)
+            {
+                action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+            }
+        }
+
         while (initialState.Count - necessaryObjectCountForAction[action] < 0)
         {
             Debug.Log($"Not enough objects for action {action}, sampling again.");
