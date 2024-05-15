@@ -238,7 +238,7 @@ def create_environment_by_name(name, task):
     # modeOffset = FLAGS.run_mode == 'actor'
     # path = Path(__file__).parent.absolute()
     environmentChannel = U3SideChannel()
-    unity_env = U3Environment(no_graphics=True, file_name=name, side_channels=[environmentChannel])
+    unity_env = U3Environment(file_name=name, side_channels=[environmentChannel])
     env = U3Wrapper(
         unity_env, environmentChannel, flatten_branched=True, uint8_visual=True
     )
