@@ -28,7 +28,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     public Dictionary<Action, int> necessaryObjectCountForAction = new Dictionary<Action, int>()
     {
         {Action.SPAWN, 0},
-        {Action.REMOVE, 1},
+        {Action.REMOVE, 2}, // don't want to end up with no objects in the environment
         {Action.REWARD, 0},
         {Action.PRINT, 0}
     };
@@ -36,7 +36,8 @@ public class ProductionRuleGraph : EnvironmentComponent
     public Dictionary<Action, List<PredicateObjects>> PermissiblepredicateObjectsForAction = new Dictionary<Action, List<PredicateObjects>>()
     {
         {Action.SPAWN, new List<PredicateObjects>(){PredicateObjects.NONE, PredicateObjects.SUBJECT}},
-        {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}},
+        // {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}}, # TODO: fix double-predicate necessaryObjectCountForAction conflict
+        {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
         {Action.REWARD, new List<PredicateObjects>(){PredicateObjects.NONE}},
         {Action.PRINT, new List<PredicateObjects>(){PredicateObjects.NONE}}
     };
