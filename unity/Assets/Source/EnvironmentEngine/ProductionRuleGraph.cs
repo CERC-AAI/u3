@@ -28,7 +28,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     public Dictionary<Action, int> necessaryObjectCountForAction = new Dictionary<Action, int>()
     {
         {Action.SPAWN, 0},
-        {Action.REMOVE, 1},
+        {Action.REMOVE, 2}, // don't want to end up with no objects in the environment
         {Action.REWARD, 0},
         {Action.PRINT, 0}
     };
@@ -36,7 +36,8 @@ public class ProductionRuleGraph : EnvironmentComponent
     public Dictionary<Action, List<PredicateObjects>> PermissiblepredicateObjectsForAction = new Dictionary<Action, List<PredicateObjects>>()
     {
         {Action.SPAWN, new List<PredicateObjects>(){PredicateObjects.NONE, PredicateObjects.SUBJECT}},
-        {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}},
+        // {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}}, # TODO: fix double-predicate necessaryObjectCountForAction conflict
+        {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
         {Action.REWARD, new List<PredicateObjects>(){PredicateObjects.NONE}},
         {Action.PRINT, new List<PredicateObjects>(){PredicateObjects.NONE}}
     };
@@ -270,26 +271,26 @@ public class ProductionRuleGraph : EnvironmentComponent
         return productionRuleSubsumes || productionRuleIsSubsumed;
     }
 
-    public List<ProductionRule> SampleForwardRules(List<ProductionRuleIdentifier> initialState, int numRules, bool actionIsReward = false, bool actionNotReward = false)
+    public List<ProductionRule> SampleForwardRules(List<ProductionRuleIdentifier> currentState, int numRules, bool actionIsReward = false, bool actionNotReward = false)
     {
         // Samples multiple forward rules from the same initial state
         List<ProductionRule> productionRules = new List<ProductionRule>();
         for (int i = 0; i < numRules; i++)
         {
-            ProductionRule productionRule = SampleForwardRule(initialState, actionIsReward, actionNotReward);
+            ProductionRule productionRule = SampleForwardRule(currentState, actionIsReward, actionNotReward);
             productionRules.Add(productionRule);
         }
         return productionRules;
     }
 
-    public ProductionRule SampleForwardRule(List<ProductionRuleIdentifier> initialState, bool actionIsReward = false, bool actionNotReward = false)
+    public ProductionRule SampleForwardRule(List<ProductionRuleIdentifier> currentState, bool actionIsReward = false, bool actionNotReward = false)
     {
         List<ProductionRuleCondition> conditions = new List<ProductionRuleCondition>();
-        ProductionRuleCondition productionRuleCondition = sampleForwardProductionRuleCondition(initialState);
+        ProductionRuleCondition productionRuleCondition = sampleForwardProductionRuleCondition(currentState);
         conditions.Add(productionRuleCondition);
 
         List<ProductionRuleAction> actions = new List<ProductionRuleAction>();
-        ProductionRuleAction productionRuleAction = SampleForwardProductionRuleAction(initialState, actionIsReward, actionNotReward);
+        ProductionRuleAction productionRuleAction = SampleForwardProductionRuleAction(currentState, actionIsReward, actionNotReward);
         actions.Add(productionRuleAction);
 
         ProductionRule productionRule = new ProductionRule(conditions, actions);
@@ -297,12 +298,12 @@ public class ProductionRuleGraph : EnvironmentComponent
         return productionRule;
     }
 
-    public ProductionRuleCondition sampleForwardProductionRuleCondition(List<ProductionRuleIdentifier> initialState)
+    public ProductionRuleCondition sampleForwardProductionRuleCondition(List<ProductionRuleIdentifier> currentState)
     {
         CONDITION condition = (CONDITION)UnityEngine.Random.Range(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
         int neededObjectCount = necessaryObjectCountForCondition[condition];
 
-        while (condition == CONDITION.NONE || neededObjectCount > initialState.Count)
+        while (condition == CONDITION.NONE || neededObjectCount > currentState.Count)
         {
             if (condition == CONDITION.NONE)
             {
@@ -321,19 +322,19 @@ public class ProductionRuleGraph : EnvironmentComponent
 
         if (neededObjectCount == 2)
         {
-            int subjectIndex = UnityEngine.Random.Range(0, initialState.Count);
-            int objectIndex = UnityEngine.Random.Range(0, initialState.Count);
+            int subjectIndex = UnityEngine.Random.Range(0, currentState.Count);
+            int objectIndex = UnityEngine.Random.Range(0, currentState.Count);
             while (subjectIndex == objectIndex)
             {
-                objectIndex = UnityEngine.Random.Range(0, initialState.Count);
+                objectIndex = UnityEngine.Random.Range(0, currentState.Count);
             }
 
-            subjectIdentifier = initialState[subjectIndex];
-            objectIdentifier = initialState[objectIndex];
+            subjectIdentifier = currentState[subjectIndex];
+            objectIdentifier = currentState[objectIndex];
         }
         else if (neededObjectCount == 1)
         {
-            subjectIdentifier = initialState[UnityEngine.Random.Range(0, initialState.Count)];
+            subjectIdentifier = currentState[UnityEngine.Random.Range(0, currentState.Count)];
         }
         else if (neededObjectCount != 0)
         {
@@ -344,7 +345,7 @@ public class ProductionRuleGraph : EnvironmentComponent
 
         return productionRuleCondition;
     }
-    public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> initialState, bool isReward = false, bool notReward = false)
+    public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> currentState, bool isReward = false, bool notReward = false)
     {
         Action action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
         if (isReward && notReward)
@@ -364,7 +365,7 @@ public class ProductionRuleGraph : EnvironmentComponent
             }
         }
 
-        while (initialState.Count - necessaryObjectCountForAction[action] < 0)
+        while (currentState.Count - necessaryObjectCountForAction[action] < 0)
         {
             Debug.Log($"Not enough objects for action {action}, sampling again.");
             action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
@@ -374,7 +375,7 @@ public class ProductionRuleGraph : EnvironmentComponent
 
         List<PredicateObjects> permissiblePredicateObjects = PermissiblepredicateObjectsForAction[action];
         PredicateObjects predicateObjects = permissiblePredicateObjects[UnityEngine.Random.Range(0, permissiblePredicateObjects.Count)];
-        ProductionRuleIdentifier identifier = initialState[UnityEngine.Random.Range(0, initialState.Count)];
+        ProductionRuleIdentifier identifier = currentState[UnityEngine.Random.Range(0, currentState.Count)];
 
         ProductionRuleAction productionRuleAction = new ProductionRuleAction(action, reward, predicateObjects, identifier);
 
