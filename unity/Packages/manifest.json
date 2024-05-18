@@ -10,7 +10,7 @@
     "com.unity.collab-proxy": "2.0.4",
     "com.unity.ide.visualstudio": "2.0.22",
     "com.unity.inputsystem": "1.5.1",
-    "com.unity.ml-agents": "2.0.1",
+    "com.unity.ml-agents": "file:H:/Git/u3/ml-agents/com.unity.ml-agents",
     "com.unity.purchasing": "4.8.0",
     "com.unity.render-pipelines.universal": "15.0.5",
     "com.unity.textmeshpro": "3.0.6",

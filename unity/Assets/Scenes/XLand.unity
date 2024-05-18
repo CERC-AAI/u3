@@ -2118,6 +2118,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
+        type: 3}
+      propertyPath: m_AllowMSAA
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
+        type: 3}
+      propertyPath: m_OcclusionCulling
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3305972231083707568, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
         type: 3}
       propertyPath: mPrefabPath
