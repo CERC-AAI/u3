@@ -205,8 +205,7 @@ def create_environment(task):
 
 
 def create_environment_by_name(name, task):
-    unity_env = U3Environment(file_name=name)
+    unity_env = U3Environment(file_name=name, seed=task)
     env = UnityToGymWrapper(unity_env, uint8_visual=True)
-    env.seed(task)
 
     return env
