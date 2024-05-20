@@ -8,8 +8,8 @@ set_log_level(_log_level)
 
 import u3_env
 
-#env = u3_env.create_environment(0)
-env = u3_env.create_environment_by_name("H:/Git/u3/python/XLand/unitylearning2", 0)
+env = u3_env.create_environment(0)
+#env = u3_env.create_environment_by_name("H:/Git/u3/python/XLand/unitylearning2", 0)
 
 for t in range(100):
     # Render the environment (optional, for visualization)
@@ -43,7 +43,7 @@ for t in range(100):
 
     for agent in agents:
         if not observation[agent] is None:
-            image = cv2.cvtColor(observation[agent], cv2.COLOR_RGB2BGR)
+            image = cv2.cvtColor(np.moveaxis(observation[agent], 0, -1), cv2.COLOR_RGB2BGR)
             frame_name = agent.replace("?", "_")
             frame_name = frame_name.replace(" ", "_")
             frame_name = frame_name.replace("=", "_")

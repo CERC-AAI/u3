@@ -140,6 +140,7 @@ public class CameraSensorInfo : SensorInfo
 
         if (myCamera == null)
         {
+            Debug.LogError("No camera found for Camera sensor! Make sure this is set.");
             return false;
         }
 

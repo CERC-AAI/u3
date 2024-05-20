@@ -2063,6 +2063,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 1457846258207110503, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1607234846047417964, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
         type: 3}
       propertyPath: m_RootOrder
@@ -2120,7 +2125,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
         type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
+        type: 3}
       propertyPath: m_AllowMSAA
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
+        type: 3}
+      propertyPath: orthographic
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
@@ -2138,8 +2153,19 @@ PrefabInstance:
       propertyPath: mPrefabPath
       value: Assets/Resources/GameObjects/XLand/Player.prefab
       objectReference: {fileID: 0}
+    - target: {fileID: 8989491749862070534, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
+        type: 3}
+      propertyPath: Camera
+      value: 
+      objectReference: {fileID: 6205469421767494493}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f, type: 3}
+--- !u!20 &6205469421767494493 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
+    type: 3}
+  m_PrefabInstance: {fileID: 6205469421767494492}
+  m_PrefabAsset: {fileID: 0}
