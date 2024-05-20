@@ -4,7 +4,7 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    env = create_environment_by_name("XLand", 42)
+    env = create_environment_by_name("./unity/Builds/XLand", 42)
 
     obs = env.reset()
     print(obs.shape)
