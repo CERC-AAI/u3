@@ -1019,7 +1019,7 @@ public class MetatileManager : EnvironmentComponent
     private static MetatileConfigurationWeights DrawMetaTileWithConfiguration(List<MetatileConfigurationWeights> metatileConfigurationWeights)
     {
         float totalWeight = metatileConfigurationWeights.Sum(x => x.weight);
-        float randomWeight = UnityEngine.Random.Range(0, totalWeight);
+        float randomWeight = GetEngine().GetRandomRange(0, totalWeight);
         float currentWeight = 0;
         int metatileConfigurationIndex = 0;
 
@@ -1115,7 +1115,7 @@ public class MetatileManager : EnvironmentComponent
                 return new Vector3Int(-1, -1, -1); // return invalid position
             }
             // Debug.Log("SelectPlacementPosition() emptyPositions.Count: " + emptyPositions.Count);
-            return emptyPositions[UnityEngine.Random.Range(0, emptyPositions.Count)];
+            return emptyPositions[GetEngine().GetRandomRange(0, emptyPositions.Count)];
         }
         else
         {
@@ -1126,7 +1126,7 @@ public class MetatileManager : EnvironmentComponent
             }
 
             float minEntropyValue = wavefront.entropies.Min();
-            int startPoint = UnityEngine.Random.Range(0, wavefront.entropies.Count);
+            int startPoint = GetEngine().GetRandomRange(0, wavefront.entropies.Count);
             int minEntropyIndex = wavefront.entropies.IndexOf(minEntropyValue, startPoint);
             if (minEntropyIndex < 0)
             {
@@ -1287,7 +1287,7 @@ public class MetatileManager : EnvironmentComponent
             {
                 shouldUseConfiguration = false;
 
-                int randomNumber = UnityEngine.Random.Range(0, mUseIndicies.Count);
+                int randomNumber = GetEngine().GetRandomRange(0, mUseIndicies.Count);
                 if (mUseIndicies[randomNumber])
                 {
                     mUseIndicies.RemoveAt(randomNumber);
@@ -2007,7 +2007,7 @@ public class MetatileManager : EnvironmentComponent
     {
         while (mPotentialConfigurationList.Count > 0)
         {
-            int putativeConfigurationIndex = UnityEngine.Random.Range(0, mPotentialConfigurationList.Count);
+            int putativeConfigurationIndex = GetEngine().GetRandomRange(0, mPotentialConfigurationList.Count);
             int candidateConfigurationIndex = mPotentialConfigurationList[putativeConfigurationIndex];
 
             if (validConfigurations[candidateConfigurationIndex] == ConfigurationValidity.VALID)

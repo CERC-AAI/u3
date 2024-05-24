@@ -29,7 +29,7 @@ public class SpawnManager : EnvironmentComponent
 
         foreach (U3DPlayer agent in agents)
         {
-            int spawnRandom = UnityEngine.Random.Range(0, spawnLocations.Count);
+            int spawnRandom = GetEngine().GetRandomRange(0, spawnLocations.Count);
             Vector3 randomLocation = spawnLocations[spawnRandom];
             spawnLocations.RemoveAt(spawnRandom);
 
@@ -38,7 +38,7 @@ public class SpawnManager : EnvironmentComponent
             U3DPlayer.AgentState agentState = (U3DPlayer.AgentState)agent.SaveTrialData();
 
             agentState.position = randomLocation + new Vector3(0f, 0.5f);
-            agentState.rotation = Quaternion.Euler(0.0f, UnityEngine.Random.Range(0.0f, 360.0f), 0.0f);
+            agentState.rotation = Quaternion.Euler(0.0f, GetEngine().GetRandomRange(0.0f, 360.0f), 0.0f);
             agentState.cameraPlanarDirection = agentState.rotation * Vector3.forward;
 
             agent.LoadTrialData(agentState);
@@ -51,12 +51,12 @@ public class SpawnManager : EnvironmentComponent
             ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
             prodRuleObj.ProductionRuleObjectInitialize(productionRuleIdentifier.ObjectShape, productionRuleIdentifier.ObjectColor);
 
-            int spawnRandom = UnityEngine.Random.Range(0, spawnLocations.Count);
+            int spawnRandom = GetEngine().GetRandomRange(0, spawnLocations.Count);
             Vector3 randomLocation = spawnLocations[spawnRandom];
             spawnLocations.RemoveAt(spawnRandom);
 
             prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f);
-            prodRuleObj.transform.rotation = Quaternion.Euler(UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f));
+            prodRuleObj.transform.rotation = Quaternion.Euler(GetEngine().GetRandomRange(0.0f, 360.0f), GetEngine().GetRandomRange(0.0f, 360.0f), GetEngine().GetRandomRange(0.0f, 360.0f));
         }
 
         base.OnRunStarted();
