@@ -128,6 +128,20 @@ public class ProductionRuleGraph : EnvironmentComponent
         }
         graphNodes = nodes;
     }*/
+        public override void InitParameters(JSONObject jsonParameters)
+    {
+        if (jsonParameters)
+        {
+            jsonParameters.GetField(out minInitialObjects, "min_init_objs", minInitialObjects);
+            jsonParameters.GetField(out maxInitialObjects, "max_init_objs", maxInitialObjects);
+            jsonParameters.GetField(out minRules, "min_rules", minRules);
+            jsonParameters.GetField(out maxRules, "max_rules", maxRules);
+            jsonParameters.GetField(out minDeadends, "min_deadends", minDeadends);
+            jsonParameters.GetField(out maxDeadends, "max_deadends", maxDeadends);
+        }
+
+        base.InitParameters(jsonParameters);
+    }
 
     public List<ProductionRuleIdentifier> GetRandomInitialState()
     {

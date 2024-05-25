@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 473794b9a814547788759f95a7723a5c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 227955
+  packageName: FREE Ultimate Procedural Primitives
+  packageVersion: 1.0
+  assetPath: Assets/KANIYONIKA/UltimateProceduralPrimitivesFREE/40_Scripts/90_Utils/Delaunay/Geom.cs
+  uploadId: 516907

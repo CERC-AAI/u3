@@ -1,0 +1,118 @@
+fileFormatVersion: 2
+guid: 4507eeec171eb4b098522dedf46a2718
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 75941f6d8fb0e494abeec7a436da412d, type: 3}
+  _shape: 99
+  _plane:
+    surfaceType: 1
+    orientation: 0
+    direction: 0
+    pivotPosition: 2
+    doubleSided: 1
+    faceSegments: {x: 3, y: 3}
+    width: 3
+    height: 3
+    flipNormals: 0
+  _planeFlex:
+    FreeVersion: NotAvailable
+  _planeSuperEllipse:
+    FreeVersion: NotAvailable
+  _box:
+    surfaceType: 1
+    direction: 0
+    pivotPosition: 2
+    width: 3
+    height: 3
+    depth: 3
+    segments: {x: 1, y: 1}
+    flipNormals: 0
+  _boxFlex:
+    FreeVersion: NotAvailable
+  _boxRounded:
+    surfaceType: 0
+    direction: 0
+    pivotPosition: 2
+    width: 3
+    height: 3
+    depth: 3
+    radius: 0.2
+    segments: 5
+    flipNormals: 0
+  _boxSuperEllipsoid:
+    FreeVersion: NotAvailable
+  _pyramid:
+    surfaceType: 1
+    direction: 0
+    pivotPosition: 2
+    width: 3
+    height: 2.5
+    depth: 3
+    segmentsSides: {x: 10, y: 10}
+    segmentsBottom: {x: 5, y: 5}
+    flipNormals: 0
+  _pyramidFlex:
+    FreeVersion: NotAvailable
+  _pyramidPerfectTriangularFlex:
+    FreeVersion: NotAvailable
+  _sphere:
+    surfaceType: 0
+    direction: 0
+    pivotPosition: 2
+    radius: 1.5
+    columns: 24
+    rows: 12
+    flipNormals: 0
+  _sphereIco:
+    FreeVersion: NotAvailable
+  _sphereFibonacci:
+    FreeVersion: NotAvailable
+  _tearDrop:
+    FreeVersion: NotAvailable
+  _cylinder:
+    FreeVersion: NotAvailable
+  _cone:
+    surfaceType: 0
+    direction: 0
+    pivotPosition: 2
+    topRadius: 0
+    bottomRadius: 1
+    Height: 3
+    columns: 24
+    rows: 12
+    caps: 1
+    flipNormals: 0
+  _supershape:
+    surfaceType: 0
+    direction: 0
+    pivotPosition: 2
+    segments: 100
+    radius: 1
+    lonShape_N1: 0.2
+    lonShape_N2: 1.7
+    lonShape_N3: 1.7
+    lonShape_M: 7
+    lonShape_A: 1
+    lonShape_B: 1
+    latShape_N1: 0.2
+    latShape_N2: 1.7
+    latShape_N3: 1.7
+    latShape_M: 7
+    latShape_A: 1
+    latShape_B: 1
+    flipNormals: 0
+  _otherShapes:
+    FreeVersion: NotAvailable
+AssetOrigin:
+  serializedVersion: 1
+  productId: 227955
+  packageName: FREE Ultimate Procedural Primitives
+  packageVersion: 1.0
+  assetPath: Assets/KANIYONIKA/UltimateProceduralPrimitivesFREE/30_Prefabs - MeshAssetsPresets/99_Supershape
+    - 02_SeaUrchin.upp
+  uploadId: 516907

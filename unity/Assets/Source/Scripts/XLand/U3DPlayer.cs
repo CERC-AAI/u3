@@ -133,6 +133,9 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     private Vector3 lastInnerNormal = Vector3.zero;
     private Vector3 lastOuterNormal = Vector3.zero;
 
+    int mOverrideCameraWidth = -1;
+    int mOverrideCameraHeight = -1;
+
     protected override void Initialize()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -176,6 +179,17 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
             // Assign the characterController to the motor
             Motor.CharacterController = this;
         }
+    }
+
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        if (jsonParameters)
+        {
+            jsonParameters.GetField(out mOverrideCameraWidth, "camera_width", -1);
+            jsonParameters.GetField(out mOverrideCameraHeight, "camera_height", -1);
+        }
+
+        base.InitParameters(jsonParameters);
     }
 
     public override void OnUpdate(float deltaTime)
@@ -745,5 +759,10 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
                 agentState.cameraTargetDistance
             );
         }
+    }
+
+    public Vector2Int GetOverrideCameraSize()
+    {
+        return new Vector2Int(mOverrideCameraWidth, mOverrideCameraHeight);
     }
 }

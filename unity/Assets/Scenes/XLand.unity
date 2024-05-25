@@ -372,7 +372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trialCounter: 0
   maxTrials: 6
-  trialResetUpdateFrequency: 20
+  trialResetUpdateFrequency: 1
   trialDurationCounter: 0
   trialRealTimeCounter: 0
 --- !u!114 &607219979
@@ -885,7 +885,7 @@ PrefabInstance:
     - target: {fileID: 8063073397250431797, guid: f0271df749728104eac22c3d897fd8ce,
         type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8063073397250431797, guid: f0271df749728104eac22c3d897fd8ce,
         type: 3}
@@ -1045,7 +1045,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74f88f56251051741a36a4233bfcfde8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugMode: 0
   forceSaveData: 0
   scenes:
   - environmentID: xland
@@ -1064,7 +1063,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1437354645
 GameObject:
@@ -1161,6 +1160,18 @@ MonoBehaviour:
     prefab: {fileID: 177658444648118417, guid: 57ef95bbe7f83f84a96df70b27bafca0, type: 3}
   - name: cylinder
     prefab: {fileID: 8363114004364241834, guid: f6cbfb47d862a344fa28e9c0be4154ec,
+      type: 3}
+  - name: round_cube
+    prefab: {fileID: 7500289910009589077, guid: 233a496e9817c9e4b8af474233f88f0a,
+      type: 3}
+  - name: round_rect
+    prefab: {fileID: 6724933356293947508, guid: 8627c99802f481c4e9edab5bece494a2,
+      type: 3}
+  - name: pryamid
+    prefab: {fileID: 5917134068801288450, guid: a96cccabe3d1c56418ef0c6c6586eeaa,
+      type: 3}
+  - name: cone
+    prefab: {fileID: 7085416308278877825, guid: 0f53ecd58230ab64aadc5297f43f8e53,
       type: 3}
   defaultProductionRules:
   - conditions:

@@ -39,9 +39,6 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     bool mIsRunning = false;
     bool mIsWaitingForActions = false;
 
-    int mOverrideCameraWidth = -1;
-    int mOverrideCameraHeight = -1;
-
     PhysicsScene mPhysicsScene;
     PhysicsScene2D mPhysicsScene2D;
 
@@ -80,8 +77,6 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     {
         if (loadParams)
         {
-            loadParams.GetField(out mOverrideCameraWidth, "camera_width", -1);
-            loadParams.GetField(out mOverrideCameraHeight, "camera_height", -1);
             loadParams.GetField(out fixedUpdatesPerSecond, "frames_per_second", fixedUpdatesPerSecond);
         }
 
@@ -111,15 +106,14 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
         for (int i = 0; i < tempList.Count; i++)
         {
-            mEnvironmentObjects[i].CheckInitialized();
-        }
+            mEnvironmentObjects[i].CheckAll();
 
-        if (loadParams)
-        {
-            for (int i = 0; i < mEnvironmentComponents.Count; i++)
-            {
+            if (loadParams)
+            { 
                 mEnvironmentComponents[i].InitParameters(loadParams);
             }
+
+            mEnvironmentObjects[i].CheckInitialized();
         }
     }
 
@@ -937,11 +931,6 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     virtual public Vector3 ApplyEnvironmentAngularVelocity(Vector3 originalAngularVelocity)
     {
         return originalAngularVelocity;
-    }
-
-    public Vector2Int GetOverrideCameraSize()
-    {
-        return new Vector2Int(mOverrideCameraWidth, mOverrideCameraHeight);
     }
 
 

@@ -165,11 +165,11 @@ public class CameraSensorInfo : SensorInfo
             height = myCamera.pixelHeight;
         }
 
-        EnvironmentComponent mParentComponent = (EnvironmentComponent)mParent;
+        U3DPlayer parentComponent = (U3DPlayer)mParent;
 
-        if (mParentComponent)
+        if (parentComponent)
         {
-            Vector2Int overrideCameraSize = mParentComponent.GetEngine().GetOverrideCameraSize();
+            Vector2Int overrideCameraSize = parentComponent.GetOverrideCameraSize();
             if (overrideCameraSize.x != -1)
             {
                 width = overrideCameraSize.x;

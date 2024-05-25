@@ -6,6 +6,7 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 using Unity.Mathematics;
+using UnityEngine.UIElements;
 // using NUnit;
 
 // Class structure is fine, but start from scratch
@@ -120,6 +121,16 @@ public class ProductionRuleManager : EnvironmentComponent
         {
             spawnManager.AddProductionRuleObjectToSpawn(ruleIdentifier);
         }
+    }
+
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        if (jsonParameters)
+        {
+            jsonParameters.GetField(out NEAR_DISTANCE, "prod_rule_near_distance", NEAR_DISTANCE);
+        }
+
+        base.InitParameters(jsonParameters);
     }
 
     protected override void DoRegisterCallbacks()

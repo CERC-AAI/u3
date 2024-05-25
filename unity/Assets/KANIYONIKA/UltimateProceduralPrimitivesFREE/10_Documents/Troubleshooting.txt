@@ -1,0 +1,31 @@
+
+
+Troubleshooting
+
+- When I browse the inspector, the "Shape" is unset.
+
+When your Unity project has a UPP object created with a previous version of UPP, you may encounter this problem.
+In that case, please set the "Shape" to the correct one and press "Apply". All parameters are retained and have not disappeared.
+
+
+- Vertex information of the mesh in 30_Prefabs is wrong.
+
+Vertex information calculation logic was optimized in ver2.0. There is a possibility that Prefabs from ver1.x are still in the project.
+Please delete the folder 30_Prefabs - MeshAssetsPresets and import it again. We apologize for the inconvenience.
+Alternatively, press Apply and it will recalculate again to fix the problem.
+
+-----------------------------------------
+
+トラブルシューティング
+
+- インスペクターを参照したら「Shape」が未設定になってしまった
+
+以前のUPバージョンで作成したUPPオブジェクトがある時に発生する可能性があります。
+その際は「Shape」を正しいものに設定し直し「Apply」を押して下さい。パラメーターは全て保持されていて、消えていません。
+
+
+- 30_Prefabs に入っているメッシュの頂点情報がおかしい
+
+ver2.0で頂点情報算出ロジックを最適化しました。 ver1.xの Prefab がプロジェクト内に残っている可能性があります。
+一度、30_Prefabs - MeshAssetsPresets　フォルダを削除して、再度インポートして下さい。お手数お掛けして申し訳ございません。
+または、Applyを押すと再度算出し直すので直ります。

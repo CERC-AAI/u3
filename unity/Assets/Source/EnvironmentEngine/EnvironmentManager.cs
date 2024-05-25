@@ -22,7 +22,7 @@ public class EnvironmentManager : MonoBehaviour
         public LocalPhysicsMode physicsType = LocalPhysicsMode.Physics3D;
     }
 
-    public bool debugMode = true;
+    //public bool debugMode = true;
     public bool forceSaveData = false;
     public List<SceneDefinition> scenes = new List<SceneDefinition>();
 
@@ -85,7 +85,7 @@ public class EnvironmentManager : MonoBehaviour
             mSceneIDs[scene.environmentID] = scene.sceneName;
         }
 
-        if (debugMode == true)
+        if (!IsPython())
         {
             GameObject[] objects = SceneManager.GetActiveScene().GetRootGameObjects();
             for (int i = 0; i < objects.Length; i++)
@@ -109,7 +109,7 @@ public class EnvironmentManager : MonoBehaviour
     {
         mIsInitialized = false;
 
-        if (debugMode && mEnvironments.ContainsKey(1))
+        if (!IsPython() && mEnvironments.ContainsKey(1))
         {
             mEnvironments[1].CheckInitialized();
         }
@@ -123,7 +123,7 @@ public class EnvironmentManager : MonoBehaviour
         {
             mIsInitialized = true;
 
-            if (debugMode && mEnvironments.ContainsKey(1))
+            if (!IsPython() && mEnvironments.ContainsKey(1))
             {
                 mEnvironments[1].InitializeEnvironment(null);
                 mEnvironments[1].StartRun();
@@ -174,7 +174,7 @@ public class EnvironmentManager : MonoBehaviour
             }
         }
 
-        if (debugMode)
+        if (!IsPython())
         {
             foreach (var pair in mEnvironments)
             {

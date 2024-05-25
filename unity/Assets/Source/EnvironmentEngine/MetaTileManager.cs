@@ -312,6 +312,22 @@ public class MetatileManager : EnvironmentComponent
     List<float> mFinalWeights = new List<float>();
     List<bool> mUseIndicies = new List<bool>();
 
+
+
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        if (jsonParameters)
+        {
+            jsonParameters.GetField(out mWidth, "env_width", mWidth);
+            jsonParameters.GetField(out mLength, "env_length", mLength);
+            jsonParameters.GetField(out mHeight, "env_height", mHeight);
+            /*jsonParameters.GetField(out saveFoler, "world_save_folder", saveFoler);
+            jsonParameters.GetField(out loadFolder, "world_load_folder", loadFolder);*/
+        }
+
+        base.InitParameters(jsonParameters);
+    }
+
     public override void OnRunStarted()
     {
         Debug.Log("MetaTileManager"); 
