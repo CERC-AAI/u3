@@ -202,13 +202,12 @@ public class EnvironmentAgent : EnvironmentComponent
     {
         if (timedOut)
         {
-            mAgentScript.EpisodeInterrupted();
+            mAgentScript.QueueEpisodeInterrupted();
         }
         else
         {
-            mAgentScript.EndEpisode();
+            mAgentScript.QueueEpisodeEnded();
         }
-        mEngine.AgentEndedEpisode(this);
     }
 
     private void OnDisable()

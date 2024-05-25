@@ -128,6 +128,7 @@ public class ProductionRuleManager : EnvironmentComponent
         if (mTrialManager)
         {
             RegisterCallback(ref mTrialManager.OnTrialOverCallbacks, OnTrialOver);
+            RegisterCallback(ref mTrialManager.OnTrialStartCallbacks, OnTrialStart);
         }
 
         if (GetGravityGun() != null)
@@ -157,7 +158,11 @@ public class ProductionRuleManager : EnvironmentComponent
         }
     }
 
-    public override void OnEpisodeEnded()
+    void OnTrialStart()
+    {
+    }
+
+    public override void OnRunEnded()
     {
         int numProdRuleObjects = allProdRuleObjects.Count;
         for (int i = 0; i < numProdRuleObjects; i++)
@@ -166,7 +171,7 @@ public class ProductionRuleManager : EnvironmentComponent
             productionRuleObject.Remove();
         }
 
-        base.OnEpisodeEnded();
+        base.OnRunEnded();
     }
 
     public void AddRule(ProductionRule rule)

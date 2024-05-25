@@ -84,8 +84,8 @@ public class ProductionRuleGraph : EnvironmentComponent
 
     /*public void BuildProductionRuleGraph(List<ProductionRuleIdentifier> rootState, int numStates = 10, int numRules = 3)
     {
-        numStates = UnityEngine.Random.Range(minRules, maxRules);
-        numRules = UnityEngine.Random.Range()
+        numStates = GetEngine().GetRandomRange(minRules, maxRules);
+        numRules = GetEngine().GetRandomRange()
 
         List<Node> nodes = new List<Node>();
         Node rootNode = new Node();
@@ -99,16 +99,16 @@ public class ProductionRuleGraph : EnvironmentComponent
 
         while (nodes.Count < numStates)
         {
-            int randomNumRules = UnityEngine.Random.Range(1, numRules);
+            int randomNumRules = GetEngine().GetRandomRange(1, numRules);
             if (nodes.Count + randomNumRules > numStates)
             {
                 randomNumRules = numStates - nodes.Count;
             }
 
-            Node node = nodes[UnityEngine.Random.Range(0, nodes.Count)];
+            Node node = nodes[GetEngine().GetRandomRange(0, nodes.Count)];
             if (node.children.Count > 0)
             {
-                node = node.children[UnityEngine.Random.Range(0, node.children.Count)];
+                node = node.children[GetEngine().GetRandomRange(0, node.children.Count)];
             }
             List<ProductionRule> sampledProductionRules = SampleForwardRules(node.state, randomNumRules);
             node.productionRules.AddRange(sampledProductionRules);
@@ -141,13 +141,13 @@ public class ProductionRuleGraph : EnvironmentComponent
         }
 
         List<ProductionRuleIdentifier> initialState = new List<ProductionRuleIdentifier>();
-        int numObjects = UnityEngine.Random.Range(minInitialObjects, maxInitialObjects + 1);
+        int numObjects = GetEngine().GetRandomRange(minInitialObjects, maxInitialObjects + 1);
         numObjects = Mathf.Max(numObjects, 1);
         for (int i = 0; i < numObjects; i++)
         {
             List<string> colorKeys = new List<string>(ProductionRuleIdentifier.colorDict.Keys);
-            string shape = shapeKeys[UnityEngine.Random.Range(0, shapeKeys.Count)];
-            string color = colorKeys[UnityEngine.Random.Range(0, colorKeys.Count)];
+            string shape = shapeKeys[GetEngine().GetRandomRange(0, shapeKeys.Count)];
+            string color = colorKeys[GetEngine().GetRandomRange(0, colorKeys.Count)];
             ProductionRuleIdentifier productionRuleIdentifier = new ProductionRuleIdentifier(shape, color);
             initialState.Add(productionRuleIdentifier);
         }
@@ -156,8 +156,8 @@ public class ProductionRuleGraph : EnvironmentComponent
 
     public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState)
     {
-        int numRules = UnityEngine.Random.Range(minRules, maxRules + 1);
-        int numDeadEnds = UnityEngine.Random.Range(minDeadends, maxDeadends + 1);
+        int numRules = GetEngine().GetRandomRange(minRules, maxRules + 1);
+        int numDeadEnds = GetEngine().GetRandomRange(minDeadends, maxDeadends + 1);
 
         List<ProductionRule> productionRules = new List<ProductionRule>();
         List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
@@ -196,7 +196,7 @@ public class ProductionRuleGraph : EnvironmentComponent
         for (int j = 0; j < numDeadEnds; j++)
         {
             // Randomly choose a point along the linear path to add a dead end
-            int linearPathIndex = UnityEngine.Random.Range(0, numRules);
+            int linearPathIndex = GetEngine().GetRandomRange(0, numRules);
             List<ProductionRuleIdentifier> deadEndState = stateSpace[linearPathIndex];
 
             ProductionRule deadEndRule = SampleForwardRule(deadEndState, actionNotReward: true);
@@ -300,7 +300,7 @@ public class ProductionRuleGraph : EnvironmentComponent
 
     public ProductionRuleCondition sampleForwardProductionRuleCondition(List<ProductionRuleIdentifier> currentState)
     {
-        CONDITION condition = (CONDITION)UnityEngine.Random.Range(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
+        CONDITION condition = (CONDITION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
         int neededObjectCount = necessaryObjectCountForCondition[condition];
 
         while (condition == CONDITION.NONE || neededObjectCount > currentState.Count)
@@ -313,7 +313,7 @@ public class ProductionRuleGraph : EnvironmentComponent
             {
                 Debug.Log($"Not enough objects for condition {condition}, sampling again.");
             }
-            condition = (CONDITION)UnityEngine.Random.Range(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
+            condition = (CONDITION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
             neededObjectCount = necessaryObjectCountForCondition[condition];
         }
 
@@ -322,11 +322,11 @@ public class ProductionRuleGraph : EnvironmentComponent
 
         if (neededObjectCount == 2)
         {
-            int subjectIndex = UnityEngine.Random.Range(0, currentState.Count);
-            int objectIndex = UnityEngine.Random.Range(0, currentState.Count);
+            int subjectIndex = GetEngine().GetRandomRange(0, currentState.Count);
+            int objectIndex = GetEngine().GetRandomRange(0, currentState.Count);
             while (subjectIndex == objectIndex)
             {
-                objectIndex = UnityEngine.Random.Range(0, currentState.Count);
+                objectIndex = GetEngine().GetRandomRange(0, currentState.Count);
             }
 
             subjectIdentifier = currentState[subjectIndex];
@@ -334,7 +334,7 @@ public class ProductionRuleGraph : EnvironmentComponent
         }
         else if (neededObjectCount == 1)
         {
-            subjectIdentifier = currentState[UnityEngine.Random.Range(0, currentState.Count)];
+            subjectIdentifier = currentState[GetEngine().GetRandomRange(0, currentState.Count)];
         }
         else if (neededObjectCount != 0)
         {
@@ -347,7 +347,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     }
     public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> currentState, bool isReward = false, bool notReward = false)
     {
-        Action action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+        Action action = (Action)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(Action)).Length);
         if (isReward && notReward)
         {
             throw new ArgumentException("isReward and notReward cannot both be true");
@@ -358,24 +358,24 @@ public class ProductionRuleGraph : EnvironmentComponent
         }
         else if (notReward)
         {
-            action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+            action = (Action)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(Action)).Length);
             while (action == Action.REWARD)
             {
-                action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+                action = (Action)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(Action)).Length);
             }
         }
 
         while (currentState.Count - necessaryObjectCountForAction[action] < 0)
         {
             Debug.Log($"Not enough objects for action {action}, sampling again.");
-            action = (Action)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Action)).Length);
+            action = (Action)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(Action)).Length);
         }
 
-        float reward = UnityEngine.Random.Range(0.0f, 1.0f);
+        float reward = GetEngine().GetRandomRange(0.0f, 1.0f);
 
         List<PredicateObjects> permissiblePredicateObjects = PermissiblepredicateObjectsForAction[action];
-        PredicateObjects predicateObjects = permissiblePredicateObjects[UnityEngine.Random.Range(0, permissiblePredicateObjects.Count)];
-        ProductionRuleIdentifier identifier = currentState[UnityEngine.Random.Range(0, currentState.Count)];
+        PredicateObjects predicateObjects = permissiblePredicateObjects[GetEngine().GetRandomRange(0, permissiblePredicateObjects.Count)];
+        ProductionRuleIdentifier identifier = currentState[GetEngine().GetRandomRange(0, currentState.Count)];
 
         ProductionRuleAction productionRuleAction = new ProductionRuleAction(action, reward, predicateObjects, identifier);
 

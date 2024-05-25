@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
 
 
 public class EnvironmentEngine : EnvironmentComponentHolder
@@ -37,6 +38,9 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     bool mIsRunning = false;
     bool mIsWaitingForActions = false;
+
+    int mOverrideCameraWidth = -1;
+    int mOverrideCameraHeight = -1;
 
     PhysicsScene mPhysicsScene;
     PhysicsScene2D mPhysicsScene2D;
@@ -74,12 +78,48 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     virtual public void InitializeEnvironment(JSONObject loadParams)
     {
+        if (loadParams)
+        {
+            loadParams.GetField(out mOverrideCameraWidth, "camera_width", -1);
+            loadParams.GetField(out mOverrideCameraHeight, "camera_height", -1);
+            loadParams.GetField(out fixedUpdatesPerSecond, "frames_per_second", fixedUpdatesPerSecond);
+        }
+
+        /*U3DPlayer player = GetCachedEnvironmentComponent<U3DPlayer>();
+
+        for (int i = 0; i < player.mSensors.Count; i++)
+        {
+            if (player.mSensors[i] is CameraSensorInfo)
+            {
+                CameraSensorInfo cameraSensorInfo = (CameraSensorInfo)player.mSensors[i];
+
+                if (cameraSensorInfo != null)
+                {
+                    ObservationSpec observationSpec = cameraSensorInfo.GetObservationSpec();
+
+                    int cameraHeight;
+                    int cameraWidth;
+                    loadParams.GetField(out cameraWidth, "camera_width", observationSpec.Shape[1]);
+                    loadParams.GetField(out cameraHeight, "camera_height", observationSpec.Shape[2]);
+
+                    cameraSensorInfo.UpdateCameraSize(cameraWidth, cameraHeight);
+                }
+            }
+        }*/
 
         CheckInitialized();
         List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
         for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].CheckInitialized();
+        }
+
+        if (loadParams)
+        {
+            for (int i = 0; i < mEnvironmentComponents.Count; i++)
+            {
+                mEnvironmentComponents[i].InitParameters(loadParams);
+            }
         }
     }
 
@@ -853,6 +893,10 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         isTraining = training;
     }
 
+    public void SetParameters(JSONObject json)
+    {
+    }
+
     public void SetPhysicsEngine(PhysicsScene physicsScene)
     {
         mPhysicsScene = physicsScene;
@@ -861,6 +905,16 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     public void SetPhysicsEngine2D(PhysicsScene2D physicsScene)
     {
         mPhysicsScene2D = physicsScene;
+    }
+
+    public PhysicsScene GetPhysicsEngine()
+    {
+        return mPhysicsScene;
+    }
+
+    public PhysicsScene2D GetPhysicsEngine2D()
+    {
+        return mPhysicsScene2D;
     }
 
     //Environment specific position and movement logic
@@ -883,6 +937,11 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     virtual public Vector3 ApplyEnvironmentAngularVelocity(Vector3 originalAngularVelocity)
     {
         return originalAngularVelocity;
+    }
+
+    public Vector2Int GetOverrideCameraSize()
+    {
+        return new Vector2Int(mOverrideCameraWidth, mOverrideCameraHeight);
     }
 
 

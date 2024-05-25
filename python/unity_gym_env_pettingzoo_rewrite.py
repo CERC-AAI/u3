@@ -71,6 +71,7 @@ class UnityToPettingzooWrapper(ParallelEnv):
         """
         self._env = unity_env
 
+        # TODO: This is blocking the ability to spawn multiple envs in a single Unity instance. Need to look into this optimization
         # TODO: verify how this works with multiple agents
         # Take a single step so that the brain information will be sent over
         if not self._env.behavior_specs:
@@ -267,6 +268,7 @@ class UnityToPettingzooWrapper(ParallelEnv):
         space.
         """
         self._env.reset()
+        self.game_over = False
         self.agents = self.possible_agents[:]
         self.num_moves = 0
         self.current_step = 0
@@ -337,6 +339,12 @@ class UnityToPettingzooWrapper(ParallelEnv):
 
         for behavior_spec in self._env._env_state.keys():
             for agent_id in self._env._env_state[behavior_spec][0].agent_id:
+                agent_unique_id = str(behavior_spec) + "_" + str(agent_id)
+                if not agent_unique_id in self.possible_agents:
+                    self.possible_agents.append(agent_unique_id)
+                    self.agent_infos[agent_unique_id] = U3Agent(agent_unique_id)
+                self.agents.append(agent_unique_id)
+            for agent_id in self._env._env_state[behavior_spec][1].agent_id:
                 agent_unique_id = str(behavior_spec) + "_" + str(agent_id)
                 if not agent_unique_id in self.possible_agents:
                     self.possible_agents.append(agent_unique_id)

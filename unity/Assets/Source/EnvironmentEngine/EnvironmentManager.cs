@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using System.Linq;
 
 public class EnvironmentManager : MonoBehaviour
 {
@@ -36,6 +37,10 @@ public class EnvironmentManager : MonoBehaviour
     List<EnvironmentEngine> mDecisionRequests = new List<EnvironmentEngine>();
     List<EnvironmentEngine> mPhysicsRequests = new List<EnvironmentEngine>();
 
+    Dictionary<EnvironmentEngine, JSONObject> mLoadParams = new Dictionary<EnvironmentEngine, JSONObject>();
+
+    Dictionary<Scene, (JSONObject, bool)> mLoadingScenes = new Dictionary<Scene, (JSONObject, bool)>();
+
     public static EnvironmentManager Instance { get; private set; }
 
     private void Awake()
@@ -46,6 +51,7 @@ public class EnvironmentManager : MonoBehaviour
             if (Application.isPlaying && !Application.isEditor)
             {
                 Destroy(this);
+                return;
             }
         }
         else
@@ -131,6 +137,41 @@ public class EnvironmentManager : MonoBehaviour
             Academy.Instance.EnvironmentStep();
 
             //Debug.Log(InputSystem.metrics.totalEventCount);
+        }
+
+        Scene[] keys = mLoadingScenes.Keys.ToArray();
+        foreach (Scene key in keys)
+        {
+            if (key.isLoaded)
+            {
+                (JSONObject, bool) value = mLoadingScenes[key];
+
+                mLoadingScenes.Remove(key);
+
+                GameObject[] objects = key.GetRootGameObjects();
+                for (int i = 0; i < objects.Length; i++)
+                {
+                    EnvironmentEngine engine = objects[i].GetComponent<EnvironmentEngine>();
+
+                    if (engine != null)
+                    {
+                        engine.SetPhysicsEngine(key.GetPhysicsScene());
+                        engine.SetPhysicsEngine2D(key.GetPhysicsScene2D());
+
+                        AddEnvironment(engine);
+
+                        engine.InitializeEnvironment(value.Item1);
+                        mLoadParams[engine] = value.Item1;
+
+                        if (!value.Item2)
+                        {
+                            engine.StartRun();
+                        }
+
+                        break;
+                    }
+                }
+            }
         }
 
         if (debugMode)
@@ -220,9 +261,37 @@ public class EnvironmentManager : MonoBehaviour
         }
     }
 
-    public void InitializeEnvironment(string environmentName, JSONObject jsonParams = null, bool shouldIdle = false)
+    public EnvironmentEngine InitializeEnvironment(string environmentName, JSONObject jsonParams = null, bool shouldIdle = false)
     {
-        if (mSceneIDs.ContainsKey(environmentName))
+        // TODO fix physics.XX errors to allow for multiple scenes at once
+        EnvironmentEngine engine = null;
+
+        GameObject[] objects = SceneManager.GetActiveScene().GetRootGameObjects();
+        for (int i = 0; i < objects.Length; i++)
+        {
+            engine = objects[i].GetComponent<EnvironmentEngine>();
+
+            if (engine != null)
+            {
+                engine.SetPhysicsEngine(SceneManager.GetActiveScene().GetPhysicsScene());
+                engine.SetPhysicsEngine2D(SceneManager.GetActiveScene().GetPhysicsScene2D());
+
+                AddEnvironment(engine);
+
+                engine.InitializeEnvironment(jsonParams);
+                mLoadParams[engine] = jsonParams;
+
+                if (!shouldIdle)
+                {
+                    engine.StartRun();
+                }
+
+                break;
+            }
+        }
+
+
+        /*if (mSceneIDs.ContainsKey(environmentName))
         {
             environmentName = mSceneIDs[environmentName];
         }
@@ -238,26 +307,14 @@ public class EnvironmentManager : MonoBehaviour
             LoadSceneParameters parameters = new LoadSceneParameters(LoadSceneMode.Additive, physicsMode);
             Scene scene = SceneManager.LoadScene(environmentName, parameters);
 
-            GameObject[] objects = scene.GetRootGameObjects();
-            for (int i = 0; i < objects.Length; i++)
-            {
-                EnvironmentEngine engine = objects[i].GetComponent<EnvironmentEngine>();
-
-                if (engine != null)
-                {
-                    engine.SetPhysicsEngine(scene.GetPhysicsScene());
-                    engine.SetPhysicsEngine2D(scene.GetPhysicsScene2D());
-
-                    AddEnvironment(engine);
-
-                    break;
-                }
-            }
+            mLoadingScenes[scene] = (jsonParams, shouldIdle);
         }
         catch (Exception e)
         {
             Debug.Log("Could not load scene: " + environmentName + ". Error: " + e.Message);
-        }
+        }*/
+
+        return engine;
     }
 
     public void OnDestroy()
@@ -302,16 +359,23 @@ public class EnvironmentManager : MonoBehaviour
     public void OnMessageReceived(IncomingMessage msg)
     {
         string receivedString = msg.ReadString();
+        JSONObject messageJSON = new JSONObject(receivedString);
+        if (!messageJSON.IsNull)
+        {
+            OnMessageReceived(messageJSON);
+        }
     }
 
 
     public void OnMessageReceived(string msg)
     {
         JSONObject messageJSON = new JSONObject(msg);
+        Debug.Log(messageJSON.ToString());
     }
 
     public void OnMessageReceived(JSONObject messageJSON)
     {
+        Debug.Log(messageJSON.ToString());
         int environmentID = 0;
         if (messageJSON["env"])
         {
@@ -325,7 +389,15 @@ public class EnvironmentManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Recieved invalid env ID: " + environmentID + ", for command: " + messageJSON.ToString());
+            if (messageJSON["msg"].str == "init")
+            {
+                InitializeEnvironment(messageJSON["env"].str, messageJSON["data"]);
+            }
+            else
+            {
+                Debug.Log("Received invalid env ID: " + environmentID + ", for command: " + messageJSON.ToString());
+            }
+
             return;
         }
 
@@ -347,6 +419,15 @@ public class EnvironmentManager : MonoBehaviour
 
             case "training":
                 messageEnvironment.SetPythonTraining(messageJSON["data"].b);
+                break;
+
+            case "reset":
+                if (messageEnvironment.IsRunning())
+                {
+                    messageEnvironment.EndRun();
+                }
+                messageEnvironment.InitializeEnvironment(mLoadParams[messageEnvironment]);
+                messageEnvironment.StartRun();
                 break;
 
                 /*case "element":

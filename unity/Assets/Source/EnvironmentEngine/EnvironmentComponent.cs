@@ -174,6 +174,11 @@ public class EnvironmentComponent : MonoBehaviour
         }
     }
 
+    public virtual void InitParameters(JSONObject jsonParameters)
+    {
+
+    }
+
     public virtual void StoreUserInputs()
     {
         if (mLocalActionInfos.Count > 0)

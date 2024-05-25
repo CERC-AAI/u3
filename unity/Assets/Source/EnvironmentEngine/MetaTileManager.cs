@@ -1016,7 +1016,7 @@ public class MetatileManager : EnvironmentComponent
         Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to calculate permissable area.");
     }
 
-    private static MetatileConfigurationWeights DrawMetaTileWithConfiguration(List<MetatileConfigurationWeights> metatileConfigurationWeights)
+    private MetatileConfigurationWeights DrawMetaTileWithConfiguration(List<MetatileConfigurationWeights> metatileConfigurationWeights)
     {
         float totalWeight = metatileConfigurationWeights.Sum(x => x.weight);
         float randomWeight = GetEngine().GetRandomRange(0, totalWeight);

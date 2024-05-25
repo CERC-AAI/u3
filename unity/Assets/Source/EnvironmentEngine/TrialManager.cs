@@ -22,6 +22,7 @@ public class TrialManager : EnvironmentComponent
     }
 
     public EnvironmentCallback OnTrialOverCallbacks;
+    public EnvironmentCallback OnTrialStartCallbacks;
 
 
     public int trialCounter = 0;
@@ -40,6 +41,17 @@ public class TrialManager : EnvironmentComponent
     protected override void DoRegisterCallbacks()
     {
         base.DoRegisterCallbacks();
+    }
+
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        if (jsonParameters != null)
+        {
+            jsonParameters.GetField(out maxTrials, "trial_count", maxTrials);
+            jsonParameters.GetField(out trialResetUpdateFrequency, "trial_seconds", trialResetUpdateFrequency);
+        }
+
+        base.InitParameters(jsonParameters);
     }
 
     public override void OnRunStarted()
@@ -63,6 +75,11 @@ public class TrialManager : EnvironmentComponent
         trialCounter = 0;
         mStartTime = Time.realtimeSinceStartup;
         ResetTrialDurationCounter();
+
+        if (OnTrialStartCallbacks != null)
+        {
+            OnTrialStartCallbacks();
+        }
     }
 
     public bool IsTrialOver()
@@ -133,6 +150,12 @@ public class TrialManager : EnvironmentComponent
     {
         mStartTime = Time.realtimeSinceStartup;
         ResetTrialDurationCounter();
+
+        if (OnTrialStartCallbacks != null)
+        {
+            OnTrialStartCallbacks();
+        }
+
         ResetState();
     }
 

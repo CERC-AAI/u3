@@ -14,6 +14,9 @@ public class U3Agent : Agent
     EnvironmentAgent mAgent;
     bool mUsingHeuristics = false;
 
+    bool mShouldEndEpisode = false;
+    bool mShouldTimeoutEpisode = false;
+
     public override void CollectObservations(VectorSensor sensor)
     {
         // Your observation collection logic here
@@ -23,6 +26,14 @@ public class U3Agent : Agent
     public void Start()
     {
         mAgent = GetComponent<EnvironmentAgent>();
+    }
+
+    public override void OnEpisodeBegin()
+    {
+        mShouldEndEpisode = false;
+        mShouldTimeoutEpisode = false;
+
+        base.OnEpisodeBegin();
     }
 
     protected override void OnEnable()
@@ -36,6 +47,7 @@ public class U3Agent : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+
         if (!mUsingHeuristics)
         {
             mAgent.OnActionReceived(actions);
@@ -43,6 +55,19 @@ public class U3Agent : Agent
         mAgent.GetEngine().OnAgentActionReceived(mAgent, mAgent.ShouldBlockDecision(actions));
 
         mUsingHeuristics = false;
+
+        if (mShouldEndEpisode)
+        {
+            EndEpisode();
+            mAgent.GetEngine().AgentEndedEpisode(mAgent);
+            return;
+        }
+        if (mShouldTimeoutEpisode)
+        {
+            EpisodeInterrupted();
+            mAgent.GetEngine().AgentEndedEpisode(mAgent);
+            return;
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -74,5 +99,13 @@ public class U3Agent : Agent
         }
     }
 
+    public void QueueEpisodeEnded()
+    {
+        mShouldEndEpisode = true;
+    }
 
+    public void QueueEpisodeInterrupted()
+    {
+        mShouldTimeoutEpisode = true;
+    }
 }
