@@ -4,6 +4,8 @@ import numpy as np
 import os
 from tqdm import tqdm
 import argparse
+import re
+import matplotlib.pyplot as plt
 from scipy.ndimage import median_filter
 import time
 
@@ -15,14 +17,12 @@ import u3_env
 
 parser = argparse.ArgumentParser(description='Build a dataset of worlds for the XLand env. Specific a dataset to append to with "--dataset <difficulty>_<height>"')
 parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_high')
-parser.add_argument('--build_type', type=str, help='Which buidl are you using? editor, linux, windows', default='linux')
 parser.add_argument('--task_index', type=int, help='Task identifier', default='0')
 args = parser.parse_args()
 
 dataset_type = "world"
 dataset_name = args.dataset
 task_id = args.task_index
-build_type = args.build_type
 dataset_folder = f"{dataset_type}s/{dataset_name}/"
 min_connectivity = 0.5
 total_count = 1000000
@@ -74,13 +74,14 @@ else:
 
 # Note that XLand has 12 frames a second
 base_parameters = {"env_width": env_width, "env_length": env_length, "env_height": env_height, "min_connectivity": min_connectivity}
+# Edtior
+#env = u3_env.create_environment(task_id, base_parameters)
 
-if build_type == "editor":
-    env = u3_env.create_environment(task_id, base_parameters)
-elif build_type == "linux":
-    env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGenerator/XLand", task_index=task_id, parameters=base_parameters)
-elif build_type == "windows":
-    env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGeneratorWindows/unitylearning2", task_index=task_id, parameters=base_parameters)
+# Linux
+env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGenerator/XLand", task_index=task_id, parameters=base_parameters)
+
+# Windows
+#env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGeneratorWindows/unitylearning2", task_index=task_id, parameters=base_parameters)
 
 root_folder = f"{os.path.dirname(os.path.abspath(__file__))}/../Datasets/"
 save_folder = f"{root_folder}{dataset_name}/"
@@ -91,6 +92,15 @@ def count_files_in_directory(directory):
     return len([name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
 
 pbar = tqdm(total=total_count)
+
+plt.ion()  # Turn on interactive mode
+fig, ax = plt.subplots()
+line1, = ax.plot([], [], 'r-')  # Initialize the line
+line2, = ax.plot([], [], 'b-')  # Initialize the line
+
+x_data = []
+y1_data = []
+y2_data = []
 
 file_index = count_files_in_directory(save_folder)
 pbar.n = file_index
@@ -130,10 +140,37 @@ for t in range(total_count * 2):
         if (last_message.startswith("save_complete")):
             file_index += 1
             pbar.update(1)
+
+            match = re.search(r'(\d+\.\d+)$', last_message)
+            if match:
+                float_value = float(match.group(1))
+                # Append new data to the lists
+                x_data.append(file_index)
+                y1_data.append(float_value)
+                #y1_data.append(env.reset_time)
+                y2_data.append(end_time - start_time)
+
+                if file_index % 100 == 0:                
+                    # Update the line with new data
+                    line1.set_xdata(x_data)
+                    line1.set_ydata(median_filter(y1_data, size=50))
+
+                    line2.set_xdata(x_data)
+                    line2.set_ydata(median_filter(y2_data, size=50))
+                    
+                    # Adjust the limits if necessary
+                    ax.relim()
+                    ax.autoscale_view()
+                    
+                    # Redraw the plot
+                    plt.draw()
+                    plt.pause(0.000000000000001)
             
     if file_index > total_count:
         break
 
 
+plt.ioff()
+plt.show()
 pbar.close()
 env.close()
