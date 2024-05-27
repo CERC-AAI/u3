@@ -13,14 +13,14 @@ set_log_level(_log_level)
 import u3_env
 
 parser = argparse.ArgumentParser(description='Build a dataset of worlds for the XLand env. Specific a dataset to append to with "--dataset <difficulty>_<height>"')
-parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_high')
-parser.add_argument('--build_type', type=str, help='Which buidl are you using? editor, linux, windows', default='linux')
-parser.add_argument('--task_index', type=int, help='Task identifier', default='0')
+parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_low')
+parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='linux')
+parser.add_argument('--worker_id', type=int, help='Worker identifier. Use this to have multiple runs on the same machine', default='0')
 args = parser.parse_args()
 
 dataset_type = "world"
 dataset_name = args.dataset
-task_id = args.task_index
+worker_id = args.worker_id
 build_type = args.build_type
 dataset_folder = f"{dataset_type}s/{dataset_name}/"
 min_connectivity = 0.5
@@ -75,11 +75,11 @@ else:
 base_parameters = {"env_width": env_width, "env_length": env_length, "env_height": env_height, "min_connectivity": min_connectivity}
 
 if build_type == "editor":
-    env = u3_env.create_environment(task_id, base_parameters)
+    env = u3_env.create_environment(worker_id, base_parameters)
 elif build_type == "linux":
-    env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGenerator/XLand", task_index=task_id, parameters=base_parameters)
+    env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGenerator/XLand", worker_id=worker_id, parameters=base_parameters)
 elif build_type == "windows":
-    env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGeneratorWindows/unitylearning2", task_index=task_id, parameters=base_parameters)
+    env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGeneratorWindows/unitylearning2", worker_id=worker_id, parameters=base_parameters)
 
 root_folder = f"{os.path.dirname(os.path.abspath(__file__))}/../Datasets/"
 save_folder = f"{root_folder}{dataset_name}/"
