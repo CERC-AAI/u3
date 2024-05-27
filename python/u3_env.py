@@ -235,8 +235,7 @@ class U3Wrapper(UnityToPettingzooWrapper):
 def create_environment(task_index, parameters : Dict[str, object] = {}):
     return create_environment_by_name("", "xland", task_index, parameters)
 
-
-def create_environment_by_name(file_name, task_name, task_index, parameters : Dict[str, object] = {}):
+def create_environment_by_name(file_name, task_name = "xland", task_index = 0, parameters : Dict[str, object] = {}):
     environmentChannel = U3SideChannel()
     if file_name == "":
         unity_env = U3Environment(seed=task_index, side_channels=[environmentChannel])
