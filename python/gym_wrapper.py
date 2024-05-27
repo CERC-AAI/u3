@@ -1,14 +1,19 @@
 import itertools
+import json
+import uuid
 
 import numpy as np
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-import gym
-from gym import error, spaces
+import gymnasium as gym
+from gymnasium import error, spaces
 
 from mlagents_envs.base_env import ActionTuple, BaseEnv
 from mlagents_envs.base_env import DecisionSteps, TerminalSteps
 from mlagents_envs import logging_util
+from mlagents_envs.environment import UnityEnvironment
+from mlagents_envs.side_channel.side_channel import IncomingMessage, SideChannel, OutgoingMessage
+
 
 
 class UnityGymException(error.Error):
@@ -22,6 +27,88 @@ class UnityGymException(error.Error):
 logger = logging_util.get_logger(__name__)
 GymStepResult = Tuple[np.ndarray, float, bool, Dict]
 
+class U3SideChannel(SideChannel):
+    def __init__(self) -> None:
+        super().__init__(uuid.UUID("621f0a70-4f87-11ea-a6bf-784f4387d1f7"))
+
+    def on_message_received(self, msg: IncomingMessage) -> None:
+        """
+        Note: We must implement this method of the SideChannel interface to
+        receive messages from Unity
+        """
+        # We simply read a string from the message and print it.
+        message = str(msg.get_raw_bytes()[4:], "utf_8")
+        self.environment.lastEnvironment = message
+        # print('Unity output: {}'.format(message[0:100]))
+
+    def send_string(self, data: str) -> None:
+        # Add the string to an OutgoingMessage
+        msg = OutgoingMessage()
+        msg.write_string(data)
+        # We call this method to queue the data we want to send
+        super().queue_message_to_send(msg)
+
+    def set_environment(self, environment):
+        self.environment = environment
+
+
+class U3GymEnv(gym.Env):
+
+    def __init__(
+        self,
+        worker_id=0,
+        seed=0,
+        camera_width=128,
+        camera_height=128,
+        trial_count=8,
+        trial_seconds=256,
+        frames_per_second=12
+    ):
+        super(U3GymEnv, self).__init__()
+        self.action_space = spaces.Tuple((
+            spaces.Box(-1, 1, shape=(4,)),
+            spaces.MultiDiscrete([1, 1, 1, 1])
+        ))
+        self.observation_space = spaces.Box(-1, 1, shape=(3, camera_height, camera_width))
+
+        self.side_channel = U3SideChannel()
+        unity_env = UnityEnvironment(
+            file_name='XLand',
+            worker_id=worker_id,
+            seed=seed + worker_id,
+            side_channels=[self.side_channel],
+            timeout_wait=180
+        )
+        parameters = dict(
+            camera_width=camera_width,
+            camera_height=camera_height,
+            trial_count=trial_count,
+            trial_seconds=trial_seconds,
+            frames_per_second=frames_per_second
+        )
+        json_data = json.dumps({
+            "env": "xland",
+            "msg": "init",
+            "data": parameters
+        })
+        self.side_channel.send_string(json_data)
+
+        self._env = UnityToGymWrapper(unity_env, uint8_visual=False)
+    
+    def reset(self, seed=None, options=None): 
+        json_data = json.dumps({
+            "env": "xland",
+            "msg": "reset"
+        })
+        self.side_channel.send_string(json_data)        
+        return self._env.reset()
+
+    def step(self, action):
+        return self._env.step(action)
+
+    def close(self):
+        self._env.close()
+
 
 class UnityToGymWrapper(gym.Env):
     """
@@ -32,7 +119,6 @@ class UnityToGymWrapper(gym.Env):
         self,
         unity_env: BaseEnv,
         uint8_visual: bool = False,
-        flatten_branched: bool = False,
         allow_multiple_obs: bool = False,
         action_space_seed: Optional[int] = None,
     ):
@@ -136,7 +222,7 @@ class UnityToGymWrapper(gym.Env):
         self.game_over = False
 
         res: GymStepResult = self._single_step(decision_step)
-        return res[0]
+        return res[0], res[-1]
 
     def step(self, action: List[Any]) -> GymStepResult:
         """Run one timestep of the environment's dynamics. When end of
@@ -201,7 +287,7 @@ class UnityToGymWrapper(gym.Env):
 
         done = isinstance(info, TerminalSteps)
 
-        return (default_observation, info.reward[0], done, {"step": info})
+        return (default_observation, info.reward[0], done, False, {"step": info})
 
     def _preprocess_single(self, single_visual_obs: np.ndarray) -> np.ndarray:
         if self.uint8_visual:
