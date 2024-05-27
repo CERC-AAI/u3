@@ -1,3 +1,5 @@
-mlagents_env
+#mlagents_env
 gymnasium
 imageio
+tqdm-4.66.4
+absl-py-2.1.0
