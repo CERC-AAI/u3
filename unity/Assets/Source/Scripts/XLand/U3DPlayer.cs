@@ -6,6 +6,8 @@ using System;
 using KinematicCharacterController.Examples;
 using Unity.MLAgents.Actuators;
 using UnityEngine.InputSystem;
+using static TrialManager;
+using Unity.MLAgents;
 
 public enum CharacterState
 {
@@ -52,22 +54,22 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 {
     [Header("Inputs")]
 
-    [Action]
+    [ACTION]
     public float mouseLookAxisUp;
-    [Action]
+    [ACTION]
     public float mouseLookAxisRight;
-    [Action]
+    //[ACTION]
     public float scrollInput;
 
-    [Action]
+    [ACTION]
     public float MoveAxisForward;
-    [Action]
+    [ACTION]
     public float MoveAxisRight;
-    [Action]
+    //[ACTION]
     public bool JumpDown;
-    [Action]
+    [ACTION]
     public bool CrouchDown;
-    [Action]
+    [ACTION]
     public bool CrouchUp;
 
     [Header("References")]
@@ -131,6 +133,9 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     private Vector3 lastInnerNormal = Vector3.zero;
     private Vector3 lastOuterNormal = Vector3.zero;
 
+    int mOverrideCameraWidth = -1;
+    int mOverrideCameraHeight = -1;
+
     protected override void Initialize()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -176,6 +181,17 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
         }
     }
 
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        if (jsonParameters)
+        {
+            jsonParameters.GetField(out mOverrideCameraWidth, "camera_width", -1);
+            jsonParameters.GetField(out mOverrideCameraHeight, "camera_height", -1);
+        }
+
+        base.InitParameters(jsonParameters);
+    }
+
     public override void OnUpdate(float deltaTime)
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -183,7 +199,7 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     }
 
-    public override void OnLateUpdate(float deltaTime)
+    public override void OnLateFixedUpdate(float deltaTime)
     {
         HandleCharacterInput();
 
@@ -697,8 +713,56 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
 
     public override bool ShouldRequestDecision(long fixedUdpateNumber)
     {
-        return (fixedUdpateNumber + 1) % (GetObjectID()+1) == 0;
+        //Test staggered requests
+        //return (fixedUdpateNumber + 1) % (GetObjectID() + 1) == 0;
 
         return base.ShouldRequestDecision(fixedUdpateNumber);
+    }
+
+    public class AgentState : ObjectState
+    {
+        public Vector3 cameraPosition;
+        public Quaternion cameraRotation;
+        public Vector3 cameraPlanarDirection;
+        public float cameraTargetDistance;
+    }
+
+    override public TrialManager.ObjectState SaveTrialData()
+    {
+        AgentState objectState = new AgentState();
+
+        objectState.position = transform.position;
+        objectState.rotation = transform.rotation;
+        objectState.cameraPosition = CharacterCamera.transform.position;
+        objectState.cameraRotation = CharacterCamera.transform.rotation;
+        objectState.cameraPlanarDirection = CharacterCamera.PlanarDirection;
+        objectState.cameraTargetDistance = CharacterCamera.TargetDistance;
+
+        objectState.saveObject = this;
+
+        return objectState;
+    }
+
+    override public void LoadTrialData(TrialManager.ObjectState objectState)
+    {
+        if (objectState is AgentState)
+        {
+            AgentState agentState = (AgentState)objectState;
+
+            transform.position = agentState.position;
+            U3CharacterMotor motor = Motor;
+            U3DCamera camera = CharacterCamera;
+            motor.SetPosition(agentState.position);
+            motor.SetRotation(agentState.rotation);
+            camera.ResetFacingDistance(
+                agentState.cameraPlanarDirection,
+                agentState.cameraTargetDistance
+            );
+        }
+    }
+
+    public Vector2Int GetOverrideCameraSize()
+    {
+        return new Vector2Int(mOverrideCameraWidth, mOverrideCameraHeight);
     }
 }

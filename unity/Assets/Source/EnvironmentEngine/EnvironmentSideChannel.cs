@@ -14,6 +14,7 @@ public class EnvironmentSideChannel : SideChannel
 
     protected override void OnMessageReceived(IncomingMessage msg)
     {
+        Debug.Log(msg.ToString());
         EnvironmentManager.Instance.OnMessageReceived(msg);
     }
 

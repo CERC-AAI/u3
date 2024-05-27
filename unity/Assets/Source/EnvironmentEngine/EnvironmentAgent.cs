@@ -18,6 +18,8 @@ public class EnvironmentAgent : EnvironmentComponent
     public List<ActionInfo> mActions = new List<ActionInfo>();
     public List<SensorInfo> mSensors = new List<SensorInfo>();
 
+    int mLastInputFrame = 0;
+
     protected override void Initialize()
     {
         mAgentScript = GetComponent<U3Agent>();
@@ -193,20 +195,19 @@ public class EnvironmentAgent : EnvironmentComponent
         {
             environmentComponents[i].StoreUserInputs();
         }
-        // Debug.Log("Heuristic is called.");
+        //Debug.Log("Heuristic is called.");
     }
 
     virtual public void DoEndEpisode(bool timedOut = false)
     {
         if (timedOut)
         {
-            mAgentScript.EpisodeInterrupted();
+            mAgentScript.QueueEpisodeInterrupted();
         }
         else
         {
-            mAgentScript.EndEpisode();
+            mAgentScript.QueueEpisodeEnded();
         }
-        mEngine.AgentEndedEpisode(this);
     }
 
     private void OnDisable()

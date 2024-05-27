@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
 
 
 public class EnvironmentEngine : EnvironmentComponentHolder
@@ -20,6 +21,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     // Private members
     protected List<EnvironmentObject> mEnvironmentObjects = new List<EnvironmentObject>();
+    protected List<EnvironmentComponent> mEnvironmentComponents = new List<EnvironmentComponent>();
     List<EnvironmentAgent> mActiveAgents = new List<EnvironmentAgent>();
     List<EnvironmentAgent> mDecisionRequests = new List<EnvironmentAgent>();
     List<EnvironmentAgent> mBlockingAgents = new List<EnvironmentAgent>();
@@ -45,6 +47,10 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     Dictionary<GameObject, List<EnvironmentObject>> mUnusedObjects = new Dictionary<GameObject, List<EnvironmentObject>>();
 
 
+    Dictionary<Type, EnvironmentObject> mCachedObjects = new Dictionary<Type, EnvironmentObject>();
+    Dictionary<Type, EnvironmentComponent> mCachedComponents = new Dictionary<Type, EnvironmentComponent>();
+    Dictionary<Type, List<EnvironmentComponent>> mCachedComponentLists = new Dictionary<Type, List<EnvironmentComponent>>();
+
     protected JSONObject mGameEvents = new JSONObject();
 
     override protected void Initialize()
@@ -69,10 +75,51 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     virtual public void InitializeEnvironment(JSONObject loadParams)
     {
+        if (loadParams)
+        {
+            loadParams.GetField(out fixedUpdatesPerSecond, "frames_per_second", fixedUpdatesPerSecond);
+
+            if (loadParams.GetField("world_save_file"))
+            {
+                GetCachedEnvironmentComponent<ProductionRuleManager>().Remove();
+                GetCachedEnvironmentComponent<TrialManager>().Remove();
+                GetCachedEnvironmentComponent<SpawnManager>().Remove();
+            }
+        }
+
+        /*U3DPlayer player = GetCachedEnvironmentComponent<U3DPlayer>();
+
+        for (int i = 0; i < player.mSensors.Count; i++)
+        {
+            if (player.mSensors[i] is CameraSensorInfo)
+            {
+                CameraSensorInfo cameraSensorInfo = (CameraSensorInfo)player.mSensors[i];
+
+                if (cameraSensorInfo != null)
+                {
+                    ObservationSpec observationSpec = cameraSensorInfo.GetObservationSpec();
+
+                    int cameraHeight;
+                    int cameraWidth;
+                    loadParams.GetField(out cameraWidth, "camera_width", observationSpec.Shape[1]);
+                    loadParams.GetField(out cameraHeight, "camera_height", observationSpec.Shape[2]);
+
+                    cameraSensorInfo.UpdateCameraSize(cameraWidth, cameraHeight);
+                }
+            }
+        }*/
 
         CheckInitialized();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
+            mEnvironmentObjects[i].CheckAll();
+
+            if (loadParams)
+            {
+                mEnvironmentObjects[i].InitParameters(loadParams);
+            }
+
             mEnvironmentObjects[i].CheckInitialized();
         }
     }
@@ -94,20 +141,26 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         }
         mInactiveAgents.Clear();
 
+        Debug.Log("Start run");
         RunStarted();
 
-        Debug.Log("Start run");
         CheckDecisions();
     }
 
     override public void RunStarted()
     {
         OnRunStarted();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].RunStarted();
         }
 
+    }
+
+    public void EndRun()
+    {
+        RunEnded();
     }
 
     override public void RunEnded()
@@ -115,7 +168,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         mIsRunning = false;
 
         OnRunEnded();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].RunEnded();
         }
@@ -182,6 +236,13 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             }
 
             mLastDecisionTime = mFixedTime;
+
+            //Debug.Log($"mDecisionRequests.Count: {mDecisionRequests.Count}");
+            if (mDecisionRequests.Count == 0)
+            {
+                //No agents require decisions, continue the simulation
+                mIsWaitingForActions = false;
+            }
         }
     }
 
@@ -232,7 +293,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         mIsWaitingForActions = false;
 
         base.StepEnded();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].StepEnded();
         }
@@ -243,7 +305,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         mIsWaitingForActions = false;
 
         base.StepStarted();
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
             mEnvironmentObjects[i].StepStarted();
         }
@@ -264,6 +327,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     public void DoUpdate()
     {
+        List<EnvironmentObject> tempList;
+
         if (!WaitingForPhysics())
         {
             float deltaTime = 0;
@@ -291,24 +356,31 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                 }
             }
 
-            if (!mIsWaitingForActions)
+            if (!mIsWaitingForActions || !IsPython())
             {
                 OnObjectUpdate(deltaTime);
-                for (int i = 0; i < mEnvironmentObjects.Count; i++)
+
+                tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+                for (int i = 0; i < tempList.Count; i++)
                 {
                     mEnvironmentObjects[i].OnObjectUpdate(deltaTime);
                 }
 
+                for (int i = 0; i < tempList.Count; i++)
+                {
+                    if (tempList[i].CheckRemove())
+                    {
+                        DoRemoveObject(tempList[i]);
+                    }
+                }
+
                 if (mEnvironmentTimer >= mNextFixedUpdate)
                 {
-
                     DoFixedUpdate(deltaTime);
                 }
 
                 if (!WaitingForPhysics())
                 {
-                    //Fix the code here to be local to each environment
-                    //KinematicCharacterController.KinematicCharacterSystem.LateUpdate();
                     OnObjectLateUpdate(deltaTime);
                     for (int i = 0; i < mEnvironmentObjects.Count; i++)
                     {
@@ -318,7 +390,32 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             }
         }
 
+        tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
+        {
+            if (tempList[i].CheckRemove())
+            {
+                DoRemoveObject(tempList[i]);
+            }
+        }
+
         //Debug.Log(JsonUtility.ToJson(this, true));
+    }
+
+    void DoRemoveObject(EnvironmentObject removeObject)
+    {
+        if (removeObject != this)
+        {
+            EnvironmentComponent[] components = removeObject.GetEnvironmentComponents();
+            foreach (EnvironmentComponent component in components)
+            {
+                mEnvironmentComponents.Remove(component);
+            }
+        }
+        mEnvironmentObjects.Remove(removeObject);
+        AddToPool(removeObject);
+
+        //Debug.Log($"Remove mEnvironmentObjects: {mEnvironmentObjects.Count}");
     }
 
     public float GetTime()
@@ -331,9 +428,10 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         if (mIsRunning && !mIsWaitingForActions)
         {
             OnObjectFixedUpdate(GetFixedDeltaTime());
-            for (int i = 0; i < mEnvironmentObjects.Count; i++)
+            List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+            for (int i = 0; i < tempList.Count; i++)
             {
-                mEnvironmentObjects[i].OnObjectFixedUpdate(GetFixedDeltaTime());
+                tempList[i].OnObjectFixedUpdate(GetFixedDeltaTime());
             }
 
             mPhysicsScene.Simulate(GetFixedDeltaTime());
@@ -352,15 +450,16 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     public void CompleteFixedUpdate()
     {
         OnObjectLateFixedUpdate(GetFixedDeltaTime());
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
         {
-            mEnvironmentObjects[i].OnObjectLateFixedUpdate(GetFixedDeltaTime());
+            tempList[i].OnObjectLateFixedUpdate(GetFixedDeltaTime());
         }
 
         OnObjectLateUpdate(mPhysicsQueuedUpdateDelta);
-        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        for (int i = 0; i < tempList.Count; i++)
         {
-            mEnvironmentObjects[i].OnObjectLateUpdate(mPhysicsQueuedUpdateDelta);
+            tempList[i].OnObjectLateUpdate(mPhysicsQueuedUpdateDelta);
         }
 
         OnFinalUpdate(mPhysicsQueuedUpdateDelta);
@@ -498,6 +597,11 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         }
     }
 
+    private static int ComparePriority(EnvironmentObject objectA, EnvironmentObject objectB)
+    {
+        return objectB.scriptExecutionPriority - objectA.scriptExecutionPriority;
+    }
+
     public void AddObject(EnvironmentObject newObject)
     {
         // Debug.Log($"Add object: {newObject} -> {mNextID}");
@@ -506,15 +610,27 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         {
             mEnvironmentObjects.Add(newObject);
             newObject.SetObjectID(mNextID++);
+            mEnvironmentObjects.Sort(ComparePriority);
+
+            mEnvironmentComponents.AddRange(newObject.GetEnvironmentComponents());
+
+            //Debug.Log($"Add mEnvironmentObjects: {mEnvironmentObjects.Count}");
         }
     }
 
     public void RemoveObject(EnvironmentObject removeObject)
     {
-        if (mEnvironmentObjects.Contains(removeObject))
-        {
-            mEnvironmentObjects.Remove(removeObject);
-        }
+        removeObject.Remove();
+    }
+
+    public void RemoveObject(EnvironmentComponent removeObject)
+    {
+        RemoveObject(removeObject.GetParentObject());
+    }
+
+    override public EnvironmentComponent[] GetEnvironmentComponents()
+    {
+        return mEnvironmentComponents.ToArray();
     }
 
     public void HadCollision(EnvironmentObject object1, EnvironmentObject object2)
@@ -525,7 +641,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     }
 
 
-    //FIX ME: Loading and savning needs to include the environmentengine components
+    //FIX ME: Loading and saving needs to include the environmentengine components
     public JSONObject SaveEnvironmentState()
     {
         JSONObject fullEnvironment = new JSONObject();
@@ -614,6 +730,70 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         return mEnvironmentObjects;
     }
 
+    public T GetCachedEnvironmentObject<T>(string name = null) where T : EnvironmentObject
+    {
+        if (!mCachedObjects.ContainsKey(typeof(T)))
+        {
+            mCachedObjects[typeof(T)] = GetEnvironmentObject<T>(name);
+        }
+        return (T)mCachedObjects[typeof(T)];
+    }
+
+    public T GetEnvironmentObject<T>(string name = null) where T : EnvironmentObject
+    {
+        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        {
+            if (mEnvironmentObjects[i] is T && (name == null || mEnvironmentObjects[i].name == name))
+            {
+                return (T)mEnvironmentObjects[i];
+            }
+        }
+
+        return null;
+    }
+
+    public T GetCachedEnvironmentComponent<T>() where T : EnvironmentComponent
+    {
+        if (!mCachedComponents.ContainsKey(typeof(T)))
+        {
+            mCachedComponents[typeof(T)] = GetEnvironmentComponent<T>(null);
+        }
+        return (T)mCachedComponents[typeof(T)];
+    }
+
+    public T GetEnvironmentComponent<T>(string name = null) where T : EnvironmentComponent
+    {
+        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        {
+            if ((name == null || mEnvironmentObjects[i].name == name))
+            {
+                T component = mEnvironmentObjects[i].GetComponent<T>();
+
+                if (component != null)
+                {
+                    return component;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public List<T> GetEnvironmentComponents<T>(string name = null) where T : EnvironmentComponent
+    {
+        List<T> components = new List<T>();
+
+        for (int i = 0; i < mEnvironmentObjects.Count; i++)
+        {
+            if ((name == null || mEnvironmentObjects[i].name == name))
+            {
+                components.AddRange(mEnvironmentObjects[i].GetComponents<T>());
+            }
+        }
+
+        return components;
+    }
+
     /*public void OnObjectMoved(EnvironmentObject movedObject)
     {
         CheckBrain();
@@ -652,9 +832,12 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             mUnusedObjects.Add(baseObject, new List<EnvironmentObject>());
         }
 
+        //Note that pooling is currently disabled due to bugs. Should fix later.
         EnvironmentObject newObject = null;
         if (mUnusedObjects[baseObject].Count > 0)
         {
+            //Debug.Log($"WAKEUP GetNewObject: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
+
             newObject = mUnusedObjects[baseObject][0];
             mUnusedObjects[baseObject].RemoveAt(0);
 
@@ -663,11 +846,35 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         else
         {
             newObject = ((GameObject)GameObject.Instantiate(baseObject)).GetComponent<EnvironmentObject>();
+
+
+            //Debug.Log($"CREATE GetNewObject: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
         }
 
-        //newObject.mBaseObject = baseObject;
+        newObject.InitalizeBaseObject(baseObject);
 
         return newObject;
+    }
+
+    void AddToPool(EnvironmentObject removeObject)
+    {
+        GameObject baseObject = removeObject.GetBaseObject();
+
+        if (baseObject)
+        {
+            /*if (!mUnusedObjects.ContainsKey(baseObject))
+            {
+                mUnusedObjects.Add(baseObject, new List<EnvironmentObject>());
+            }
+
+            mUnusedObjects[baseObject].Add(removeObject);
+
+            Debug.Log($"AddToPool: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
+
+            return;    */
+        }
+
+        Destroy(removeObject.gameObject);
     }
 
     //External interface methods
@@ -687,6 +894,10 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         isTraining = training;
     }
 
+    public void SetParameters(JSONObject json)
+    {
+    }
+
     public void SetPhysicsEngine(PhysicsScene physicsScene)
     {
         mPhysicsScene = physicsScene;
@@ -695,6 +906,16 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     public void SetPhysicsEngine2D(PhysicsScene2D physicsScene)
     {
         mPhysicsScene2D = physicsScene;
+    }
+
+    public PhysicsScene GetPhysicsEngine()
+    {
+        return mPhysicsScene;
+    }
+
+    public PhysicsScene2D GetPhysicsEngine2D()
+    {
+        return mPhysicsScene2D;
     }
 
     //Environment specific position and movement logic

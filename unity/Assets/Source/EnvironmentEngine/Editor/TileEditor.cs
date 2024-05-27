@@ -48,7 +48,12 @@ public class TileEditor : Editor
                     Rect colorRect = GUILayoutUtility.GetLastRect();
                     colorRect.width -= 2;
                     colorRect.height -= 2;
-                    EditorGUI.DrawRect(colorRect, faces[selectedTile.faceIDs[i]].color);
+                    Color color = Color.white;
+                    if (selectedTile.faceIDs[i] < faces.Count)
+                    {
+                        color = faces[selectedTile.faceIDs[i]].color;
+                    }
+                    EditorGUI.DrawRect(colorRect, color);
                     EditorGUILayout.EndHorizontal();
 
                     serializedProperty.intValue = (int)index;

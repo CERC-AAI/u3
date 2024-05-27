@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Linq;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,17 +16,19 @@ using UnityEditor;
 public class EnvironmentObject : EnvironmentComponentHolder
 {
     // Public members
+    [Tooltip("Higher values go first. Default is 0")]
+    public int scriptExecutionPriority = 0;
 
     public Vector3 Position
     {
         get { return transform.localPosition; }
-        set { transform.localPosition = mEngine.ApplyEnvironmentPosition(value);  }
+        set { transform.localPosition = mEngine.ApplyEnvironmentPosition(value); }
     }
 
     public Vector3 Rotation
     {
         get { return transform.localPosition; }
-        set 
+        set
         {
             Quaternion currentRotation = transform.localRotation;
             Vector3 eulerAngles = currentRotation.eulerAngles;
@@ -47,6 +51,8 @@ public class EnvironmentObject : EnvironmentComponentHolder
     [HideInInspector]
     public string mPrefabPath;
 
+    bool mIsValid = false;
+
     protected PlayerInput mInput;
     protected Dictionary<string, InputStates> mInputStates;
 
@@ -57,6 +63,9 @@ public class EnvironmentObject : EnvironmentComponentHolder
     Collider2D[] mColliders2D;
     Collider[] mColliders;
 
+    bool mHadInput = false;
+
+    GameObject mBaseObject;
 
     override protected void Initialize()
     {
@@ -85,7 +94,34 @@ public class EnvironmentObject : EnvironmentComponentHolder
             }
         }
 
+        mIsValid = true;
+
         base.Initialize();
+    }
+
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        base.InitParameters(jsonParameters);
+
+        CheckComponents();
+
+        for (int i = 0; i < mComponents.Length; i++)
+        {
+            if (mComponents[i] != this)
+            {
+                mComponents[i].InitParameters(jsonParameters);
+            }
+        }
+    }
+
+    public void InitalizeBaseObject(GameObject baseObject)
+    {
+        mBaseObject = baseObject;
+    }
+
+    public GameObject GetBaseObject()
+    {
+        return mBaseObject;
     }
 
     public override void OnRunStarted()
@@ -108,17 +144,44 @@ public class EnvironmentObject : EnvironmentComponentHolder
         }
     }
 
+    public bool CheckRemove()
+    {
+        if (!mIsValid)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     override public void Remove()
     {
-        base.Remove();
+        if (mIsValid)
+        {
+            base.Remove();
 
-        transform.parent = mEngine.recycleBin;
-        gameObject.SetActive(false);
+            if (!mIsBeingDestroyed)
+            {
+                //TODO: Make this use a recycle bin for less memory allocation
+                //Destroy(gameObject);
+                transform.parent = mEngine.recycleBin;
+            }
+
+            gameObject.SetActive(false);
+            mIsValid = false;
+
+            //InvalidateEngine();
+        }
     }
 
     public override void WakeUp()
     {
         gameObject.SetActive(true);
+        mIsValid = true;
+        if (mEngine != null)
+        {
+            mEngine.AddObject(this);
+        }
 
         base.WakeUp();
     }
@@ -155,6 +218,12 @@ public class EnvironmentObject : EnvironmentComponentHolder
     sealed override public void OnObjectLateFixedUpdate(float fixedDeltaTime)
     {
         base.OnObjectLateFixedUpdate(fixedDeltaTime);
+
+        if (mHadInput)
+        {
+            FixedProcessInputs();
+            mHadInput = false;
+        }
     }
 
     public override void OnStepEnded()
@@ -347,7 +416,7 @@ public class EnvironmentObject : EnvironmentComponentHolder
             mColliders2D[i].isTrigger = true;
         }
     }
-    
+
     public void ClearColliders()
     {
         for (int i = 0; i < mColliders.Length; i++)
@@ -377,10 +446,37 @@ public class EnvironmentObject : EnvironmentComponentHolder
         return mInput;
     }
 
+    //This is needed to keep the fixed updates from having multiple "PRESSED" events.
+    public void FixedProcessInputs()
+    {
+        if (mInputStates != null)
+        {
+            List<string> keyList = mInputStates.Keys.ToList();
+            foreach (string keyName in keyList)
+            {
+                if (mInputStates[keyName] == InputStates.PRESSED)
+                {
+                    mInputStates[keyName] = InputStates.IN_PROGRESS;
+                }
+                else if (mInputStates[keyName] == InputStates.RELEASED)
+                {
+                    mInputStates[keyName] = InputStates.NONE;
+                }
+            }
+
+            for (int i = 0; i < mComponents.Length; i++)
+            {
+                mComponents[i].StoreUserInputs();
+            }
+        }
+    }
+
     public void ProcessInputs()
     {
         if (mInput != null && mInputStates != null)
         {
+            mHadInput = true;
+
             foreach (InputAction action in mInput.actions)
             {
                 if (action != null)

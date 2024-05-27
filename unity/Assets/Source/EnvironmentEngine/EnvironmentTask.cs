@@ -38,7 +38,7 @@ public class EnvironmentTask : EnvironmentComponentHolder
         EndEpisode();
     }
 
-    virtual protected void StartEpisode()
+    virtual public void StartEpisode()
     {
         mEngine.OnTaskEpisodeStarted(this);
 
@@ -50,7 +50,7 @@ public class EnvironmentTask : EnvironmentComponentHolder
         }
     }
 
-    virtual protected void EndEpisode()
+    virtual public void EndEpisode()
     {
         for (int i = 0; i < mComponents.Length; i++)
         {

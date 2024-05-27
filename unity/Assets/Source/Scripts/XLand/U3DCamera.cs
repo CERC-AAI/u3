@@ -62,12 +62,17 @@ public class U3DCamera : MonoBehaviour
     {
         Transform = this.transform;
 
-        _currentDistance = DefaultDistance;
+        ResetFacingDistance(Vector3.forward, DefaultDistance);
+    }
+
+    public void ResetFacingDistance(Vector3 facingVector, float currentDistance)
+    {
+        _currentDistance = currentDistance;
         TargetDistance = _currentDistance;
 
         _targetVerticalAngle = 0f;
 
-        PlanarDirection = Vector3.forward;
+        PlanarDirection = facingVector;
     }
 
     // Set the transform that the camera will orbit around

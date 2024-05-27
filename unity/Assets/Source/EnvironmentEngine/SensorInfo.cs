@@ -129,6 +129,7 @@ public class QuaternionSensorInfo : SensorInfo
 public class CameraSensorInfo : SensorInfo
 {
     CameraSensor mCameraSensor;
+    Sensor mAtrributeData;
 
     //If the values are set you pass them into the CameraSensor constructor in init(Sensor sensorAttribute)
     // if they're not set, you use the FieldInfo to get the Camera object, and query it for good default values
@@ -142,6 +143,8 @@ public class CameraSensorInfo : SensorInfo
         {
             return false;
         }
+
+        mAtrributeData = sensorAttribute;
 
         mName = sensorAttribute.sensorName;
         bool grayscale = sensorAttribute.grayscale;
@@ -162,9 +165,31 @@ public class CameraSensorInfo : SensorInfo
             height = myCamera.pixelHeight;
         }
 
+        U3DPlayer parentComponent = (U3DPlayer)mParent;
+
+        if (parentComponent)
+        {
+            Vector2Int overrideCameraSize = parentComponent.GetOverrideCameraSize();
+            if (overrideCameraSize.x != -1)
+            {
+                width = overrideCameraSize.x;
+            }
+            if (overrideCameraSize.y != -1)
+            {
+                height = overrideCameraSize.y;
+            }
+        }
+
         mCameraSensor = new CameraSensor(myCamera, width, height, grayscale, mName, compression);
 
         return true;
+    }
+
+    public void UpdateCameraSize(int width, int height)
+    {
+        Camera myCamera = (Camera)mFieldInfo.GetValue(mParent);
+
+        mCameraSensor = new CameraSensor(myCamera, width, height, mAtrributeData.grayscale, mName, mAtrributeData.compressionType);
     }
 
     public override ObservationSpec setObservationSpec()

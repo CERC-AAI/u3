@@ -26,7 +26,7 @@ public class MetatilePool : IMetatileContainer
         return tags;
     }
 
-    public override Metatile GetMetatile()
+    public override MetaTile GetMetatile()
     {
         return null;
     }
@@ -44,15 +44,21 @@ public class MetatilePool : IMetatileContainer
 
     public void GetWeightedMetatiles(float weight, List<MetatileProbability> deepCopy)
     {
+        float totalWeight = 0;
+        for (int i = 0; i < metatileProbabilities.Count; i++)
+        {
+            totalWeight += metatileProbabilities[i].GetDynamicWeight();
+        }
+
         int depth_count = 0;
         for (int i = 0; i < metatileProbabilities.Count; i++)
         {
-            if (metatileProbabilities[i].metatileContainer is Metatile)
+            if (metatileProbabilities[i].metatileContainer is MetaTile)
             {
                 //Debug.Log("is Metatile");
                 MetatileProbability metatileprobability = new MetatileProbability();
                 metatileprobability.metatileContainer = metatileProbabilities[i].metatileContainer;
-                metatileprobability.SetDynamicWeight(metatileProbabilities[i].GetDynamicWeight() * weight);
+                metatileprobability.SetDynamicWeight(metatileProbabilities[i].GetDynamicWeight() / totalWeight * weight);
                 deepCopy.Add(metatileprobability);
             }
             else if (metatileProbabilities[i].metatileContainer is MetatilePool)
@@ -62,11 +68,11 @@ public class MetatilePool : IMetatileContainer
                 {
                     throw new Exception("depth count too big, something went wrong");
                 }
-                Debug.Log("is not Metatile, going one level deeper");
+                //Debug.Log("is not Metatile, going one level deeper");
                 //Debug.Log("Type: " + metatileProbabilities[i].metatileProbability.GetType());
                 MetatilePool metatilepool = (MetatilePool)metatileProbabilities[i].metatileContainer;
                 //Debug.Log("metatilepool: " + metatilepool);
-                metatilepool.GetWeightedMetatiles(metatileProbabilities[i].GetDynamicWeight() * weight, deepCopy);
+                metatilepool.GetWeightedMetatiles(metatileProbabilities[i].GetDynamicWeight() / totalWeight * weight, deepCopy);
             }
 
             else
@@ -90,7 +96,7 @@ public class MetatilePool : IMetatileContainer
 
     }
 
-    public static Metatile DrawMetatileWithoutReplacement(List<MetatileProbability> metatileProbabilities)
+    public static MetaTile DrawMetatileWithoutReplacement(List<MetatileProbability> metatileProbabilities)
     {
         float totalWeight = 0f;
         foreach (MetatileProbability metatileprobability in metatileProbabilities)
@@ -104,7 +110,7 @@ public class MetatilePool : IMetatileContainer
         {
             if (randomWeight < metatileProbabilities[i].GetDynamicWeight())
             {
-                Metatile metatileForRemoval = metatileProbabilities[i].metatileContainer.DrawMetatile();
+                MetaTile metatileForRemoval = metatileProbabilities[i].metatileContainer.DrawMetatile();
                 metatileProbabilities.RemoveAt(i);
                 return metatileForRemoval;
             }
@@ -117,9 +123,9 @@ public class MetatilePool : IMetatileContainer
     }
 
 
-    public override List<Metatile> GetMetatiles()
+    public override List<MetaTile> GetMetatiles()
     {
-        List<Metatile> metatiles = new List<Metatile>();
+        List<MetaTile> metatiles = new List<MetaTile>();
         for (int i = 0; i < metatileProbabilities.Count; i++)
         {
             // get the metatiles from each metatile probability
@@ -128,7 +134,7 @@ public class MetatilePool : IMetatileContainer
         return metatiles;
     }
 
-    public override Metatile DrawMetatile()
+    public override MetaTile DrawMetatile()
     {
 
         // Calculate the total weight from the dictionary
@@ -286,17 +292,17 @@ public class IMetatileContainer : MonoBehaviour
     {
         return null;
     }
-    public virtual Metatile DrawMetatile()
+    public virtual MetaTile DrawMetatile()
     {
         return null;
     }
 
-    public virtual List<Metatile> GetMetatiles()
+    public virtual List<MetaTile> GetMetatiles()
     {
         return null;
     }
 
-    public virtual Metatile GetMetatile()
+    public virtual MetaTile GetMetatile()
     {
         return null;
     }

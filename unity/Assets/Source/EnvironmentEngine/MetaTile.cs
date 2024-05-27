@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using System.Linq;
+using System.Xml;
 
 
 // Initialize an empty 3D array of null values 10 by 10 by 10
@@ -9,7 +11,7 @@ using UnityEngine;
 // Tile is just a definitional thing now
 
 [ExecuteInEditMode]
-public class Metatile : IMetatileContainer
+public class MetaTile : IMetatileContainer
 {
     public List<Tile> tiles;
     public Transform payload;
@@ -20,7 +22,7 @@ public class Metatile : IMetatileContainer
     public struct Configuration
     {
         public Vector3 origin;
-        public MetatileEnvironment.Orientation orientation;
+        public MetatileManager.Orientation orientation;
         public bool flipped;
     }
 
@@ -37,9 +39,26 @@ public class Metatile : IMetatileContainer
         return mConfigurationMap[index];
     }
 
-    public int GetConfiguration(Vector3 origin, MetatileEnvironment.Orientation orientation, bool flipped)
+    public int GetConfiguration(Vector3 origin, MetatileManager.Orientation orientation, bool flipped)
     {
         Initialization();
+        return mConfigurationMap.FindIndex((Configuration configMap) => { return origin == configMap.origin && orientation == configMap.orientation && flipped == configMap.flipped; });
+    }
+
+    public int GetConfiguration(Vector3 origin, Quaternion rotation, bool flipped)
+    {
+        Initialization();
+
+        MetatileManager.Orientation orientation = MetatileManager.Orientation.UpFront;
+        foreach (KeyValuePair<MetatileManager.Orientation, Quaternion> pair in MetatileManager.OrientationToQuaternion)
+        {
+            if (pair.Value == rotation)
+            {
+                orientation = pair.Key;
+                break;
+            }
+        }
+
         return mConfigurationMap.FindIndex((Configuration configMap) => { return origin == configMap.origin && orientation == configMap.orientation && flipped == configMap.flipped; });
     }
 
@@ -54,20 +73,20 @@ public class Metatile : IMetatileContainer
         return tags;
     }
 
-    public override Metatile DrawMetatile()
+    public override MetaTile DrawMetatile()
     {
         // TODO: do we need to instantiate a game object here?
         return this;
     }
 
-    public override List<Metatile> GetMetatiles()
+    public override List<MetaTile> GetMetatiles()
     {
-        List<Metatile> metatiles = new List<Metatile>();
+        List<MetaTile> metatiles = new List<MetaTile>();
         metatiles.Add(this);
         return metatiles;
     }
 
-    public override Metatile GetMetatile()
+    public override MetaTile GetMetatile()
     {
         return this;
     }
@@ -230,14 +249,16 @@ public class Metatile : IMetatileContainer
         return false;
     }
 
-    public Transform DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileEnvironment metatileEnvironment, bool debug = false)
+    public List<Transform> DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileManager metatileEnvironment, float voxelSize, bool debug = false)
     {
-        Transform payloadCopy = null;
+        List<Transform> payloads = new List<Transform>();
 
         if (payload != null)
         {
-            payloadCopy = MetatileEnvironment.instantiateNewObject(payload);
-            payloadCopy.transform.position = position;
+            Transform payloadCopy = null;
+
+            payloadCopy = MetatileManager.instantiateNewObject(payload);
+            payloadCopy.transform.position = new Vector3(position.x, position.y, position.z) * voxelSize;
             payloadCopy.transform.localRotation = rotation;
             payloadCopy.parent = metatileEnvironment.transform;
 
@@ -245,6 +266,35 @@ public class Metatile : IMetatileContainer
             {
                 payloadCopy.transform.localScale = new Vector3(1, -1, 1);
             }
+
+            EnvironmentTile[] placedTiles = payloadCopy.GetComponentsInChildren<EnvironmentTile>();
+
+            if (placedTiles.Length > 0)
+            {
+                for (int i = 0; i < placedTiles.Length; i++)
+                {
+                    placedTiles[i].OnTilePlaced();
+                }
+
+                foreach (EnvironmentTile payloadPart in placedTiles)
+                {
+                    payloadPart.transform.parent = metatileEnvironment.transform;
+
+                    payloads.Add(payloadPart.transform);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < payloadCopy.childCount; i++)
+                {
+                    Transform child = payloadCopy.GetChild(i);
+
+                    child.transform.parent = metatileEnvironment.transform;
+
+                    payloads.Add(child);
+                }
+            }
+            Destroy(payloadCopy.gameObject);
         }
 
         if (debug)
@@ -265,7 +315,7 @@ public class Metatile : IMetatileContainer
             tempParent.transform.localRotation = rotation;
         }
 
-        return payloadCopy;
+        return payloads;
     }
 
     private void Initialization()
@@ -274,14 +324,14 @@ public class Metatile : IMetatileContainer
         {
             return;
         }
-        foreach (MetatileEnvironment.Orientation orientation in Enum.GetValues(typeof(MetatileEnvironment.Orientation)))
+        foreach (MetatileManager.Orientation orientation in Enum.GetValues(typeof(MetatileManager.Orientation)))
         {
             foreach (bool flipped in new List<bool> { false, true })
             {
                 if (flipped && !this.canFlip ||
-                    MetatileEnvironment.OrientationToQuaternion[orientation].x != 0 && this.rotationDirections.x == 0 ||
-                    MetatileEnvironment.OrientationToQuaternion[orientation].y != 0 && this.rotationDirections.y == 0 ||
-                    MetatileEnvironment.OrientationToQuaternion[orientation].z != 0 && this.rotationDirections.z == 0)
+                    MetatileManager.OrientationToQuaternion[orientation].x != 0 && this.rotationDirections.x == 0 ||
+                    MetatileManager.OrientationToQuaternion[orientation].y != 0 && this.rotationDirections.y == 0 ||
+                    MetatileManager.OrientationToQuaternion[orientation].z != 0 && this.rotationDirections.z == 0)
                 {
                     continue;
                 }

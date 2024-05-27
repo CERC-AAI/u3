@@ -27,22 +27,22 @@ public class Callback : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-public class Action : Attribute
+public class ACTION : Attribute
 {
     public float minValue = -ActionInfo.DEFAULT_VALUE_RANGE;
     public float maxValue = ActionInfo.DEFAULT_VALUE_RANGE;
 
-    public Action()
+    public ACTION()
     {
     }
 
-    public Action(float minValue = float.MinValue, float maxValue = float.MinValue)
+    public ACTION(float minValue = float.MinValue, float maxValue = float.MinValue)
     {
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
 
-    public Action(int minValue = int.MinValue, int maxValue = int.MinValue)
+    public ACTION(int minValue = int.MinValue, int maxValue = int.MinValue)
     {
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -58,7 +58,7 @@ public class Sensor : Attribute
     public int width;
     public bool grayscale;
     public SensorCompressionType compressionType;
-    // TODO: add new properties here for different sensor types, 
+    // TODO: add new properties here for different sensor types,
     // e.g. height and width for camera sensors
     // but add unit testing for property mismatching
 
@@ -120,6 +120,8 @@ public class EnvironmentComponent : MonoBehaviour
     List<Type> mCallbackTypes = new List<Type>();
     bool mCallbacksInitialized = false;
 
+    protected bool mIsBeingDestroyed = false;
+
     Dictionary<Type, object> mCachedComponents = new Dictionary<Type, object>();
 
 
@@ -154,6 +156,7 @@ public class EnvironmentComponent : MonoBehaviour
         }
 
         mInitialized = true;
+        mIsBeingDestroyed = false;
 
         DoRegisterCallbacks();
     }
@@ -169,6 +172,11 @@ public class EnvironmentComponent : MonoBehaviour
         {
             Debug.LogError(name + "(" + GetType().ToString() + ") Each EnvironmentComponent must be attached to a GameObject with an EnvironmentObject, or a EnvironmentEngine derived class.");
         }
+    }
+
+    public virtual void InitParameters(JSONObject jsonParameters)
+    {
+
     }
 
     public virtual void StoreUserInputs()
@@ -192,13 +200,15 @@ public class EnvironmentComponent : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (mEngine && this is EnvironmentObject)
-        {
-            mEngine.RemoveObject((EnvironmentObject)this);
-        }
+        mIsBeingDestroyed = true;
+
         if (mEngine && this is EnvironmentAgent)
         {
             mEngine.RemoveAgent((EnvironmentAgent)this);
+        }
+        if (mEngine && this is EnvironmentObject)
+        {
+            mEngine.RemoveObject((EnvironmentObject)this);
         }
 
         for (int i = 0; i < mCallbackReferences.Count; i++)
@@ -210,7 +220,12 @@ public class EnvironmentComponent : MonoBehaviour
         mCallbackTypes.Clear();
     }
 
-    private void CheckEngine()
+    /*virtual public void InvalidateEngine()
+    {
+        mEngine = null;
+    }*/
+
+    protected void CheckEngine()
     {
         if (!mEngine)
         {
@@ -253,7 +268,7 @@ public class EnvironmentComponent : MonoBehaviour
 
             foreach (FieldInfo fieldInfo in fieldInfos)
             {
-                Action actionAttribute = fieldInfo.GetCustomAttribute<Action>();
+                ACTION actionAttribute = fieldInfo.GetCustomAttribute<ACTION>();
                 if (actionAttribute != null)
                 {
                     Type actionInfoType = typeof(ActionInfo);
@@ -693,6 +708,16 @@ public class EnvironmentComponent : MonoBehaviour
         }
 
         OnPostLoadState();
+    }
+
+    virtual public TrialManager.ObjectState SaveTrialData()
+    {
+        return null;
+    }
+
+    virtual public void LoadTrialData(TrialManager.ObjectState objectState)
+    {
+
     }
 
     virtual public void OnPreGetState()

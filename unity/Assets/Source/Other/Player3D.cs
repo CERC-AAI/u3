@@ -15,7 +15,7 @@ public class Player3D : EnvironmentAgent
     Movement mMovement;
     HealthBar mHealthBar;
 
-    [Action]
+    [ACTION]
     public GridEnvironment.Actions movementState;
 
     override protected void Initialize()

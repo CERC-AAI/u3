@@ -14,33 +14,21 @@
 
 """Atari env factory."""
 
-import tempfile
 from mlagents_envs.environment import UnityEnvironment
 from absl import flags
-from absl import logging
-import gymnasium as gym
-from pathlib import Path
 import uuid
+import json
 
 
-import subprocess
 from typing import Dict, List, Optional, Any, Tuple
 from mlagents_envs.side_channel.side_channel import (
     SideChannel,
     IncomingMessage,
     OutgoingMessage,
 )
-import mlagents_envs
-from mlagents_envs.logging_util import get_logger
-from mlagents_envs.exception import (
-    UnityEnvironmentException,
-    UnityActionException,
-    UnityTimeOutException,
-    UnityCommunicatorStoppedException,
-)
 from mlagents_envs.base_env import BaseEnv
 
-# from mlagents_envs.envs.unity_gym_env import UnityToGymWrapper
+from gym_wrapper import UnityToGymWrapper
 from unity_gym_env_pettingzoo_rewrite import UnityToPettingzooWrapper
 
 
@@ -68,7 +56,9 @@ class U3SideChannel(SideChannel):
         """
         # We simply read a string from the message and print it.
         message = str(msg.get_raw_bytes()[4:], "utf_8")
-        self.environment.lastEnvironment = message
+        if (not self.environment.current_step in self.environment.env_messages):
+            self.environment.env_messages[self.environment.current_step] = []
+        self.environment.env_messages[self.environment.current_step].append(message)
         # print('Unity output: {}'.format(message[0:100]))
 
     def send_string(self, data: str) -> None:
@@ -80,6 +70,8 @@ class U3SideChannel(SideChannel):
 
     def set_environment(self, environment):
         self.environment = environment
+        self.environment.env_messages = {}
+        self.environment.last_env_messages = {}
 
 
 class U3Environment(UnityEnvironment):
@@ -147,16 +139,35 @@ class U3Wrapper(UnityToPettingzooWrapper):
         uint8_visual: bool = False,
         flatten_branched: bool = False,
         allow_multiple_obs: bool = False,
+        parameters: Dict[str, object] = {},
+        task_name: str = "xland",
     ):
         self.sideChannel = sideChannel
         self.sideChannel.set_environment(self)
-        self.lastEnvironment = ""
+
+        self.init_env(task_name, parameters)
+
         super(U3Wrapper, self).__init__(
             unity_env=unity_env,
             uint8_visual=uint8_visual,
             flatten_branched=flatten_branched,
             allow_multiple_obs=allow_multiple_obs,
         )
+
+    def init_env(self, env_name: str, parameters: Dict[str, object]) -> None:
+        """Sets a parameter of this env.
+        Parameters are in JSON format.
+        """
+        
+        json_message = {}
+        json_message["env"] = env_name # TODO Make this work with multiple envs in one Unity instance
+        json_message["msg"] = "init"
+        json_message["data"] = parameters
+
+        string_message = json.dumps(json_message)
+
+        self.sideChannel.send_string(string_message)
+        return
 
     def seed(self, seed: Any = None) -> None:
         """Sets the seed for this env's random number generator(s).
@@ -204,24 +215,35 @@ class U3Wrapper(UnityToPettingzooWrapper):
         self.sideChannel.send_string("reset")
 
         return
+    
+    def reset(self, parameters : Dict[str, object] = {}) -> None:
+        json_message = {}
+        json_message["env"] = 1 # TODO Make this work with multiple envs in one Unity instance
+        json_message["msg"] = "reset"
+        json_message["data"] = parameters
+
+        string_message = json.dumps(json_message)
+
+        self.sideChannel.send_string(string_message)
+
+        super().reset()
+
+        self.last_env_messages = self.env_messages
+        self.env_messages = {}
 
 
-def create_environment(task):
-    # logging.info('Creating environment: %s', FLAGS.game)
+def create_environment(task_index, parameters : Dict[str, object] = {}):
+    return create_environment_by_name("", "xland", task_index, parameters)
 
-    # print(FLAGS)
-    # print(task)
-    # print(FLAGS.run_mode)
-
-    # full_game_name = '{}'.format(FLAGS.game)
-    # import os
-    # modeOffset = FLAGS.run_mode == 'actor'
-    # path = Path(__file__).parent.absolute()
+def create_environment_by_name(file_name, task_name = "xland", task_index = 0, parameters : Dict[str, object] = {}):
     environmentChannel = U3SideChannel()
-    unity_env = U3Environment(side_channels=[environmentChannel])
+    if file_name == "":
+        unity_env = U3Environment(seed=task_index, side_channels=[environmentChannel])
+    else:
+        unity_env = U3Environment(file_name=file_name, seed=task_index, side_channels=[environmentChannel])
     env = U3Wrapper(
-        unity_env, environmentChannel, flatten_branched=True, uint8_visual=True
+        unity_env, environmentChannel, flatten_branched=True, uint8_visual=True, parameters=parameters, task_name=task_name
     )
-    env.seed(task)
+    env.seed(task_index)
 
     return env

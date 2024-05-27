@@ -19,7 +19,7 @@ public class GridPlayer : EnvironmentAgent
     Movement mMovement;
     HealthBar mHealthBar;
 
-    [Action]
+    [ACTION]
     public GridEnvironment.Actions movementState;
 
     // Should be 3 vector3s for position, rotation, and scale
@@ -140,7 +140,7 @@ public class GridPlayer : EnvironmentAgent
 
     override public void Heuristic(in ActionBuffers actionsOut)
     {
-        /*test = UnityEngine.Random.Range(0, 2) == 1;
+        /*test = GetEngine().GetRandomRange(0, 2) == 1;
         test2 = UnityEngine.Random.onUnitSphere;*/
 
         movementState = GridEnvironment.Actions.NOOP;

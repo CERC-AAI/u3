@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: ea8b5beac13e74ec797fb5ea71108b24
+timeCreated: 1501159425
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 227955
+  packageName: FREE Ultimate Procedural Primitives
+  packageVersion: 1.0
+  assetPath: Assets/KANIYONIKA/UltimateProceduralPrimitivesFREE/40_Scripts/90_Utils/Delaunay/DelaunayTriangulation.cs
+  uploadId: 516907

@@ -269,7 +269,7 @@ using System.Text.RegularExpressions;
 
     public void TrialInitialize(bool isNewBlock)
     {
-        //mCurrentValue = mMeans[UnityEngine.Random.Range(0, mMeans.Length)];
+        //mCurrentValue = mMeans[GetEngine().GetRandomRange(0, mMeans.Length)];
         mCurrentValue = mStartValue + GetEngine().GetRandomFloat() * (mEndValue - mStartValue);
         if (mCurrentValue < 0)
         {

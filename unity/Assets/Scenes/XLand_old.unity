@@ -588,7 +588,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 117973842}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 5}
+  m_LocalPosition: {x: 5, y: -0.5, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1704,6 +1704,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!114 &414432179
 MonoBehaviour:
@@ -1759,6 +1760,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!1001 &416450561
 PrefabInstance:
@@ -1965,6 +1967,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!114 &420662715
 MonoBehaviour:
@@ -3483,6 +3486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!114 &754941431
 MonoBehaviour:
@@ -4732,6 +4736,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!1001 &978885532
 PrefabInstance:
@@ -6183,6 +6188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!114 &1126805304
 MonoBehaviour:
@@ -6238,6 +6244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!114 &1126805306
 MonoBehaviour:
@@ -6634,7 +6641,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1202056663}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.8784866, y: 2.6484966, z: -11.396228}
+  m_LocalPosition: {x: 5.95, y: 2.6484966, z: -11.396228}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6653,6 +6660,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!54 &1202056666
 Rigidbody:
@@ -8112,6 +8120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!4 &1680077882
 Transform:
@@ -8524,6 +8533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!114 &1761730603
 MonoBehaviour:
@@ -8903,7 +8913,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1829786734}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.1215134, y: 2.6484966, z: -8.396228}
+  m_LocalPosition: {x: 5.09, y: 2.6484966, z: -4.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8924,6 +8934,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!114 &1829786737
 MonoBehaviour:
@@ -9804,6 +9815,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!54 &1939419096
 Rigidbody:
@@ -10399,6 +10411,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2033542608}
   - component: {fileID: 2033542607}
+  - component: {fileID: 2033542609}
   m_Layer: 0
   m_Name: MetaTileEnvironment
   m_TagString: Untagged
@@ -10419,7 +10432,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   voxelSize: 1
-  metatilepool: {fileID: 2721922502780412005, guid: eea1d9fca23e8ff48b734b563b2febb7,
+  metatilepool: {fileID: 4368192324598907990, guid: f49107dc9e4fa6e4382dac87214619eb,
     type: 3}
   placedPayloads: []
   timelapse: 0
@@ -10442,6 +10455,20 @@ Transform:
   m_Father: {fileID: 1064040327}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2033542609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033542606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
+  mPrefabPath: 
 --- !u!1001 &2041131585
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11007,6 +11034,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!1 &2118579657
 GameObject:
@@ -11173,6 +11201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptExecutionPriority: 0
   mPrefabPath: 
 --- !u!114 &2118579669
 MonoBehaviour:

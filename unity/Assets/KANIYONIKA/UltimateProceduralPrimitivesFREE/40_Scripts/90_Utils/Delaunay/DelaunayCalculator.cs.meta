@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 647223e4a5ed64f2fbcab9cb6e991618
+timeCreated: 1500899493
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 227955
+  packageName: FREE Ultimate Procedural Primitives
+  packageVersion: 1.0
+  assetPath: Assets/KANIYONIKA/UltimateProceduralPrimitivesFREE/40_Scripts/90_Utils/Delaunay/DelaunayCalculator.cs
+  uploadId: 516907

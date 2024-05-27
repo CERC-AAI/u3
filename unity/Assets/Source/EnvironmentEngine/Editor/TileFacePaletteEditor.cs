@@ -49,8 +49,8 @@ public class TileFacePaletteEditor : Editor
             float topIndent = colorSize;
             int margin = 1;
 
-            string environmentString = "Placed faces";
-            string incomingString = "Incoming faces";
+            string environmentString = "";// "Placed faces";
+            string incomingString = "";//"Incoming faces";
 
             GUIStyle boldStyle = new GUIStyle(GUI.skin.label);
             boldStyle.fontStyle = FontStyle.Bold;
@@ -126,7 +126,7 @@ public class TileFacePaletteEditor : Editor
             List<TileFacePalette.MatchedFaces> matchingMatrixData = new List<TileFacePalette.MatchedFaces>();
             for (int i = 0; i < selectedPalette.matchingMatrix.Count; i++)
             {
-                matchingMatrixData.Add(new TileFacePalette.MatchedFaces(selectedPalette.matchingMatrix[i].mA, selectedPalette.matchingMatrix[i].mB, selectedPalette.matchingMatrix[i].mWeight));
+                matchingMatrixData.Add(new TileFacePalette.MatchedFaces(selectedPalette.matchingMatrix[i].mIncoming, selectedPalette.matchingMatrix[i].mPlaced, selectedPalette.matchingMatrix[i].mWeight));
             }
 
             selectedPalette.matchingMatrix.Clear();
@@ -139,9 +139,9 @@ public class TileFacePaletteEditor : Editor
 
             for (int i = 0; i < matchingMatrixData.Count; i++)
             {
-                if (matchingMatrixData[i].mA < numFaces && matchingMatrixData[i].mB < numFaces)
+                if (matchingMatrixData[i].mIncoming < numFaces && matchingMatrixData[i].mPlaced < numFaces)
                 {
-                    tempData[matchingMatrixData[i].mA][matchingMatrixData[i].mB] = matchingMatrixData[i].mWeight;
+                    tempData[matchingMatrixData[i].mIncoming][matchingMatrixData[i].mPlaced] = matchingMatrixData[i].mWeight;
                 }
             }
 
@@ -153,7 +153,7 @@ public class TileFacePaletteEditor : Editor
             {
                 for (int j = 0; j < numFaces; j++)
                 {
-                    //if (i <= j)
+                    if (i <= j)
                     {
                         float oldValue = tempData[i][j];
                         if (oldValue == 0)
@@ -181,10 +181,10 @@ public class TileFacePaletteEditor : Editor
 
                         if (newValue != 0)
                         {
-                            if (oldValue == 0 && tempData[j][i] == 0)
+                            /*if (oldValue == 0 && tempData[j][i] == 0)
                             {
                                 selectedPalette.matchingMatrix.Add(new TileFacePalette.MatchedFaces(j, i, newValue));
-                            }
+                            }*/
                             selectedPalette.matchingMatrix.Add(new TileFacePalette.MatchedFaces(i, j, newValue));
 
                             index++;

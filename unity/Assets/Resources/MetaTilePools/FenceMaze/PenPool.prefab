@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8700022825762673883
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 121081934370275679}
+  - component: {fileID: 4368192324598907990}
+  m_Layer: 0
+  m_Name: PenPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &121081934370275679
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8700022825762673883}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.216633, y: 2.06, z: -2.53}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4368192324598907990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8700022825762673883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac82d13eff340cb41b855dfa56d88bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 4368192324598907990, guid: 533eef3e567b684408535de38d747758, type: 3}
+  tags: 
+  palette: {fileID: -6947243484448938200, guid: 2bc2e7f4f1724c544b281a20ce43222a,
+    type: 3}
+  metatileProbabilities:
+  - metatileContainer: {fileID: 100174510953274016, guid: 744be06acf441464c84698fd2cb9613d,
+      type: 3}
+    weight: 10
+  - metatileContainer: {fileID: 100174510953274016, guid: f0ed7ada9a5f3f54aa35669ce9eb2fcd,
+      type: 3}
+    weight: 5
+  - metatileContainer: {fileID: 100174510953274016, guid: b15031f17d788e045895422957e9a08f,
+      type: 3}
+    weight: 1
+  - metatileContainer: {fileID: 100174510953274016, guid: 09cd89e6fe4aa59429e6c9d0d30278bf,
+      type: 3}
+    weight: 2
+  - metatileContainer: {fileID: 100174510953274016, guid: b627ee9f26bf4ec4da44791aed21f48f,
+      type: 3}
+    weight: 3
+  - metatileContainer: {fileID: 100174510953274016, guid: bbe5b3d24627cf04eb9dce3c873c05f1,
+      type: 3}
+    weight: 4
+  - metatileContainer: {fileID: 100174510953274016, guid: 25e619ee3cac88047aa3ee2f0e82c049,
+      type: 3}
+    weight: 5

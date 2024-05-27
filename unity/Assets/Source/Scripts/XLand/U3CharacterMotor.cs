@@ -10,6 +10,7 @@ using KinematicCharacterController;
 [RequireComponent(typeof(CapsuleCollider))]
 public class U3CharacterMotor : EnvironmentComponent
 {
+    //TODO Modify all Physics.XX calls to work with independent Physics Scenes
 #pragma warning disable 0414
     [Header("Components")]
     /// <summary>
