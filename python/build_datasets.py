@@ -4,7 +4,6 @@ import numpy as np
 import os
 from tqdm import tqdm
 import argparse
-from scipy.ndimage import median_filter
 import time
 
 _log_level = INFO
