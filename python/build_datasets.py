@@ -3,6 +3,7 @@ from time import sleep
 import numpy as np
 import os
 from tqdm import tqdm
+import argparse
 
 _log_level = INFO
 set_log_level(_log_level)
@@ -10,8 +11,14 @@ set_log_level(_log_level)
 
 import u3_env
 
+parser = argparse.ArgumentParser(description='Build a dataset of worlds for the XLand env. Specific a dataset to append to with "--dataset <difficulty>_<height>"')
+parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_low')
+parser.add_argument('--task_index', type=int, help='Task identifier', default='0')
+args = parser.parse_args()
+
 dataset_type = "world"
-dataset_name = "easy_low"
+dataset_name = args.dataset
+task_id = args.task_index
 dataset_folder = f"{dataset_type}s/{dataset_name}/"
 min_connectivity = 0.5
 total_count = 1000000
@@ -26,10 +33,43 @@ env_height = 1
 env_height_var = 1
 env_height_min = 1
 
+parts = dataset_name.split('_')
+
+if parts[0] == "easy":
+    env_width = 5
+    env_width_var = 2
+    env_length = 5
+    env_length_var = 2
+elif parts[0] == "medium":
+    env_width = 10
+    env_width_var = 3
+    env_length = 10
+    env_length_var = 3
+elif parts[0] == "hard":
+    env_width = 15
+    env_width_var = 5
+    env_length = 15
+    env_length_var = 5
+else:
+    print("Dataset name must start with 'easy', 'medium' or 'hard'")
+    sys.exit()
+
+
+if parts[1] == "low":
+    env_height = 1
+    env_height_var = 1
+elif parts[1] == "high":
+    env_height = 3
+    env_height_var = 2
+else:
+    print("Dataset name must end with 'low' or 'high'")
+    sys.exit()
+
+
 # Note that XLand has 12 frames a second
 base_parameters = {"env_width": env_width, "env_length": env_length, "env_height": env_height, "min_connectivity": min_connectivity}
-#env = u3_env.create_environment(0, base_parameters)
-env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGenerator/XLand", task_index=0, parameters=base_parameters)
+#env = u3_env.create_environment(task_id, base_parameters)
+env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGenerator/XLand", task_index=task_id, parameters=base_parameters)
 
 root_folder = f"{os.path.dirname(os.path.abspath(__file__))}/../Datasets/"
 save_folder = f"{root_folder}{dataset_name}/"
