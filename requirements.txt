@@ -1,5 +1,6 @@
 #mlagents_env
+./ml-agents/ml-agents-envs
 gymnasium
 imageio
-tqdm-4.66.4
-absl-py-2.1.0
+tqdm==4.66.4
+absl-py==2.1.0
