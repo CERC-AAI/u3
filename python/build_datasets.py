@@ -12,7 +12,7 @@ set_log_level(_log_level)
 import u3_env
 
 dataset_type = "world"
-dataset_name = f"easy_low"
+dataset_name = "easy_low"
 dataset_folder = f"{dataset_type}s/{dataset_name}/"
 min_connectivity = 0.5
 total_count = 1000
