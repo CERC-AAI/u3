@@ -61,93 +61,52 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Source\Scripts\XLand\GravityGun.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentManager.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\FrameratePanel.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\10- Multiple movement states setup\Scripts\MyCharacterController.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\b- Double Jumping\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\12- NoClip state\Scripts\MyCharacterController.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentComponentHolder.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\14- Climbing Ladders\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\Movement.cs" />
-    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\AdjustTrainingTimescale.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\9- Custom collision filtering\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\Area.cs" />
-    <Compile Include="Assets\Source\Scripts\LineGame\NoInput.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleAction.cs" />
     <Compile Include="Assets\Source\Other\U3Agent.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\5- Adding velocities and impulses\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\ProductionRule.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\SensorInfo.cs" />
-    <Compile Include="Assets\StarterAssets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\Source\Scripts\XLand\U3DKinematicObject.cs" />
-    <Compile Include="Assets\Source\Scripts\XLand\U3DPlayer.cs" />
-    <Compile Include="Assets\Source\Other\Player3D.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Exit.cs" />
-    <Compile Include="Assets\Source\Scripts\ButtonGame\ButtonGame.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Core\KinematicCharacterMotor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\16- FramePerfect Rotation\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\U3DEnvironment.cs" />
     <Compile Include="Assets\KinematicCharacterController\ExampleCharacter\Scripts\ExampleCharacterController.cs" />
-    <Compile Include="Assets\Source\Scripts\ButtonGame\Door.cs" />
-    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\CollisionCallbacks.cs" />
-    <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualButton.cs" />
-    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\TargetController.cs" />
-    <Compile Include="Assets\Source\Scripts\LineGame\LineEnvironment.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PhysicsObject.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\U3PhysicsMover.cs" />
-    <Compile Include="Assets\Source\Scripts\ButtonGame\KeyGame.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\BuildManager.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\2- Basic Movement and Gravity\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\LoadBar.cs" />
     <Compile Include="Assets\Libraries\JSON\VectorTemplates.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentComponent.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\Teleporter.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentSideChannel.cs" />
     <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualJoystick.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\c- Wall Jumping\MyCharacterController.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\CameraFollow.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Core\KCCSettings.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\TrialManager.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\ModelOverrider.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\TargettingCursor.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\ExampleAIController.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\7- Orienting towards arbitrary up direction\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\FlyCamera.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\10- Multiple movement states setup\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\JavascriptInterface.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\4- Landing and leaving ground\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\a- Simple Jumping\MyPlayer.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\15- Root motion example\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\StarterAssets\FirstPersonController\Scripts\BasicRigidBodyPush.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\GridEnvironment.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PlanetManager.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleObject.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\U3SensorComponent.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\SpawnManager.cs" />
     <Compile Include="Assets\Libraries\JSONLoader.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\14- Climbing Ladders\Scripts\MyLadder.cs" />
     <Compile Include="Assets\ML-Agents\Examples\3DBall\Scripts\Ball3DHardAgent.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentEngine.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\ActionInfo.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\KinematicCharacterSystem.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\EnvironmentTile.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\c- Wall Jumping\MyPlayer.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\U3CharacterSystem.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\12- NoClip state\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Core\ICharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\CueCard.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Core\PhysicsMover.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\DirectionIndicator.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\Elevator.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Key.cs" />
-    <Compile Include="Assets\StarterAssets\Mobile\Scripts\CanvasInputs\UICanvasControllerInput.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\StressTestManager.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\6- Crouching\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\GroundContact.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\6- Crouching\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\LineSlider.cs" />
     <Compile Include="Assets\Source\Other\MakeCube.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\U3CharacterMotor.cs" />
@@ -155,30 +114,86 @@
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\16- FramePerfect Rotation\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\14- Climbing Ladders\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\OvalSlider.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\ExampleMovingPlatform.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\U3DCamera.cs" />
     <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PlayableMover.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\5- Adding velocities and impulses\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\9- Custom collision filtering\Scripts\MyCharacterController.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PrefabLauncher.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentObject.cs" />
-    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\SensorBase.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\InstructionCard.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\ProjectSettingsOverrides.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\OrientationCubeController.cs" />
+    <Compile Include="Assets\Source\Scripts\ButtonGame\FrogGame.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\13- Swimming state\Scripts\MyPlayer.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\4- Landing and leaving ground\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\a- Simple Jumping\MyCharacterController.cs" />
+    <Compile Include="Assets\Source\Scripts\ButtonGame\HealthBar.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleManager.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Core\ReadOnlyAttribute.cs" />
+    <Compile Include="Assets\StarterAssets\Mobile\Scripts\Utilities\MobileDisableAutoSwitchControls.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\SyncVariable.cs" />
+    <Compile Include="Assets\Source\Other\Common.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentSensor.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleCondition.cs" />
+    <Compile Include="Assets\Source\Other\BinarizeData.cs" />
+    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\JointDriveController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\15- Root motion example\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\StarterAssets\FirstPersonController\Scripts\FirstPersonController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\7- Orienting towards arbitrary up direction\Scripts\MyPlayer.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\13- Swimming state\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\ExampleCharacter\Scripts\ExamplePlayer.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\1- Player Camera Character Setup\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\ML-Agents\Examples\3DBall\Scripts\Ball3DAgent.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\GraphicsObject.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentManager.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\FrameratePanel.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\10- Multiple movement states setup\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\b- Double Jumping\MyPlayer.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentComponentHolder.cs" />
+    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\AdjustTrainingTimescale.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\9- Custom collision filtering\Scripts\MyPlayer.cs" />
+    <Compile Include="Assets\Source\Scripts\LineGame\NoInput.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\5- Adding velocities and impulses\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\SensorInfo.cs" />
+    <Compile Include="Assets\StarterAssets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\U3DKinematicObject.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\U3DPlayer.cs" />
+    <Compile Include="Assets\Source\Other\Player3D.cs" />
+    <Compile Include="Assets\Source\Scripts\ButtonGame\ButtonGame.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Core\KinematicCharacterMotor.cs" />
+    <Compile Include="Assets\Source\Scripts\ButtonGame\Door.cs" />
+    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\CollisionCallbacks.cs" />
+    <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualButton.cs" />
+    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\TargetController.cs" />
+    <Compile Include="Assets\Source\Scripts\LineGame\LineEnvironment.cs" />
+    <Compile Include="Assets\Source\Scripts\ButtonGame\KeyGame.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\BuildManager.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentComponent.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Core\KCCSettings.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyPlayer.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\TrialManager.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\JavascriptInterface.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\a- Simple Jumping\MyPlayer.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\15- Root motion example\Scripts\MyPlayer.cs" />
+    <Compile Include="Assets\StarterAssets\FirstPersonController\Scripts\BasicRigidBodyPush.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PlanetManager.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleObject.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\14- Climbing Ladders\Scripts\MyLadder.cs" />
+    <Compile Include="Assets\Source\EnvironmentEngine\ActionInfo.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\12- NoClip state\Scripts\MyPlayer.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Core\ICharacterController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Core\PhysicsMover.cs" />
+    <Compile Include="Assets\StarterAssets\Mobile\Scripts\CanvasInputs\UICanvasControllerInput.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\6- Crouching\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\ExampleMovingPlatform.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Walkthrough\9- Custom collision filtering\Scripts\MyCharacterController.cs" />
+    <Compile Include="Assets\KinematicCharacterController\Examples\Scripts\PrefabLauncher.cs" />
+    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\SensorBase.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\GridPlayer.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\Button.cs" />
-    <Compile Include="Assets\Source\Scripts\ButtonGame\FrogGame.cs" />
     <Compile Include="Assets\Source\Scripts\ButtonGame\HealthOrb.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\13- Swimming state\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\TargetContact.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\4- Landing and leaving ground\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\FreeSelectionOutline\Scripts\SelectionOutlineController.cs" />
-    <Compile Include="Assets\Source\Scripts\ButtonGame\HealthBar.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\a- Simple Jumping\MyCharacterController.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleManager.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\2- Basic Movement and Gravity\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Core\ReadOnlyAttribute.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\1- Player Camera Character Setup\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentAgent.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\Tile.cs" />
@@ -186,36 +201,21 @@
     <Compile Include="Assets\Source\EnvironmentEngine\MetaTilePool.cs" />
     <Compile Include="Assets\Source\Other\Spawn.cs" />
     <Compile Include="Assets\KinematicCharacterController\Core\IMoverController.cs" />
-    <Compile Include="Assets\StarterAssets\Mobile\Scripts\Utilities\MobileDisableAutoSwitchControls.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\SyncVariable.cs" />
-    <Compile Include="Assets\Source\Other\Common.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentTask.cs" />
     <Compile Include="Assets\Source\Other\Pushable.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\EnvironmentSensor.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleCondition.cs" />
-    <Compile Include="Assets\Source\Other\BinarizeData.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\3- Jumping\Scripts\b- Double Jumping\MyCharacterController.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\MetaTile.cs" />
-    <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\JointDriveController.cs" />
     <Compile Include="Assets\Libraries\JSON\JSONObject.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\11- Charging state\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\MetaTileManager.cs" />
     <Compile Include="Assets\KinematicCharacterController\ExampleCharacter\Scripts\ExampleCharacterCamera.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\TileFacePalette.cs" />
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\Monitor.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\15- Root motion example\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\XLand\Floor.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\SpriteGraphicsObject.cs" />
-    <Compile Include="Assets\StarterAssets\FirstPersonController\Scripts\FirstPersonController.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\7- Orienting towards arbitrary up direction\Scripts\MyPlayer.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\13- Swimming state\Scripts\MyCharacterController.cs" />
-    <Compile Include="Assets\KinematicCharacterController\ExampleCharacter\Scripts\ExamplePlayer.cs" />
-    <Compile Include="Assets\KinematicCharacterController\Walkthrough\1- Player Camera Character Setup\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\StarterAssets\InputSystem\StarterAssetsInputs.cs" />
-    <Compile Include="Assets\ML-Agents\Examples\3DBall\Scripts\Ball3DAgent.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\11- Charging state\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\Scripts\GridWorld\GridObject.cs" />
-    <Compile Include="Assets\Source\EnvironmentEngine\GraphicsObject.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\8- Creating a moving platform\Scripts\MyMovingPlatform.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\ProductionRuleIdentifier.cs" />
   </ItemGroup>
@@ -1182,6 +1182,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.MemoryProfiler.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.MemoryProfiler.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
       <HintPath>Library\ScriptAssemblies\Unity.Analytics.DataPrivacy.dll</HintPath>
       <Private>False</Private>
@@ -1212,6 +1216,10 @@
     </Reference>
     <Reference Include="UnityEditor.Purchasing">
       <HintPath>Library\ScriptAssemblies\UnityEditor.Purchasing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.MemoryProfiler">
+      <HintPath>Library\ScriptAssemblies\Unity.MemoryProfiler.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ML-Agents">
@@ -1294,8 +1302,8 @@
       <HintPath>Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Sentis.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Sentis.Editor.dll</HintPath>
+    <Reference Include="Unity.EditorCoroutines.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.PlasticSCM.Editor">
@@ -1318,8 +1326,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Sentis.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Sentis.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Toolchain.Linux-x86_64">
+      <HintPath>Library\ScriptAssemblies\Unity.Toolchain.Linux-x86_64.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
@@ -1330,12 +1346,8 @@
       <HintPath>Library\ScriptAssemblies\Analytics.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Toolchain.Linux-x86_64">
-      <HintPath>Library\ScriptAssemblies\Unity.Toolchain.Linux-x86_64.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Toolchain.Win-x86_64-Linux-x86_64">
-      <HintPath>Library\ScriptAssemblies\Unity.Toolchain.Win-x86_64-Linux-x86_64.dll</HintPath>
+    <Reference Include="Unity.MemoryProfiler.Editor.MemoryProfilerModule">
+      <HintPath>Library\ScriptAssemblies\Unity.MemoryProfiler.Editor.MemoryProfilerModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ML-Agents.Editor">
@@ -1346,8 +1358,8 @@
       <HintPath>Library\ScriptAssemblies\Unity.Services.Core.Environments.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
+    <Reference Include="Unity.Toolchain.Win-x86_64-Linux-x86_64">
+      <HintPath>Library\ScriptAssemblies\Unity.Toolchain.Win-x86_64-Linux-x86_64.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">
@@ -1356,6 +1368,10 @@
     </Reference>
     <Reference Include="Unity.Sysroot.Linux_x86_64">
       <HintPath>Library\ScriptAssemblies\Unity.Sysroot.Linux_x86_64.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.Purchasing.Stores">
@@ -1368,6 +1384,10 @@
     </Reference>
     <Reference Include="Unity.2D.PixelPerfect">
       <HintPath>Library\ScriptAssemblies\Unity.2D.PixelPerfect.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Services.Core">
+      <HintPath>Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst">
@@ -1384,10 +1404,6 @@
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Services.Core">
-      <HintPath>Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.SpatialTracking">

@@ -283,6 +283,8 @@ public class MetatileManager : EnvironmentComponent
 
     public int[,] heightMap;
 
+    float mGenerationTime;
+
     Dictionary<Vector2Int, HashSet<Vector2Int>> Edges = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
 
     HashSet<Vector2Int> SeenNodes;
@@ -944,6 +946,7 @@ public class MetatileManager : EnvironmentComponent
         }
 
         //mGeneratingEnvironment = false;
+        mGenerationTime = Time.realtimeSinceStartup - startTime;
         Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to generate.");
 
         OnGenerationComplete();
@@ -997,7 +1000,8 @@ public class MetatileManager : EnvironmentComponent
             if ((float)maxComponent.Count / ((float)mWidth * (float)mLength) >= connectivityThreshold)
             {
                 SavePayloads(saveFile);
-                EnvironmentManager.Instance.SendEventToPython("save_complete");
+                //EnvironmentManager.Instance.SendEventToPython("save_complete");
+                EnvironmentManager.Instance.SendEventToPython($"save_complete:{mGenerationTime}");
             }
             else
             {
