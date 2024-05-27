@@ -426,7 +426,26 @@ public class EnvironmentManager : MonoBehaviour
                 {
                     messageEnvironment.EndRun();
                 }
-                messageEnvironment.InitializeEnvironment(mLoadParams[messageEnvironment]);
+
+                JSONObject loadParams = mLoadParams[messageEnvironment];
+
+                JSONObject resetParams = messageJSON["data"];
+                if (resetParams)
+                {
+                    foreach (string paramName in resetParams.keys)
+                    {
+                        if (loadParams.GetField(paramName) == null)
+                        {
+                            loadParams.AddField(paramName, resetParams[paramName]);
+                        }
+                        else
+                        {
+                            loadParams.SetField(paramName, resetParams[paramName]);
+                        }
+                    }
+                }
+
+                messageEnvironment.InitializeEnvironment(loadParams);
                 messageEnvironment.StartRun();
                 break;
 

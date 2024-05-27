@@ -56,7 +56,9 @@ class U3SideChannel(SideChannel):
         """
         # We simply read a string from the message and print it.
         message = str(msg.get_raw_bytes()[4:], "utf_8")
-        self.environment.lastEnvironment = message
+        if (not self.environment.current_step in self.environment.env_messages):
+            self.environment.env_messages[self.environment.current_step] = []
+        self.environment.env_messages[self.environment.current_step].append(message)
         # print('Unity output: {}'.format(message[0:100]))
 
     def send_string(self, data: str) -> None:
@@ -68,6 +70,8 @@ class U3SideChannel(SideChannel):
 
     def set_environment(self, environment):
         self.environment = environment
+        self.environment.env_messages = {}
+        self.environment.last_env_messages = {}
 
 
 class U3Environment(UnityEnvironment):
@@ -140,7 +144,6 @@ class U3Wrapper(UnityToPettingzooWrapper):
     ):
         self.sideChannel = sideChannel
         self.sideChannel.set_environment(self)
-        self.lastEnvironment = ""
 
         self.init_env(task_name, parameters)
 
@@ -213,17 +216,20 @@ class U3Wrapper(UnityToPettingzooWrapper):
 
         return
     
-    def reset(self) -> None:
+    def reset(self, parameters : Dict[str, object] = {}) -> None:
         json_message = {}
         json_message["env"] = 1 # TODO Make this work with multiple envs in one Unity instance
         json_message["msg"] = "reset"
-        #json_message["data"] = parameters
+        json_message["data"] = parameters
 
         string_message = json.dumps(json_message)
 
         self.sideChannel.send_string(string_message)
-        
+
         super().reset()
+
+        self.last_env_messages = self.env_messages
+        self.env_messages = {}
 
 
 def create_environment(task_index, parameters : Dict[str, object] = {}):

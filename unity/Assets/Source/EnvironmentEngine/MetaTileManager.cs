@@ -13,6 +13,7 @@ using static MetaTile;
 using QuickGraph;
 using QuickGraph.Algorithms;
 using UnityEngine.InputSystem;
+using System.IO.Abstractions;
 
 public class MetatileManager : EnvironmentComponent
 {
@@ -21,6 +22,8 @@ public class MetatileManager : EnvironmentComponent
     public int mMaxConfigurationCount = 20;
 
     public float voxelSize = 1;
+
+    public float connectivityThreshold = 0.5f;
 
     public string saveFile = "";
     public string loadFile = "";
@@ -312,6 +315,8 @@ public class MetatileManager : EnvironmentComponent
     List<float> mFinalWeights = new List<float>();
     List<bool> mUseIndicies = new List<bool>();
 
+    public Floor floor;
+
 
 
     public override void InitParameters(JSONObject jsonParameters)
@@ -321,8 +326,9 @@ public class MetatileManager : EnvironmentComponent
             jsonParameters.GetField(out mWidth, "env_width", mWidth);
             jsonParameters.GetField(out mLength, "env_length", mLength);
             jsonParameters.GetField(out mHeight, "env_height", mHeight);
-            /*jsonParameters.GetField(out saveFoler, "world_save_folder", saveFoler);
-            jsonParameters.GetField(out loadFolder, "world_load_folder", loadFolder);*/
+            jsonParameters.GetField(out saveFile, "world_save_file", saveFile);
+            jsonParameters.GetField(out loadFile, "world_load_file", loadFile);
+            jsonParameters.GetField(out connectivityThreshold, "min_connectivity", connectivityThreshold);
         }
 
         base.InitParameters(jsonParameters);
@@ -362,6 +368,11 @@ public class MetatileManager : EnvironmentComponent
         if (DEBUG && !mGeneratingEnvironment)
         {
             StartCoroutine(GenerateEnvironment(metatilepool));
+        }
+
+        if (floor)
+        {
+            floor.SetSize(new Vector2(mWidth * voxelSize, mLength * voxelSize));
         }
     }
 
@@ -899,7 +910,7 @@ public class MetatileManager : EnvironmentComponent
 
                 if (DEBUG || timelapse)
                 {
-                    candidateMetatile.DepositPayload(placementPositionOriginOffset, rotation, configuration.flipped, this);
+                    candidateMetatile.DepositPayload(placementPositionOriginOffset, rotation, configuration.flipped, this, voxelSize);
                     if (DEBUG)
                     {
                         Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPositionOriginOffset}, origin={rotatedOffset}, orientation={configuration.orientation}, flipped = {configuration.flipped}, Count={placedMetatiles.Count}");
@@ -981,9 +992,21 @@ public class MetatileManager : EnvironmentComponent
             }
      
         }*/
+        if (saveFile != "")
+        {
+            if ((float)maxComponent.Count / ((float)mWidth * (float)mLength) >= connectivityThreshold)
+            {
+                SavePayloads(saveFile);
+                EnvironmentManager.Instance.SendEventToPython("save_complete");
+            }
+            else
+            {
+                Debug.Log("Maximum connectivity too low, did not save");
+                EnvironmentManager.Instance.SendEventToPython("save_failed");
+            }
+        }
        
 
-        //TODO: Vedant, add code to populate this list
         mPermissibleSpawns.Clear();
         /*for (int x = 0; x < heightMap.GetLength(0); x++)
         {
@@ -2074,14 +2097,13 @@ public class MetatileManager : EnvironmentComponent
                 placedMetatiles[i].position,
                 placedMetatiles[i].rotation,
                 placedMetatiles[i].flipped,
-                this
+                this,
+                voxelSize
             ));
         }
-
-        SavePayloads();
     }
 
-    void SavePayloads()
+    void SavePayloads(string fileName)
     {
         JSONObject fullComponent = new JSONObject();
 
@@ -2106,14 +2128,24 @@ public class MetatileManager : EnvironmentComponent
         }
         fullComponent.AddField("d", componentList);
 
-        string path = Path.Combine(Application.persistentDataPath, "test.json");
+        //string path = Path.Combine(Application.dataPath, $"{fileName}.json");
+        string path = fileName;
+        path = path.Replace("{dataPath}", $"{Application.dataPath}/../Datasets/");
+
+        string directoryPath = Path.GetDirectoryName(path);
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
 
         // Write the JSON string to a file
         File.WriteAllText(path, fullComponent.ToString());
     }
     void LoadPayloads(string fileName)
     {
-        string path = Path.Combine(Application.persistentDataPath, $"{fileName}.json");
+        //string path = Path.Combine(Application.dataPath, $"{fileName}.json");
+        string path = fileName;
+        path = path.Replace("{dataPath}", $"{Application.dataPath}/../Datasets/");
 
         string jsonData = File.ReadAllText(path);
 
@@ -2157,7 +2189,8 @@ public class MetatileManager : EnvironmentComponent
                 position,
                 OrientationToQuaternion[configuration.orientation],
                 flipped,
-                this
+                this,
+                voxelSize
             ));
         }
     }

@@ -123,6 +123,88 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &359794823
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 359794824}
+  - component: {fileID: 359794826}
+  - component: {fileID: 359794825}
+  m_Layer: 0
+  m_Name: MetaTileManager (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &359794824
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359794823}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1437354646}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &359794825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359794823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6c1c3ff9b2fd8a4d9b36214e332e4c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mWidth: 10
+  mLength: 10
+  mHeight: 1
+  mManyMetatileCount: 2
+  mMaxConfigurationCount: 20
+  voxelSize: 1
+  saveFile: 
+  loadFile: 
+  VISUALIZE_GRAPH: 0
+  debugArrow: {fileID: 6767979993923170774, guid: 0a87a0185df628240a362c4f57b4dcbf,
+    type: 3}
+  debugNode: {fileID: 6767979993923170774, guid: 3da53670c0bf37f4abe573831139315d,
+    type: 3}
+  edgeTiles: ffffffffffffffffffffffffffffffffffffffffffffffff
+  metatilepool: {fileID: 4368192324598907990, guid: 533eef3e567b684408535de38d747758,
+    type: 3}
+  placedPayloads: []
+  timelapse: 0
+  DEBUG: 0
+  debugTile: {fileID: 8411421930320262341, guid: 854926c658783f947a2964d1b81dbfc1,
+    type: 3}
+  mGeneratingEnvironment: 0
+  floor: {fileID: 698393863}
+--- !u!114 &359794826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359794823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f15c38adf594f1b40b42a8400bc31227, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptExecutionPriority: 1000
+  mPrefabPath: 
 --- !u!1 &542508511
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,7 +385,7 @@ GameObject:
   m_Component:
   - component: {fileID: 600408222}
   m_Layer: 0
-  m_Name: Greybox
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -372,7 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trialCounter: 0
   maxTrials: 6
-  trialResetUpdateFrequency: 1
+  trialResetUpdateFrequency: 20
   trialDurationCounter: 0
   trialRealTimeCounter: 0
 --- !u!114 &607219979
@@ -1098,6 +1180,7 @@ Transform:
   - {fileID: 607219977}
   - {fileID: 1202128850}
   - {fileID: 600408222}
+  - {fileID: 359794824}
   m_Father: {fileID: 1761730600}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1667,7 +1750,7 @@ MonoBehaviour:
     type: 3}
   debugNode: {fileID: 6767979993923170774, guid: 3da53670c0bf37f4abe573831139315d,
     type: 3}
-  edgeTiles: ffffffff03000000ffffffffffffffffffffffffffffffff
+  edgeTiles: ffffffff01000000ffffffffffffffffffffffffffffffff
   metatilepool: {fileID: 4368192324598907990, guid: 8b0660a070f5b0f4392930fa36439313,
     type: 3}
   placedPayloads: []
@@ -1676,6 +1759,7 @@ MonoBehaviour:
   debugTile: {fileID: 8411421930320262341, guid: 854926c658783f947a2964d1b81dbfc1,
     type: 3}
   mGeneratingEnvironment: 0
+  floor: {fileID: 698393863}
 --- !u!114 &1778617916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2128,31 +2212,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
-        type: 3}
-      propertyPath: m_AllowMSAA
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2514984737576294893, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
-        type: 3}
-      propertyPath: m_OcclusionCulling
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3305972231083707568, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
-        type: 3}
-      propertyPath: mPrefabPath
-      value: Assets/Resources/GameObjects/XLand/Player.prefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 5535060245417175460, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6078277062694512511, guid: 56e58c1af5aafdf44af0a06e0c5a0e7f,
-        type: 3}
-      propertyPath: mPrefabPath
-      value: Assets/Resources/GameObjects/XLand/Player.prefab
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

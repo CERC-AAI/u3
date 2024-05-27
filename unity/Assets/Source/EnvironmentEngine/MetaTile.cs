@@ -249,7 +249,7 @@ public class MetaTile : IMetatileContainer
         return false;
     }
 
-    public List<Transform> DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileManager metatileEnvironment, bool debug = false)
+    public List<Transform> DepositPayload(Vector3Int position, Quaternion rotation, bool flipped, MetatileManager metatileEnvironment, float voxelSize, bool debug = false)
     {
         List<Transform> payloads = new List<Transform>();
 
@@ -258,7 +258,7 @@ public class MetaTile : IMetatileContainer
             Transform payloadCopy = null;
 
             payloadCopy = MetatileManager.instantiateNewObject(payload);
-            payloadCopy.transform.position = position;
+            payloadCopy.transform.position = new Vector3(position.x, position.y, position.z) * voxelSize;
             payloadCopy.transform.localRotation = rotation;
             payloadCopy.parent = metatileEnvironment.transform;
 
@@ -269,16 +269,30 @@ public class MetaTile : IMetatileContainer
 
             EnvironmentTile[] placedTiles = payloadCopy.GetComponentsInChildren<EnvironmentTile>();
 
-            for (int i = 0; i < placedTiles.Length; i++)
+            if (placedTiles.Length > 0)
             {
-                placedTiles[i].OnTilePlaced();
+                for (int i = 0; i < placedTiles.Length; i++)
+                {
+                    placedTiles[i].OnTilePlaced();
+                }
+
+                foreach (EnvironmentTile payloadPart in placedTiles)
+                {
+                    payloadPart.transform.parent = metatileEnvironment.transform;
+
+                    payloads.Add(payloadPart.transform);
+                }
             }
-
-            foreach (EnvironmentTile payloadPart in placedTiles)
+            else
             {
-                payloadPart.transform.parent = metatileEnvironment.transform;
+                for (int i = 0; i < payloadCopy.childCount; i++)
+                {
+                    Transform child = payloadCopy.GetChild(i);
 
-                payloads.Add(payloadPart.transform);
+                    child.transform.parent = metatileEnvironment.transform;
+
+                    payloads.Add(child);
+                }
             }
             Destroy(payloadCopy.gameObject);
         }

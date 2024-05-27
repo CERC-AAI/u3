@@ -99,6 +99,21 @@ public class EnvironmentObject : EnvironmentComponentHolder
         base.Initialize();
     }
 
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        base.InitParameters(jsonParameters);
+
+        CheckComponents();
+
+        for (int i = 0; i < mComponents.Length; i++)
+        {
+            if (mComponents[i] != this)
+            {
+                mComponents[i].InitParameters(jsonParameters);
+            }
+        }
+    }
+
     public void InitalizeBaseObject(GameObject baseObject)
     {
         mBaseObject = baseObject;

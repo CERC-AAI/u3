@@ -78,6 +78,13 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         if (loadParams)
         {
             loadParams.GetField(out fixedUpdatesPerSecond, "frames_per_second", fixedUpdatesPerSecond);
+
+            if (loadParams.GetField("world_save_file"))
+            {
+                GetCachedEnvironmentComponent<ProductionRuleManager>().Remove();
+                GetCachedEnvironmentComponent<TrialManager>().Remove();
+                GetCachedEnvironmentComponent<SpawnManager>().Remove();
+            }
         }
 
         /*U3DPlayer player = GetCachedEnvironmentComponent<U3DPlayer>();
@@ -109,8 +116,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             mEnvironmentObjects[i].CheckAll();
 
             if (loadParams)
-            { 
-                mEnvironmentComponents[i].InitParameters(loadParams);
+            {
+                mEnvironmentObjects[i].InitParameters(loadParams);
             }
 
             mEnvironmentObjects[i].CheckInitialized();
