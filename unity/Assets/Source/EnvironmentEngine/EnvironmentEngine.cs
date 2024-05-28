@@ -17,7 +17,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     [Range(1, 100)]
     public int fixedUpdatesPerSecond = 10;
     [Tooltip("Toggles whether to run the environment in training mode (Physics step every frame, and less graphics).")]
-    public bool isTraining = false;
+    public bool isTraining = true;
 
     // Private members
     protected List<EnvironmentObject> mEnvironmentObjects = new List<EnvironmentObject>();
@@ -336,7 +336,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             if (mIsRunning && !mIsWaitingForActions)
             {
                 //Run a fixed update every frame.
-                if (isTraining || fixedUpdatesPerSecond == 0)
+                if (IsTraining() || fixedUpdatesPerSecond == 0)
                 {
                     deltaTime = GetFixedDeltaTime();
                 }
@@ -810,7 +810,14 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     {
         //CheckBrain();
         //return mBrain.IsPython();
-        return false;
+        return EnvironmentManager.Instance.IsPython();
+    }
+
+    public bool IsTraining()
+    {
+        //CheckBrain();
+        //return mBrain.IsPython();
+        return isTraining && IsPython();
     }
 
     public bool IsRunning()

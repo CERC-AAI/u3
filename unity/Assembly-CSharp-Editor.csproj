@@ -444,7 +444,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.IO.Abstractions">
-      <HintPath>H:\Git\u3\ml-agents\com.unity.ml-agents\Plugins\System.IO.Abstractions.dll</HintPath>
+      <HintPath>E:\git\u3_new\ml-agents\com.unity.ml-agents\Plugins\System.IO.Abstractions.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="QuickGraph.Data">
@@ -492,7 +492,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Grpc.Core">
-      <HintPath>H:\Git\u3\ml-agents\com.unity.ml-agents\Plugins\ProtoBuffer\Grpc.Core.dll</HintPath>
+      <HintPath>E:\git\u3_new\ml-agents\com.unity.ml-agents\Plugins\ProtoBuffer\Grpc.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -504,7 +504,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.IO.Abstractions.TestingHelpers">
-      <HintPath>H:\Git\u3\ml-agents\com.unity.ml-agents\Plugins\System.IO.Abstractions.TestingHelpers.dll</HintPath>
+      <HintPath>E:\git\u3_new\ml-agents\com.unity.ml-agents\Plugins\System.IO.Abstractions.TestingHelpers.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="unityplastic">
