@@ -49,9 +49,8 @@ public class ProductionRuleGraph : EnvironmentComponent
     public int minInitialObjects = 1;
     public int maxInitialObjects = 3;
     public int minRules = 1;
-    public int maxRules = 3;
-    public int minDeadends = 1;
-    public int maxDeadends = 1;
+    public int maxRules = 6;
+    public int minDeadends = 0;
 
 
     /*[Serializable]
@@ -130,7 +129,7 @@ public class ProductionRuleGraph : EnvironmentComponent
         }
         graphNodes = nodes;
     }*/
-        public override void InitParameters(JSONObject jsonParameters)
+    public override void InitParameters(JSONObject jsonParameters)
     {
         if (jsonParameters)
         {
@@ -139,7 +138,7 @@ public class ProductionRuleGraph : EnvironmentComponent
             jsonParameters.GetField(out minRules, "min_rules", minRules);
             jsonParameters.GetField(out maxRules, "max_rules", maxRules);
             jsonParameters.GetField(out minDeadends, "min_deadends", minDeadends);
-            jsonParameters.GetField(out maxDeadends, "max_deadends", maxDeadends);
+            // jsonParameters.GetField(out maxDeadends, "max_deadends", maxDeadends);
         }
 
         base.InitParameters(jsonParameters);
@@ -173,7 +172,8 @@ public class ProductionRuleGraph : EnvironmentComponent
     public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState)
     {
         int numRules = GetEngine().GetRandomRange(minRules, maxRules + 1);
-        int numDeadEnds = GetEngine().GetRandomRange(minDeadends, maxDeadends + 1);
+        int maxDeadEnds = maxRules / 2;
+        int numDeadEnds = GetEngine().GetRandomRange(minDeadends, maxDeadEnds + 1);
 
         List<ProductionRule> productionRules = new List<ProductionRule>();
         List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
