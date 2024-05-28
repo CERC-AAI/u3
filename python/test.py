@@ -1,7 +1,8 @@
 from mlagents_envs.logging_util import *
-import cv2
 from time import sleep
 import numpy as np
+import os
+import time
 
 _log_level = INFO
 set_log_level(_log_level)
@@ -10,9 +11,12 @@ set_log_level(_log_level)
 import u3_env
 
 # Note that XLand has 20 frames a second
-env = u3_env.create_environment(0, {"camera_width": 64, "camera_height": 64, "trial_count" : 2, "trial_seconds" : 2.0, "frames_per_second" : 12})
+#env = u3_env.create_environment_by_name(0, {"camera_width": 64, "camera_height": 64, "trial_count" : 2, "trial_seconds" : 2.0, "frames_per_second" : 12})
 #env = u3_env.create_environment_by_name("H:/Git/u3/python/XLand/unitylearning2", 0)
+env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/LinuxTraining/XLand", worker_id=0, 
+                                        parameters={"camera_width": 256, "camera_height": 256, "trial_count" : 2, "trial_seconds" : 10.0, "frames_per_second" : 50})
 
+start_time = time.time()
 for t in range(100):
     # Render the environment (optional, for visualization)
     #env.render()
@@ -44,15 +48,16 @@ for t in range(100):
         print("Episode finished after {} timesteps".format(t + 1))
         env.reset()
     
-    for agent in agents:
+    '''for agent in agents:
         if not observation[agent] is None:
             image = cv2.cvtColor(np.swapaxes(observation[agent], 0, -1), cv2.COLOR_RGB2BGR)
             frame_name = agent.replace("?", "_")
             frame_name = frame_name.replace(" ", "_")
             frame_name = frame_name.replace("=", "_")
             cv2.imwrite(f"python/Images/{frame_name}-frame{t}.png", image)
-    print(observation[agent].shape)
+    print(observation[agent].shape)'''
 
-
+total_time = time.time() - start_time
+print(f"average step per second: {100/total_time}")
 
 env.close()
