@@ -232,18 +232,18 @@ class U3Wrapper(UnityToPettingzooWrapper):
         self.env_messages = {}
 
 
-def create_environment(task_index, parameters : Dict[str, object] = {}):
-    return create_environment_by_name("", "xland", task_index, parameters)
+def create_environment(worker_id, parameters : Dict[str, object] = {}, seed : int = 0):
+    return create_environment_by_name("", "xland", worker_id, parameters)
 
-def create_environment_by_name(file_name, task_name = "xland", task_index = 0, parameters : Dict[str, object] = {}):
+def create_environment_by_name(file_name, task_name = "xland", worker_id = 0, parameters : Dict[str, object] = {}, seed : int = 0):
     environmentChannel = U3SideChannel()
     if file_name == "":
-        unity_env = U3Environment(seed=task_index, side_channels=[environmentChannel])
+        unity_env = U3Environment(seed=seed, side_channels=[environmentChannel], worker_id=worker_id)
     else:
-        unity_env = U3Environment(file_name=file_name, seed=task_index, side_channels=[environmentChannel])
+        unity_env = U3Environment(file_name=file_name, seed=seed, side_channels=[environmentChannel], worker_id=worker_id)
     env = U3Wrapper(
         unity_env, environmentChannel, flatten_branched=True, uint8_visual=True, parameters=parameters, task_name=task_name
     )
-    env.seed(task_index)
+    env.seed(seed)
 
     return env

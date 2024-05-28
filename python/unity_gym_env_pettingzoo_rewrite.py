@@ -1,4 +1,5 @@
 import itertools
+import time
 
 import numpy as np
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -267,7 +268,10 @@ class UnityToPettingzooWrapper(ParallelEnv):
         Returns: observation (object/list): the initial observation of the
         space.
         """
+        start_time = time.time()
         self._env.reset()
+        self.reset_time = time.time() - start_time
+
         self.game_over = False
         self.agents = self.possible_agents[:]
         self.num_moves = 0

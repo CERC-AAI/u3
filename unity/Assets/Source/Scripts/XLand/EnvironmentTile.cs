@@ -33,4 +33,20 @@ public class EnvironmentTile : MonoBehaviour
             renderer.material.color = ColorMap[positionY % ColorMap.Count];
         }
     }
+
+    public void OnDestroy()
+    {
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            Renderer renderer = renderers[i];
+
+            //Debug.Log(transform.position);
+            //renderer.material.SetColor("Albedo", Color.blue);
+
+            int positionY = Mathf.CeilToInt(transform.position.y);
+            Destroy(renderer.material);
+        }
+    }
 }

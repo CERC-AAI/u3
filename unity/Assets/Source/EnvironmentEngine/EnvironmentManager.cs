@@ -43,6 +43,8 @@ public class EnvironmentManager : MonoBehaviour
 
     public static EnvironmentManager Instance { get; private set; }
 
+    public float mUpdateTime;
+
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.
@@ -185,6 +187,7 @@ public class EnvironmentManager : MonoBehaviour
             }
         }
 
+        float startTime = Time.realtimeSinceStartup;
         foreach (var pair in mEnvironments)
         {
             pair.Value.DoUpdate();
@@ -205,6 +208,7 @@ public class EnvironmentManager : MonoBehaviour
                 pair.Value.CompleteFixedUpdate();
             }
         }
+        mUpdateTime = Time.realtimeSinceStartup - startTime;
     }
 
     public void OnRunEnded(EnvironmentEngine environment)
@@ -422,6 +426,7 @@ public class EnvironmentManager : MonoBehaviour
                 break;
 
             case "reset":
+                float startTime = Time.realtimeSinceStartup;
                 if (messageEnvironment.IsRunning())
                 {
                     messageEnvironment.EndRun();
@@ -447,6 +452,8 @@ public class EnvironmentManager : MonoBehaviour
 
                 messageEnvironment.InitializeEnvironment(loadParams);
                 messageEnvironment.StartRun();
+
+                Debug.Log($"Restart time: {Time.realtimeSinceStartup - startTime}");
                 break;
 
                 /*case "element":
