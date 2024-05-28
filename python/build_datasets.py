@@ -13,8 +13,8 @@ set_log_level(_log_level)
 import u3_env
 
 parser = argparse.ArgumentParser(description='Build a dataset of worlds for the XLand env. Specific a dataset to append to with "--dataset <difficulty>_<height>"')
-parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_low')
-parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='linux')
+parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_high')
+parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='windows')
 parser.add_argument('--worker_id', type=int, help='Worker identifier. Use this to have multiple runs on the same machine', default='0')
 args = parser.parse_args()
 
@@ -89,14 +89,53 @@ os.makedirs(save_folder, exist_ok=True)
 def count_files_in_directory(directory):
     return len([name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
 
+def get_missing_files(directory):
+    # Get a list of all files in the directory
+    files = os.listdir(directory)
+    
+    # Filter the list to include only .json files
+    json_files = [f for f in files if f.endswith('.json')]
+    
+    # Extract the numeric part from the filenames
+    file_numbers = [int(f.split('.')[0]) for f in json_files]
+    
+    # Determine the maximum file number
+    if not file_numbers:
+        print("No JSON files found in the directory.")
+        return []
+    
+    max_file_number = max(file_numbers)
+    
+    # Create a set of all expected file numbers
+    expected_files = set(range(max_file_number + 1))
+    
+    # Create a set of actual file numbers
+    actual_files = set(file_numbers)
+    
+    # Find the missing files by subtracting the sets
+    missing_files = expected_files - actual_files
+    
+    # Return the sorted list of missing file names
+    missing_file_names = sorted([num for num in missing_files])
+    
+    return missing_file_names
+
+missing_files = get_missing_files(save_folder)
+
+
 pbar = tqdm(total=total_count)
 
-file_index = count_files_in_directory(save_folder)
+file_index = count_files_in_directory(save_folder) - len(missing_files)
 pbar.n = file_index
 pbar.last_print_n = file_index  # This ensures the average iteration speed calculation starts correctly
 pbar.refresh()  # Refresh the progress bar to show the initial value
 for t in range(total_count * 2):
-    save_paramers = {"world_save_file" : f"{save_folder}{file_index}.json"}
+    use_file_index = file_index
+    if len(missing_files) > 0:
+        use_file_index = missing_files[0]
+        del missing_files[0]
+
+    save_paramers = {"world_save_file" : f"{save_folder}{use_file_index}.json"}
 
     if env_width_var > 0:
         while True:
