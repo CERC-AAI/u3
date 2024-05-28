@@ -13,10 +13,14 @@ import u3_env
 # Note that XLand has 20 frames a second
 #env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/LinuxTraining/XLand", worker_id=0, 
 #                                        parameters={"camera_width": 256, "camera_height": 256, "trial_count" : 2, "trial_seconds" : 10.0, "frames_per_second" : 50})
-env = u3_env.create_environment(worker_id=0, parameters={"camera_width": 256, "camera_height": 256, "trial_count" : 2, "trial_seconds" : 10.0, "frames_per_second" : 50})
+env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WindowsTraining/unitylearning2", worker_id=0, 
+                                        parameters={"camera_width": 64, "camera_height": 64, "trial_count" : 2, "trial_seconds" : 10.0, "frames_per_second" : 12})
+#env = u3_env.create_environment(worker_id=0, parameters={"camera_width": 256, "camera_height": 256, "trial_count" : 2, "trial_seconds" : 10.0, "frames_per_second" : 50})
+
+n_steps = 1000
 
 start_time = time.time()
-for t in range(100):
+for t in range(n_steps):
     # Render the environment (optional, for visualization)
     #env.render()
 
@@ -57,6 +61,6 @@ for t in range(100):
     print(observation[agent].shape)'''
 
 total_time = time.time() - start_time
-print(f"average step per second: {100/total_time}")
+print(f"average step per second: {n_steps/total_time}")
 
 env.close()
