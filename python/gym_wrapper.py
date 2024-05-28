@@ -73,7 +73,7 @@ class U3GymEnv(gym.Env):
 
         self.side_channel = U3SideChannel()
         unity_env = UnityEnvironment(
-            file_name='XLand',
+            file_name='unity/Builds/LinuxTraining/XLand',
             worker_id=worker_id,
             seed=seed + worker_id,
             side_channels=[self.side_channel],
