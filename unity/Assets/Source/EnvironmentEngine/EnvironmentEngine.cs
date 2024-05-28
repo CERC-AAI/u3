@@ -336,7 +336,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             if (mIsRunning && !mIsWaitingForActions)
             {
                 //Run a fixed update every frame.
-                if (isTraining || fixedUpdatesPerSecond == 0)
+                if (IsTraining() || fixedUpdatesPerSecond == 0)
                 {
                     deltaTime = GetFixedDeltaTime();
                 }

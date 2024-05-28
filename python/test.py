@@ -11,10 +11,9 @@ set_log_level(_log_level)
 import u3_env
 
 # Note that XLand has 20 frames a second
-#env = u3_env.create_environment_by_name(0, {"camera_width": 64, "camera_height": 64, "trial_count" : 2, "trial_seconds" : 2.0, "frames_per_second" : 12})
-#env = u3_env.create_environment_by_name("H:/Git/u3/python/XLand/unitylearning2", 0)
-env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/LinuxTraining/XLand", worker_id=0, 
-                                        parameters={"camera_width": 256, "camera_height": 256, "trial_count" : 2, "trial_seconds" : 10.0, "frames_per_second" : 50})
+#env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/LinuxTraining/XLand", worker_id=0, 
+#                                        parameters={"camera_width": 256, "camera_height": 256, "trial_count" : 2, "trial_seconds" : 10.0, "frames_per_second" : 50})
+env = u3_env.create_environment(worker_id=0, parameters={"camera_width": 256, "camera_height": 256, "trial_count" : 2, "trial_seconds" : 10.0, "frames_per_second" : 50})
 
 start_time = time.time()
 for t in range(100):
