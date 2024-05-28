@@ -23,7 +23,7 @@ using UnityEngine.UIElements;
 // ProductionRuleObject overrides EnvironmentComponent OnCollision, the parameter will be the other object collided with.
 // If you're a productionRuleObject, do you match my identifier? If so, then if we have a production rule for our collision, then do X.
 
-public enum Action
+public enum ACTION
 {
     SWAP,
     SPAWN,
@@ -64,6 +64,9 @@ public enum CONDITION
 
 public class ProductionRuleManager : EnvironmentComponent
 {
+
+    public string saveFile = "";
+    public string loadFile = "";
 
     // A list to store all production rules
     public List<ProductionRule> productionRules = new List<ProductionRule>();
@@ -112,9 +115,22 @@ public class ProductionRuleManager : EnvironmentComponent
 
         Debug.Log("ProductionRuleManager");
 
-        // New ProductionRuleGraph
-        List<ProductionRuleIdentifier> initialState = productionRuleGraph.GetRandomInitialState();
-        productionRules = productionRuleGraph.BuildProductionRuleSet(initialState);
+        List<ProductionRuleIdentifier> initialState;
+
+        if (loadFile != "")
+        {
+            Tuple<List<ProductionRule>, List<ProductionRuleIdentifier>> loadedData = productionRuleGraph.LoadPayloads(loadFile);
+            productionRules = loadedData.Item1;
+            initialState = loadedData.Item2;
+
+        }
+        else
+        {
+            // New ProductionRuleGraph
+            initialState = productionRuleGraph.GetRandomInitialState();
+
+            productionRules = productionRuleGraph.BuildProductionRuleSet(initialState);
+        }
 
         SpawnManager spawnManager = GetEngine().GetCachedEnvironmentComponent<SpawnManager>();
 

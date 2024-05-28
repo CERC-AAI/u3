@@ -1,12 +1,17 @@
-using System;
+using System.Threading;
+using System.Net.Sockets;
+using System.Globalization;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System;
 using UnityEngine;
 using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 using Unity.Mathematics;
 using static ProductionRuleManager;
+using System.IO.Abstractions;
 
 [Serializable]
 public class ProductionRuleGraph : EnvironmentComponent
@@ -25,23 +30,23 @@ public class ProductionRuleGraph : EnvironmentComponent
         {CONDITION.NONE, 0}
     };
 
-    public Dictionary<Action, int> necessaryObjectCountForAction = new Dictionary<Action, int>()
+    public Dictionary<ACTION, int> necessaryObjectCountForAction = new Dictionary<ACTION, int>()
     {
-        {Action.SPAWN, 0},
-        {Action.REMOVE, 2}, // don't want to end up with no objects in the environment
-        {Action.SWAP, 1}, // don't want to end up with no objects in the environment
-        {Action.REWARD, 0},
-        {Action.PRINT, 0}
+        {ACTION.SPAWN, 0},
+        {ACTION.REMOVE, 2}, // don't want to end up with no objects in the environment
+        {ACTION.SWAP, 1}, // don't want to end up with no objects in the environment
+        {ACTION.REWARD, 0},
+        {ACTION.PRINT, 0}
     };
 
-    public Dictionary<Action, List<PredicateObjects>> PermissiblepredicateObjectsForAction = new Dictionary<Action, List<PredicateObjects>>()
+    public Dictionary<ACTION, List<PredicateObjects>> PermissiblepredicateObjectsForAction = new Dictionary<ACTION, List<PredicateObjects>>()
     {
-        {Action.SPAWN, new List<PredicateObjects>(){PredicateObjects.NONE, PredicateObjects.SUBJECT}},
-        // {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}}, # TODO: fix double-predicate necessaryObjectCountForAction conflict
-        {Action.SWAP, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
-        {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
-        {Action.REWARD, new List<PredicateObjects>(){PredicateObjects.NONE}},
-        {Action.PRINT, new List<PredicateObjects>(){PredicateObjects.NONE}}
+        {ACTION.SPAWN, new List<PredicateObjects>(){PredicateObjects.NONE, PredicateObjects.SUBJECT}},
+        // {ACTION.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}}, # TODO: fix double-predicate necessaryObjectCountForAction conflict
+        {ACTION.SWAP, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
+        {ACTION.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
+        {ACTION.REWARD, new List<PredicateObjects>(){PredicateObjects.NONE}},
+        {ACTION.PRINT, new List<PredicateObjects>(){PredicateObjects.NONE}}
     };
 
     //Node currentNode; // points to the current state of the environment
@@ -237,6 +242,147 @@ public class ProductionRuleGraph : EnvironmentComponent
         return productionRules;
     }
 
+
+
+    public void SavePayloads(string filename, List<ProductionRule> productionRules, List<ProductionRuleIdentifier> initialState)
+    {
+        // Save the initial state and production rules to a json file
+        JSONObject initialStateJson = new JSONObject();
+        JSONObject productionRulesJson = new JSONObject();
+
+        // Serialize Initial State
+        for (int i = 0; i < initialState.Count; i++)
+        {
+            JSONObject identifierJson = new JSONObject();
+            identifierJson.AddField("shape", initialState[i].ObjectShape);
+            identifierJson.AddField("color", initialState[i].ObjectColor);
+            initialStateJson.AddField($"object{i}", identifierJson);
+        }
+
+        // Serialize Production Rules
+        for (int i = 0; i < productionRules.Count; i++)
+        {
+            JSONObject productionRuleJson = new JSONObject();
+            ProductionRule productionRule = productionRules[i];
+
+            // Serialize Conditions
+            for (int j = 0; j < productionRule.conditions.Count; j++)
+            {
+                JSONObject conditionJson = new JSONObject();
+                ProductionRuleCondition condition = productionRule.conditions[j];
+                conditionJson.AddField("condition", condition.condition.ToString());
+                conditionJson.AddField("subjectIdentifier", SerializeIdentifier(condition.subjectIdentifier));
+                conditionJson.AddField("objectIdentifier", SerializeIdentifier(condition.objectIdentifier));
+                productionRuleJson.AddField($"condition{j}", conditionJson);
+            }
+
+            // Serialize Actions
+            for (int j = 0; j < productionRule.actions.Count; j++)
+            {
+                JSONObject actionJson = new JSONObject();
+                ProductionRuleAction action = productionRule.actions[j];
+                actionJson.AddField("action", action.action.ToString());
+                actionJson.AddField("predicateObjects", action.predicateObjects.ToString());
+                actionJson.AddField("identifier", SerializeIdentifier(action.identifier));
+                productionRuleJson.AddField($"action{j}", actionJson);
+            }
+
+            productionRulesJson.AddField($"productionRule{i}", productionRuleJson);
+        }
+
+        // Combine both JSON objects into a single object
+        JSONObject combinedJson = new JSONObject();
+        combinedJson.AddField("initialState", initialStateJson);
+        combinedJson.AddField("productionRules", productionRulesJson);
+
+        // Save JSON to file
+        System.IO.File.WriteAllText(filename, combinedJson.ToString());
+    }
+
+    private string SerializeIdentifier(ProductionRuleIdentifier identifier)
+    {
+        JSONObject identifierJson = new JSONObject();
+        identifierJson.AddField("shape", identifier.ObjectShape);
+        identifierJson.AddField("color", identifier.ObjectColor);
+        return identifierJson.ToString();
+    }
+
+
+    public Tuple<List<ProductionRule>, List<ProductionRuleIdentifier>> LoadPayloads(string filename)
+    {
+        // Read the JSON file
+        string jsonString = System.IO.File.ReadAllText(filename);
+        JSONObject jsonObject = new JSONObject(jsonString);
+
+        // Initialize the lists
+        List<ProductionRuleIdentifier> initialState = new List<ProductionRuleIdentifier>();
+        List<ProductionRule> productionRules = new List<ProductionRule>();
+
+        // Deserialize Initial State
+        JSONObject initialStateJson = jsonObject.GetField("initialState");
+        foreach (string key in initialStateJson.keys)
+        {
+            JSONObject identifierJson = initialStateJson.GetField(key);
+            ProductionRuleIdentifier identifier = new ProductionRuleIdentifier(
+                identifierJson.GetField("shape").str,
+                identifierJson.HasField("color") ? identifierJson.GetField("color").str : null
+            );
+            initialState.Add(identifier);
+        }
+
+        // Deserialize Production Rules
+        JSONObject productionRulesJson = jsonObject.GetField("productionRules");
+        foreach (string key in productionRulesJson.keys)
+        {
+            JSONObject productionRuleJson = productionRulesJson.GetField(key);
+
+            List<ProductionRuleCondition> conditions = new List<ProductionRuleCondition>();
+            List<ProductionRuleAction> actions = new List<ProductionRuleAction>();
+
+            // Deserialize Conditions
+            foreach (string conditionKey in productionRuleJson.keys)
+            {
+                if (conditionKey.StartsWith("condition"))
+                {
+                    JSONObject conditionJson = productionRuleJson.GetField(conditionKey);
+                    CONDITION condition = Enum.Parse<CONDITION>(conditionJson.GetField("condition").str);
+                    ProductionRuleIdentifier subjectIdentifier = DeserializeIdentifier(conditionJson.GetField("subjectIdentifier").str);
+                    ProductionRuleIdentifier objectIdentifier = conditionJson.HasField("objectIdentifier") ? DeserializeIdentifier(conditionJson.GetField("objectIdentifier").str) : null;
+                    ProductionRuleCondition conditionObj = new ProductionRuleCondition(condition, subjectIdentifier, objectIdentifier);
+                    conditions.Add(conditionObj);
+                }
+            }
+
+            // Deserialize Actions
+            foreach (string actionKey in productionRuleJson.keys)
+            {
+                if (actionKey.StartsWith("action"))
+                {
+                    JSONObject actionJson = productionRuleJson.GetField(actionKey);
+                    ACTION action = (ACTION)Enum.Parse(typeof(ACTION), actionJson.GetField("action").str);
+                    float reward = action == ACTION.REWARD ? actionJson.GetField("reward").f : 0.0f;
+                    PredicateObjects predicateObjects = (PredicateObjects)Enum.Parse(typeof(PredicateObjects), actionJson.GetField("predicateObjects").str);
+                    ProductionRuleIdentifier identifier = DeserializeIdentifier(actionJson.GetField("identifier").str);
+                    ProductionRuleAction actionObj = new ProductionRuleAction(action, reward, predicateObjects, identifier);
+                    actions.Add(actionObj);
+                }
+            }
+
+            ProductionRule productionRule = new ProductionRule(conditions, actions);
+            productionRules.Add(productionRule);
+        }
+
+        return new Tuple<List<ProductionRule>, List<ProductionRuleIdentifier>>(productionRules, initialState);
+    }
+
+    private ProductionRuleIdentifier DeserializeIdentifier(string json)
+    {
+        JSONObject identifierJson = new JSONObject(json);
+        string shape = identifierJson.GetField("shape").str;
+        string color = identifierJson.HasField("color") ? identifierJson.GetField("color").str : null;
+        return new ProductionRuleIdentifier(shape, color);
+    }
+
     /*public void UpdateProductionRuleGraph(ProductionRule productionRule)
     {
         ForwardWalk(productionRule);
@@ -363,28 +509,28 @@ public class ProductionRuleGraph : EnvironmentComponent
     }
     public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> currentState, bool isReward = false, bool notReward = false)
     {
-        Action action = (Action)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(Action)).Length);
+        ACTION action = (ACTION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(ACTION)).Length);
         if (isReward && notReward)
         {
             throw new ArgumentException("isReward and notReward cannot both be true");
         }
         if (isReward)
         {
-            action = Action.REWARD;
+            action = ACTION.REWARD;
         }
         else if (notReward)
         {
-            action = (Action)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(Action)).Length);
-            while (action == Action.REWARD)
+            action = (ACTION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(ACTION)).Length);
+            while (action == ACTION.REWARD)
             {
-                action = (Action)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(Action)).Length);
+                action = (ACTION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(ACTION)).Length);
             }
         }
 
         while (currentState.Count - necessaryObjectCountForAction[action] < 0)
         {
             Debug.Log($"Not enough objects for action {action}, sampling again.");
-            action = (Action)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(Action)).Length);
+            action = (ACTION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(ACTION)).Length);
         }
 
         float reward = GetEngine().GetRandomRange(0.0f, 1.0f);
@@ -401,7 +547,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     public List<ProductionRuleIdentifier> GetNextState(List<ProductionRuleIdentifier> currentState, ProductionRule forwardProductionRule)
     {
         // TODO: move to ProductionRuleAction
-        Action action = forwardProductionRule.actions[0].action;
+        ACTION action = forwardProductionRule.actions[0].action;
         ProductionRuleIdentifier actionTargetIdentifier = null;
         if (forwardProductionRule.actions[0].predicateObjects == PredicateObjects.SUBJECT)
         {
@@ -430,37 +576,37 @@ public class ProductionRuleGraph : EnvironmentComponent
         {
             nextState.Add(identifier);
         }
-        if (action == Action.SPAWN)
+        if (action == ACTION.SPAWN)
         {
             nextState.Add(actionTargetIdentifier);
         }
-        else if (action == Action.REMOVE)
+        else if (action == ACTION.REMOVE)
         {
             nextState.Remove(actionTargetIdentifier);
         }
-        else if (action == Action.SWAP)
+        else if (action == ACTION.SWAP)
         {
             nextState.Remove(forwardProductionRule.conditions[0].subjectIdentifier);
             nextState.Add(forwardProductionRule.actions[0].identifier);
         }
-        else if (action == Action.REWARD)
+        else if (action == ACTION.REWARD)
         {
             // do nothing
         }
-        else if (action == Action.PRINT)
+        else if (action == ACTION.PRINT)
         {
             // do nothing
         }
         else
         {
-            throw new ArgumentException("Action not recognized");
+            throw new ArgumentException("ACTION not recognized");
         }
         return nextState;
     }
 
     public List<ProductionRuleIdentifier> GetPreviousState(List<ProductionRuleIdentifier> currentState, ProductionRule backwardProductionRule)
     {
-        Action action = backwardProductionRule.actions[0].action;
+        ACTION action = backwardProductionRule.actions[0].action;
         ProductionRuleIdentifier actionTargetIdentifier = null;
         if (backwardProductionRule.actions[0].predicateObjects == PredicateObjects.SUBJECT)
         {
@@ -489,17 +635,17 @@ public class ProductionRuleGraph : EnvironmentComponent
         {
             previousState.Add(identifier);
         }
-        if (action == Action.SPAWN)
+        if (action == ACTION.SPAWN)
         {
             previousState.Remove(actionTargetIdentifier);
         }
-        else if (action == Action.REMOVE)
+        else if (action == ACTION.REMOVE)
         {
             previousState.Add(actionTargetIdentifier);
         }
         else
         {
-            throw new ArgumentException("Action not recognized");
+            throw new ArgumentException("ACTION not recognized");
         }
         return previousState;
     }

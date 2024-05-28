@@ -23,7 +23,7 @@ public class ProductionRuleAction
 
     public ProductionRuleIdentifier identifier;
 
-    public Action action;
+    public ACTION action;
     // private List<object> actionParameters;
 
     public float reward;
@@ -31,7 +31,7 @@ public class ProductionRuleAction
 
     public string debugPrintString = "Test print";
 
-    public ProductionRuleAction(Action action, float reward, PredicateObjects predicateObjects, ProductionRuleIdentifier identifier = null)
+    public ProductionRuleAction(ACTION action, float reward, PredicateObjects predicateObjects, ProductionRuleIdentifier identifier = null)
     {
         this.action = action;
         this.reward = reward;
@@ -45,7 +45,7 @@ public class ProductionRuleAction
 
         if (predicateObjects == PredicateObjects.SUBJECT)
         {
-            if (action != Action.SPAWN && action != Action.SWAP)
+            if (action != ACTION.SPAWN && action != ACTION.SWAP)
             {
                 ExecuteAction(subject, env, subject, obj);
             }
@@ -66,7 +66,7 @@ public class ProductionRuleAction
         }
         else if (predicateObjects == PredicateObjects.NONE)
         {
-            if (action != Action.SPAWN)
+            if (action != ACTION.SPAWN)
             {
                 ProductionRuleObject productionRuleObject = productionRuleManager.GetProductionRuleObjectByIdentifier(identifier);
                 ExecuteAction(productionRuleObject, env, subject, obj);
@@ -89,7 +89,7 @@ public class ProductionRuleAction
         CheckParameterValidity(productionRuleObject, env);
         switch (action)
         {
-            case Action.SPAWN:
+            case ACTION.SPAWN:
                 Debug.Log(debugPrintString);
                 if (subject == null)
                 {
@@ -101,26 +101,26 @@ public class ProductionRuleAction
                 }
                 break;
 
-            case Action.REMOVE:
+            case ACTION.REMOVE:
                 Debug.Log(debugPrintString);
                 Remove(productionRuleObject, env);
                 break;
 
-            case Action.SWAP:
+            case ACTION.SWAP:
                 Debug.Log(debugPrintString);
                 Swap(productionRuleObject, env, subject, obj);
                 break;
 
-            case Action.REWARD:
+            case ACTION.REWARD:
                 Debug.Log(debugPrintString);
                 Reward(env);
                 break;
 
-            case Action.PRINT:
+            case ACTION.PRINT:
                 Debug.Log(debugPrintString);
                 break;
             default:
-                throw new ArgumentException("Action not recognized");
+                throw new ArgumentException("ACTION not recognized");
         }
     }
 
@@ -178,34 +178,34 @@ public class ProductionRuleAction
     {
         switch (action)
         {
-            case Action.SPAWN:
-            case Action.REMOVE:
-            case Action.SWAP:
+            case ACTION.SPAWN:
+            case ACTION.REMOVE:
+            case ACTION.SWAP:
                 if (productionRuleObject == null)
                 {
                     throw new ArgumentException("Invalid call to ExecuteAction: ProductionRuleObject is null");
                 }
                 break;
-            case Action.REWARD:
-            case Action.PRINT:
+            case ACTION.REWARD:
+            case ACTION.PRINT:
                 break;
             default:
-                throw new ArgumentException("Action not recognized");
+                throw new ArgumentException("ACTION not recognized");
         }
 
     }
 
     public string Encode()
     {
-        if (action == Action.SPAWN)
+        if (action == ACTION.SPAWN)
         {
             return $"spawn a {this.identifier.Encode()}";
         }
-        else if (action == Action.REMOVE)
+        else if (action == ACTION.REMOVE)
         {
             return $"remove a {this.identifier.Encode()}";
         }
-        else if (action == Action.SWAP)
+        else if (action == ACTION.SWAP)
         {
             if (predicateObjects == PredicateObjects.SUBJECT)
             {
@@ -225,17 +225,17 @@ public class ProductionRuleAction
             }
 
         }
-        else if (action == Action.REWARD)
+        else if (action == ACTION.REWARD)
         {
             return $"reward {this.reward}";
         }
-        else if (action == Action.PRINT)
+        else if (action == ACTION.PRINT)
         {
             return $"print {this.reward}";
         }
         else
         {
-            throw new ArgumentException("Action not recognized");
+            throw new ArgumentException("ACTION not recognized");
         }
 
     }
