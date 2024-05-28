@@ -16,17 +16,17 @@ PrefabInstance:
     - target: {fileID: -364223573239433514, guid: d6ad3825f5e86304b9fe03e56fd6a65e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 4.648185
       objectReference: {fileID: 0}
     - target: {fileID: -364223573239433514, guid: d6ad3825f5e86304b9fe03e56fd6a65e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.49999905
       objectReference: {fileID: 0}
     - target: {fileID: -364223573239433514, guid: d6ad3825f5e86304b9fe03e56fd6a65e,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.929
+      value: -11.830725
       objectReference: {fileID: 0}
     - target: {fileID: -364223573239433514, guid: d6ad3825f5e86304b9fe03e56fd6a65e,
         type: 3}
@@ -63,10 +63,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2163061155770630284, guid: d6ad3825f5e86304b9fe03e56fd6a65e,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: cf774b4c734b1d04e9fbf6d71e964591, type: 2}
     - target: {fileID: 8980549144392899874, guid: d6ad3825f5e86304b9fe03e56fd6a65e,
         type: 3}
       propertyPath: m_Name
-      value: RoundedBoxColl Variant
+      value: RoundedBox
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

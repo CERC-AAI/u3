@@ -16,17 +16,17 @@ PrefabInstance:
     - target: {fileID: -364223573239433514, guid: f7b1e780a3fec0643bec15211384c88e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 4.648185
       objectReference: {fileID: 0}
     - target: {fileID: -364223573239433514, guid: f7b1e780a3fec0643bec15211384c88e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.49999905
       objectReference: {fileID: 0}
     - target: {fileID: -364223573239433514, guid: f7b1e780a3fec0643bec15211384c88e,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.78
+      value: -11.830725
       objectReference: {fileID: 0}
     - target: {fileID: -364223573239433514, guid: f7b1e780a3fec0643bec15211384c88e,
         type: 3}
@@ -63,10 +63,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2163061155770630284, guid: f7b1e780a3fec0643bec15211384c88e,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: cf774b4c734b1d04e9fbf6d71e964591, type: 2}
     - target: {fileID: 8980549144392899874, guid: f7b1e780a3fec0643bec15211384c88e,
         type: 3}
       propertyPath: m_Name
-      value: Pyramid Variant
+      value: Pyramid
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -78,7 +83,7 @@ PrefabInstance:
       addedObject: {fileID: 3367764294891021344}
   m_SourcePrefab: {fileID: -4216948427090074523, guid: f7b1e780a3fec0643bec15211384c88e,
     type: 3}
---- !u!1 &5917134068801288450 stripped
+--- !u!1 &7368304391284349220 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8980549144392899874, guid: f7b1e780a3fec0643bec15211384c88e,
     type: 3}
@@ -90,7 +95,7 @@ MeshCollider:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5917134068801288450}
+  m_GameObject: {fileID: 7368304391284349220}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
