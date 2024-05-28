@@ -29,6 +29,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     {
         {Action.SPAWN, 0},
         {Action.REMOVE, 2}, // don't want to end up with no objects in the environment
+        {Action.SWAP, 1}, // don't want to end up with no objects in the environment
         {Action.REWARD, 0},
         {Action.PRINT, 0}
     };
@@ -37,6 +38,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     {
         {Action.SPAWN, new List<PredicateObjects>(){PredicateObjects.NONE, PredicateObjects.SUBJECT}},
         // {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}}, # TODO: fix double-predicate necessaryObjectCountForAction conflict
+        {Action.SWAP, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
         {Action.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
         {Action.REWARD, new List<PredicateObjects>(){PredicateObjects.NONE}},
         {Action.PRINT, new List<PredicateObjects>(){PredicateObjects.NONE}}
@@ -435,6 +437,11 @@ public class ProductionRuleGraph : EnvironmentComponent
         else if (action == Action.REMOVE)
         {
             nextState.Remove(actionTargetIdentifier);
+        }
+        else if (action == Action.SWAP)
+        {
+            nextState.Remove(forwardProductionRule.conditions[0].subjectIdentifier);
+            nextState.Add(forwardProductionRule.actions[0].identifier);
         }
         else if (action == Action.REWARD)
         {

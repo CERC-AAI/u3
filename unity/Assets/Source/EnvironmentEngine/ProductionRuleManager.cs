@@ -25,6 +25,7 @@ using UnityEngine.UIElements;
 
 public enum Action
 {
+    SWAP,
     SPAWN,
     REMOVE,
     REWARD,

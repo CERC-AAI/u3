@@ -45,7 +45,15 @@ public class ProductionRuleAction
 
         if (predicateObjects == PredicateObjects.SUBJECT)
         {
-            ExecuteAction(subject, env, subject, obj);
+            if (action != Action.SPAWN && action != Action.SWAP)
+            {
+                ExecuteAction(subject, env, subject, obj);
+            }
+            else
+            {
+                ProductionRuleObject productionRulePrefab = productionRuleManager.productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
+                ExecuteAction(productionRulePrefab, env, subject, obj);
+            }
         }
         else if (predicateObjects == PredicateObjects.OBJECT)
         {
@@ -68,7 +76,6 @@ public class ProductionRuleAction
                 ProductionRuleObject productionRulePrefab = productionRuleManager.productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
                 ExecuteAction(productionRulePrefab, env, subject, obj);
             }
-
         }
         else
         {
@@ -97,6 +104,11 @@ public class ProductionRuleAction
             case Action.REMOVE:
                 Debug.Log(debugPrintString);
                 Remove(productionRuleObject, env);
+                break;
+
+            case Action.SWAP:
+                Debug.Log(debugPrintString);
+                Swap(productionRuleObject, env, subject, obj);
                 break;
 
             case Action.REWARD:
@@ -130,12 +142,36 @@ public class ProductionRuleAction
         ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
         prodRuleObj.ProductionRuleObjectInitialize(identifier.ObjectShape, identifier.ObjectColor);
         prodRuleObj.transform.position = position;
-
     }
 
     public void Remove(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
     {
         env.RemoveObject(productionRuleObject);
+    }
+
+    public void Swap(ProductionRuleObject productionRuleObjectPrefab, EnvironmentEngine env, ProductionRuleObject subject, ProductionRuleObject obj)
+    {
+        Vector3 subjectPosition = subject.transform.position;
+
+        if (predicateObjects == PredicateObjects.SUBJECT)
+        {
+            Remove(subject, env);
+        }
+        else if (predicateObjects == PredicateObjects.OBJECT)
+        {
+            Remove(obj, env);
+        }
+        else if (predicateObjects == PredicateObjects.BOTH)
+        {
+            Remove(subject, env);
+            Remove(obj, env);
+        }
+        else
+        {
+            throw new ArgumentException("PredicateObjects not recognized, or not supported for Swap action");
+        }
+
+        Spawn(productionRuleObjectPrefab, env, subjectPosition);
     }
 
     public void CheckParameterValidity(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
@@ -144,6 +180,7 @@ public class ProductionRuleAction
         {
             case Action.SPAWN:
             case Action.REMOVE:
+            case Action.SWAP:
                 if (productionRuleObject == null)
                 {
                     throw new ArgumentException("Invalid call to ExecuteAction: ProductionRuleObject is null");
@@ -167,6 +204,26 @@ public class ProductionRuleAction
         else if (action == Action.REMOVE)
         {
             return $"remove a {this.identifier.Encode()}";
+        }
+        else if (action == Action.SWAP)
+        {
+            if (predicateObjects == PredicateObjects.SUBJECT)
+            {
+                return $"swap {this.identifier.Encode()} with subject";
+            }
+            else if (predicateObjects == PredicateObjects.OBJECT)
+            {
+                return $"swap {this.identifier.Encode()} with object";
+            }
+            else if (predicateObjects == PredicateObjects.BOTH)
+            {
+                return $"swap {this.identifier.Encode()} with both";
+            }
+            else
+            {
+                throw new ArgumentException("PredicateObjects not recognized, or not supported for Swap action");
+            }
+
         }
         else if (action == Action.REWARD)
         {
