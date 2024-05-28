@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 96375706a8f914ebba33b694886b0a8f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 227955
+  packageName: FREE Ultimate Procedural Primitives
+  packageVersion: 1.0
+  assetPath: Assets/KANIYONIKA/UltimateProceduralPrimitivesFREE/40_Scripts/20_Formulas/FormulaPlaneFlex.cs
+  uploadId: 516907

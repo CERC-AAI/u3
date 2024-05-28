@@ -37,7 +37,7 @@ public class ProductionRuleIdentifier
     };
 
     // Create a dictionary of shapes and their corresponding prefabs
-    /*public Dictionary<string, GameObject> shapeDict = new Dictionary<string, GameObject>()
+    /*static public Dictionary<string, GameObject> shapeDict = new Dictionary<string, GameObject>()
     {
         {"sphere", Resources.Load<GameObject>("Prefabs/Sphere")},
         {"cube", Resources.Load<GameObject>("Prefabs/Cube")},

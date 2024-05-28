@@ -6,6 +6,7 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 using Unity.Mathematics;
+using UnityEngine.UIElements;
 // using NUnit;
 
 // Class structure is fine, but start from scratch
@@ -64,7 +65,7 @@ public class ProductionRuleManager : EnvironmentComponent
 {
 
     // A list to store all production rules
-    private List<ProductionRule> productionRules = new List<ProductionRule>();
+    public List<ProductionRule> productionRules = new List<ProductionRule>();
 
     private List<ProductionRule> permissibleProductionRules = new List<ProductionRule>();
 
@@ -78,7 +79,7 @@ public class ProductionRuleManager : EnvironmentComponent
 
     public ProductionRuleGraph productionRuleGraph;
 
-    public TrialManager trialManager;
+    TrialManager mTrialManager;
 
     [Serializable]
     public class ProductionRulePrefab
@@ -110,15 +111,35 @@ public class ProductionRuleManager : EnvironmentComponent
 
         Debug.Log("ProductionRuleManager");
 
-        //LoadDefaultProductionRules();
+        // New ProductionRuleGraph
+        List<ProductionRuleIdentifier> initialState = productionRuleGraph.GetRandomInitialState();
+        productionRules = productionRuleGraph.BuildProductionRuleSet(initialState);
+
+        SpawnManager spawnManager = GetEngine().GetCachedEnvironmentComponent<SpawnManager>();
+
+        foreach (ProductionRuleIdentifier ruleIdentifier in initialState)
+        {
+            spawnManager.AddProductionRuleObjectToSpawn(ruleIdentifier);
+        }
+    }
+
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        if (jsonParameters)
+        {
+            jsonParameters.GetField(out NEAR_DISTANCE, "prod_rule_near_distance", NEAR_DISTANCE);
+        }
+
+        base.InitParameters(jsonParameters);
     }
 
     protected override void DoRegisterCallbacks()
     {
-        TrialManager trialManager = GetEngine().GetEnvironmentComponent<TrialManager>();
-        if (trialManager)
+        mTrialManager = GetEngine().GetEnvironmentComponent<TrialManager>();
+        if (mTrialManager)
         {
-            RegisterCallback(ref trialManager.OnTrialOverCallbacks, OnTrialOver);
+            RegisterCallback(ref mTrialManager.OnTrialOverCallbacks, OnTrialOver);
+            RegisterCallback(ref mTrialManager.OnTrialStartCallbacks, OnTrialStart);
         }
 
         if (GetGravityGun() != null)
@@ -148,7 +169,11 @@ public class ProductionRuleManager : EnvironmentComponent
         }
     }
 
-    public override void OnEpisodeEnded()
+    void OnTrialStart()
+    {
+    }
+
+    public override void OnRunEnded()
     {
         int numProdRuleObjects = allProdRuleObjects.Count;
         for (int i = 0; i < numProdRuleObjects; i++)
@@ -157,7 +182,7 @@ public class ProductionRuleManager : EnvironmentComponent
             productionRuleObject.Remove();
         }
 
-        base.OnEpisodeEnded();
+        base.OnRunEnded();
     }
 
     public void AddRule(ProductionRule rule)
@@ -242,15 +267,6 @@ public class ProductionRuleManager : EnvironmentComponent
                     }
                 }
             }
-        }
-    }
-
-    public void UpdateProductionRuleGraph(ProductionRule productionRule)
-    {
-        if (productionRuleGraph)
-        {
-            productionRuleGraph.ForwardWalk(productionRule);
-            productionRules = productionRuleGraph.GetCurrentProductionRules();
         }
     }
 

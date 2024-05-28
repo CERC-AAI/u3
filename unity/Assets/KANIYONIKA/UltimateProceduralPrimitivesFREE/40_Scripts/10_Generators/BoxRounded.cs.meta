@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: deb3977faa90c4cfe8ff0383e4575078
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 227955
+  packageName: FREE Ultimate Procedural Primitives
+  packageVersion: 1.0
+  assetPath: Assets/KANIYONIKA/UltimateProceduralPrimitivesFREE/40_Scripts/10_Generators/BoxRounded.cs
+  uploadId: 516907

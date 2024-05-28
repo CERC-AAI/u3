@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d58b01db3882c4a23a515d978db69f1f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 227955
+  packageName: FREE Ultimate Procedural Primitives
+  packageVersion: 1.0
+  assetPath: Assets/KANIYONIKA/UltimateProceduralPrimitivesFREE/40_Scripts/90_Utils/StereographicProjection.cs
+  uploadId: 516907

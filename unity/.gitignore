@@ -9,5 +9,6 @@
 
 # whitelist
 !Assets/**
+!Builds/**
 !ProjectSettings/**
 !Packages/**

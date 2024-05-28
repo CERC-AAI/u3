@@ -11,9 +11,13 @@ using NUnit;
 using UnityEngine.UIElements;
 using UnityEngine.Assertions.Must;
 using System.Linq;
+using static UnityEngine.Rendering.ProbeTouchupVolume;
+using System.Drawing;
 
 public class SpawnManager : EnvironmentComponent
 {
+    private List<ProductionRuleIdentifier> mProductionRuleObjectsToSpawn = new List<ProductionRuleIdentifier>();
+
     public override void OnRunStarted()
     {
         Debug.Log("SpawnManager");
@@ -25,35 +29,48 @@ public class SpawnManager : EnvironmentComponent
 
         foreach (U3DPlayer agent in agents)
         {
-            Vector3 randomLocation = spawnLocations[UnityEngine.Random.Range(0, spawnLocations.Count)];
+            int spawnRandom = GetEngine().GetRandomRange(0, spawnLocations.Count);
+            Vector3 randomLocation = spawnLocations[spawnRandom];
+            spawnLocations.RemoveAt(spawnRandom);
 
             Debug.Log($"Spawn at: {randomLocation}");
 
             U3DPlayer.AgentState agentState = (U3DPlayer.AgentState)agent.SaveTrialData();
 
             agentState.position = randomLocation + new Vector3(0f, 0.5f);
-            agentState.rotation = Quaternion.Euler(0.0f, UnityEngine.Random.Range(0.0f, 360.0f), 0.0f);
+            agentState.rotation = Quaternion.Euler(0.0f, GetEngine().GetRandomRange(0.0f, 360.0f), 0.0f);
             agentState.cameraPlanarDirection = agentState.rotation * Vector3.forward;
 
             agent.LoadTrialData(agentState);
         }
 
         ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
-        for (int i = 0; i < 3; i++)
+        foreach (ProductionRuleIdentifier productionRuleIdentifier in mProductionRuleObjectsToSpawn)
         {
             EnvironmentObject prodRuleObject = GetEngine().CreateEnvironmentObject(productionRuleManager.productionRuleObjectPrefab.gameObject);
             ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
+            prodRuleObj.ProductionRuleObjectInitialize(productionRuleIdentifier.ObjectShape, productionRuleIdentifier.ObjectColor);
 
-            int shape = UnityEngine.Random.Range(0, productionRuleManager.productionRulePrefabs.Count);
-            int color = UnityEngine.Random.Range(0, ProductionRuleIdentifier.colorDict.Count);
+            int spawnRandom = GetEngine().GetRandomRange(0, spawnLocations.Count);
+            Vector3 randomLocation = spawnLocations[spawnRandom];
+            spawnLocations.RemoveAt(spawnRandom);
 
-            prodRuleObj.ProductionRuleObjectInitialize(productionRuleManager.productionRulePrefabs[shape].name, ProductionRuleIdentifier.colorDict.Keys.ToArray()[color]);
-
-            Vector3 randomLocation = spawnLocations[UnityEngine.Random.Range(0, spawnLocations.Count)];
             prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f);
-            prodRuleObj.transform.rotation = Quaternion.Euler(UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f), UnityEngine.Random.Range(0.0f, 360.0f));
+            prodRuleObj.transform.rotation = Quaternion.Euler(GetEngine().GetRandomRange(0.0f, 360.0f), GetEngine().GetRandomRange(0.0f, 360.0f), GetEngine().GetRandomRange(0.0f, 360.0f));
         }
 
         base.OnRunStarted();
+    }
+
+    public override void OnRunEnded()
+    {
+        mProductionRuleObjectsToSpawn.Clear();
+
+        base.OnRunEnded();
+    }
+
+    public void AddProductionRuleObjectToSpawn(ProductionRuleIdentifier productionRuleIndentifier)
+    {
+        mProductionRuleObjectsToSpawn.Add(productionRuleIndentifier);
     }
 }

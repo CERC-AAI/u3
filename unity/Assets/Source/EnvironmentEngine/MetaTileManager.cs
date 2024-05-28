@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
-using UnityEditor.ShaderGraph.Legacy;
 using NUnit.Framework;
 using System.Reflection;
 using System.IO;
 using static MetaTile;
 using QuickGraph;
 using QuickGraph.Algorithms;
+using UnityEngine.InputSystem;
+using System.IO.Abstractions;
 
 public class MetatileManager : EnvironmentComponent
 {
@@ -22,8 +23,14 @@ public class MetatileManager : EnvironmentComponent
 
     public float voxelSize = 1;
 
+    public float connectivityThreshold = 0.5f;
+
     public string saveFile = "";
     public string loadFile = "";
+
+    public bool VISUALIZE_GRAPH = false;
+    public Transform debugArrow;
+    public Transform debugNode;
 
     //TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK
     [HideInInspector]
@@ -146,6 +153,7 @@ public class MetatileManager : EnvironmentComponent
         public List<int> mFaceIndices = new List<int>() { -1, -1, -1, -1, -1, -1 };
         public List<List<int>> mValidFaceTypes = new List<List<int>>();
         public Dictionary<MetaTile, bool> mValidMetatileList = new Dictionary<MetaTile, bool>();
+        public Quaternion mRotation;
 
         public int CheckBoundaryTile(Vector3Int position, MetatileManager metatileManager,  Tile.FACETYPE face)
         {
@@ -275,6 +283,8 @@ public class MetatileManager : EnvironmentComponent
 
     public int[,] heightMap;
 
+    float mGenerationTime;
+
     Dictionary<Vector2Int, HashSet<Vector2Int>> Edges = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
 
     HashSet<Vector2Int> SeenNodes;
@@ -306,6 +316,25 @@ public class MetatileManager : EnvironmentComponent
 
     List<float> mFinalWeights = new List<float>();
     List<bool> mUseIndicies = new List<bool>();
+
+    public Floor floor;
+
+
+
+    public override void InitParameters(JSONObject jsonParameters)
+    {
+        if (jsonParameters)
+        {
+            jsonParameters.GetField(out mWidth, "env_width", mWidth);
+            jsonParameters.GetField(out mLength, "env_length", mLength);
+            jsonParameters.GetField(out mHeight, "env_height", mHeight);
+            jsonParameters.GetField(out saveFile, "world_save_file", saveFile);
+            jsonParameters.GetField(out loadFile, "world_load_file", loadFile);
+            jsonParameters.GetField(out connectivityThreshold, "min_connectivity", connectivityThreshold);
+        }
+
+        base.InitParameters(jsonParameters);
+    }
 
     public override void OnRunStarted()
     {
@@ -342,6 +371,11 @@ public class MetatileManager : EnvironmentComponent
         {
             StartCoroutine(GenerateEnvironment(metatilepool));
         }
+
+        if (floor)
+        {
+            floor.SetSize(new Vector2(mWidth * voxelSize, mLength * voxelSize));
+        }
     }
 
     public void CalculateHeightMap()
@@ -366,7 +400,7 @@ public class MetatileManager : EnvironmentComponent
                         
                     }
                 }
-                Debug.Log($"Height at {x} {z} = {heightMap[x, z]}");
+                //Debug.Log($"Height at {x} {z} = {heightMap[x, z]}");
             }
         } 
     }
@@ -380,22 +414,41 @@ public class MetatileManager : EnvironmentComponent
         var algo =  new QuickGraph.Algorithms.ConnectedComponents.StronglyConnectedComponentsAlgorithm<Vector2Int, Edge<Vector2Int>> (qGraph);
         algo.Compute();
 
+        var algoComponents = algo.Components;
+
+        // First, print algo.Components to see the initial state
+        /*Debug.Log("Initial Components:");
+        foreach (var kv in algoComponents)
+        {
+            Debug.Log($"Key: {kv.Key.x}, {kv.Key.y}, Value: {kv.Value}");
+        }*/
         // Convert the strongly connected components to the desired format
         // Group the vertices by their component index
-        var components = algo.Components
+        var components = algoComponents
             .GroupBy(kv => kv.Value)
             .Select(group => new HashSet<Vector2Int>(group.Select(kv => kv.Key)))
             .ToList();
+
+        // Iterate over each component (HashSet of Vector2Int)
+        /*for (int i = 0; i < components.Count; i++)
+        {
+            Debug.Log($"Component {i + 1}:"); // Label each component with a number for easier tracking
+
+            // Iterate over each Vector2Int in the current HashSet
+            foreach (Vector2Int vertex in components[i])
+            {
+                Debug.Log($"{vertex.x} {vertex.y}"); // Print x and y coordinates of the vertex
+            }
+        }*/
 
         return components;
     }
 
     // Method to convert the graph to a QuickGraph graph
-   IVertexListGraph<Vector2Int, Edge<Vector2Int>> ConvertToQuickGraph(Dictionary<Vector2Int, HashSet<Vector2Int>> graph)
+   BidirectionalGraph<Vector2Int, Edge<Vector2Int>> ConvertToQuickGraph(Dictionary<Vector2Int, HashSet<Vector2Int>> graph)
     {
-        var qGraph = new UndirectedGraph<Vector2Int, Edge<Vector2Int>>();
+        var qGraph = new BidirectionalGraph<Vector2Int, Edge<Vector2Int>>();
 
-        // Add vertices to the QuickGraph graph
         foreach (var vertex in graph.Keys)
         {
             qGraph.AddVertex(vertex);
@@ -405,13 +458,15 @@ public class MetatileManager : EnvironmentComponent
         foreach (var kvp in graph)
         {
             var v1 = kvp.Key;
+            qGraph.AddVertex(v1);
             foreach (var v2 in kvp.Value)
-            {
+            {   
+                
                 qGraph.AddEdge(new Edge<Vector2Int>(v1, v2));
             }
         }
 
-        return (IVertexListGraph<Vector2Int, Edge<Vector2Int>>)qGraph; // Explicit cast
+        return qGraph; // Explicit cast
     }
 
     public bool CheckNonEmpty( string mTileType )
@@ -433,7 +488,7 @@ public class MetatileManager : EnvironmentComponent
             return;
         }
         
-        if (Edges.ContainsKey( key ))
+        /*if (Edges.ContainsKey( key ))
         {
             Edges[ key ].Add( value );
         }
@@ -442,39 +497,84 @@ public class MetatileManager : EnvironmentComponent
             HashSet<Vector2Int> values = new HashSet<Vector2Int>();
             values.Add( value );
             Edges[ key ] = values;
+        }*/
+        Edges[key].Add(value);
+
+        if (VISUALIZE_GRAPH)
+        {
+            Transform EdgeArrow = Instantiate<Transform>(debugArrow);
+            Vector2 position = ((Vector2)key + (Vector2)value) / 2;
+
+            EdgeArrow.transform.position = new Vector3(position.x, heightMap[key.x, key.y], position.y);
+            EdgeArrow.Rotate(Quaternion.FromToRotation(EdgeArrow.forward, new Vector3(value.x - key.x, 0, value.y - key.y)).eulerAngles);
         }
 
-        if ( !SeenNodes.Contains( value ) )
+
+        /*if ( !SeenNodes.Contains( value ) )
         {
             nodeQueue.Enqueue( value );
 
-        }
+        }*/
 
     }
 
-    public void AddNodesIfRamp( Vector2Int key, Tile tile )
+    public void AddNodesIfRamp( Vector2Int key, Quaternion rotation )
     {
-        float y_rotate = tile.transform.rotation.y;
+        float y_rotate = rotation.eulerAngles.y;
         // 4 cases, 0, 90, 180, 270
-        int node2_y = key.y  - 1;
-        if ( node2_y < 0 ) {
-            return;
-        }
         // 0 , 1, 2, 3
         // positive x, neg z, neg x, positive z
         int[] x_cases_changes = new int[] { 1, 0, -1, 0 };
         int[] z_cases_changes = new int[] { 0, -1, 0, 1 };
 
+        int keyHeight = heightMap[key.x, key.y];
+
+        //Down ramp
         int node2_x = key.x + x_cases_changes[Mathf.RoundToInt(y_rotate / 90f)];
         int node2_z = key.y + z_cases_changes[Mathf.RoundToInt(y_rotate / 90f)];
-        
-        Vector2Int node2 = new Vector2Int(node2_x, node2_z );
-        if ( !SeenNodes.Contains( node2 ) )
+
+        if (node2_x >= 0 && node2_x < heightMap.GetLength(0) &&
+            node2_z >= 0 && node2_z < heightMap.GetLength(1))
         {
-            return;
+            Vector2Int node2 = new Vector2Int(node2_x, node2_z);
+            int nodeHeight = heightMap[node2.x, node2.y];
+            /*if ( !SeenNodes.Contains( node2 ) )
+            {
+                return;
+            }*/
+            if (keyHeight >= nodeHeight)
+            {
+                AddEdge(key, node2);
+            }
+            if (keyHeight - 1 <= nodeHeight) // -1 accounts for ramps that go "off cliffs"
+            {
+                AddEdge(node2, key);
+            }
         }
-        AddEdge( key, node2 );
-        AddEdge( node2, key );
+
+
+        //Up ramp
+        node2_x = key.x - x_cases_changes[Mathf.RoundToInt(y_rotate / 90f)];
+        node2_z = key.y - z_cases_changes[Mathf.RoundToInt(y_rotate / 90f)];
+
+        if (node2_x >= 0 && node2_x < heightMap.GetLength(0) &&
+            node2_z >= 0 && node2_z < heightMap.GetLength(1))
+        {
+            Vector2Int node2 = new Vector2Int(node2_x, node2_z);
+            int nodeHeight = heightMap[node2.x, node2.y];
+            /*if ( !SeenNodes.Contains( node2 ) )
+            {
+                return;
+            }*/
+            if (keyHeight >= nodeHeight)
+            {
+                AddEdge(key, node2);
+            }
+            if (keyHeight <= nodeHeight)
+            {
+                AddEdge(node2, key);
+            }
+        }
 
     }
 
@@ -486,7 +586,7 @@ public class MetatileManager : EnvironmentComponent
         //int y = node2.y;
         int z2 = node2.y;
         //Debug.Log($"Coord: {x2} {z2}");
-        if ( !SeenNodes.Contains( node2 ) || node1 == node2 )
+        if (node1 == node2 )
         {   
             return; 
         }
@@ -496,7 +596,7 @@ public class MetatileManager : EnvironmentComponent
             // Need to check if its not blocked
             // for simplicity
             AddEdge( node1, node2 );
-            AddEdge( node2, node2 );
+            //AddEdge( node2, node2 );
         }
         // Need to consider if I need to check ramp here too. Most likely not
 
@@ -535,7 +635,6 @@ public class MetatileManager : EnvironmentComponent
                 {
                     edgesList = edgesList.Remove(edgesList.Length - 2); // Remove the last ", "
                 }
-                //Debug.Log($"Node {entry.Key} is connected to: [{edgesList}] with {entry.Value.Count} connections.");
             }
         }
     } 
@@ -589,18 +688,23 @@ public class MetatileManager : EnvironmentComponent
 
     }
 
-    public void ExploreNeighbours( Vector2Int currentNode, int height ) {
+    public void ExploreNeighbours(Vector2Int currentNode, int height) {
 
         int x = currentNode.x;
-        int z = currentNode.y; 
+        int z = currentNode.y;
+
+        //Debug.Log($"X: {x}, Y: {z}");
         // Need to consider corner case
         // without rotation corner skips positive z negative x
-                // front
-        //Debug.Log($"Coord Pre: {x} {z}");
+        // front
         // down-left
         // Need to consider unrotated
-        if ( environment[x, height, z].mTileType.ToLower() == "ramp" ) 
-            AddNodesIfRamp(currentNode, environment[x, height, z].mTile );
+        if (environment[x, height, z].mTileType.ToLower() == "ramp")
+        { 
+            AddNodesIfRamp(currentNode, environment[x, height, z].mRotation);
+            return;
+        }
+
             // Edges[ currentNode ].Add( new Vector3Int( Math.Min( x + 1, 0), height - 1, z) );
         Vector2Int node2 = new Vector2Int( x, Math.Min( z + 1, environment.GetLength(2) - 1 ) );
         AddEdgeIfRequired( currentNode, node2 );
@@ -619,19 +723,19 @@ public class MetatileManager : EnvironmentComponent
 
         //front left
         node2 = new Vector2Int( Math.Max( x - 1, 0), Math.Max(z - 1, 0) );
-        AddEdgeIfRequired( currentNode, node2 );
+        /*AddEdgeIfRequired( currentNode, node2 );
 
         // front-right
         node2 =  new Vector2Int(  Math.Min( x + 1, environment.GetLength(0) - 1 ),  Math.Max(z - 1, 0 ) );
         AddEdgeIfRequired( currentNode, node2 );
 
         // back-left
-        node2 = new Vector2Int( Math.Max( x - 1,0),  Math.Max( z - 1, 0 ) );
+        node2 = new Vector2Int( Math.Max( x - 1,0), Math.Min(z + 1, environment.GetLength(2) - 1));
         AddEdgeIfRequired( currentNode, node2 );
         
         // back right
-        node2 = new Vector2Int( Math.Min( x + 1, environment.GetLength(0) - 1 ),  Math.Max( z - 1, 0) );
-        AddEdgeIfRequired( currentNode, node2 );
+        node2 = new Vector2Int( Math.Min( x + 1, environment.GetLength(0) - 1 ), Math.Min(z + 1, environment.GetLength(2) - 1));
+        AddEdgeIfRequired( currentNode, node2 );*/
 
        
         
@@ -650,26 +754,39 @@ public class MetatileManager : EnvironmentComponent
     
         while (nodeQueue.Count > 0)
         {
-            Vector2Int currentNode = nodeQueue.Dequeue(); // Dequeue the next node
+            Vector2Int currentNode = nodeQueue.Dequeue(); // Dequeue the ne`xt node
 
             // Add neighbors
-            ExploreNeighbours( currentNode, height );
+            ExploreNeighbours( currentNode, Math.Max( 0, height - 1 ) );
         }
     }
 
     public void CreateGraph()
     {
+
+        for (int x = 0; x < environment.GetLength(0); x++)
+        {
+            for (int z = 0; z < environment.GetLength(2); z++)
+            {
+                Vector2Int currentNode = new Vector2Int(x, z);
+                Edges[currentNode] = new HashSet<Vector2Int>();
+            }
+        }
         // Initialize by marking every tile except ramp at x = 0, z = 0 as 0
-        SeenNodes = new HashSet<Vector2Int>();
-        for( int x = 0; x < environment.GetLength(0); x++ )
+        //SeenNodes = new HashSet<Vector2Int>();
+        for ( int x = 0; x < environment.GetLength(0); x++ )
         {
             for( int z = 0; z < environment.GetLength(2); z++ )
-            {   
+            {
+                int height = heightMap[x, z];
+                Vector2Int currentNode = new Vector2Int(x, z);
+                ExploreNeighbours(currentNode, Math.Max(0, height - 1));
+
                 //Debug.Log($"Starting Search at {x}{z}");
                 // Check 
-                int height = heightMap[ x, z ];
+                /*int height = heightMap[ x, z ];
                 Vector2Int key = new Vector2Int( x, z );
-                bfs( key, height );
+                bfs( key, height );*/
             }
         }
 
@@ -795,7 +912,7 @@ public class MetatileManager : EnvironmentComponent
 
                 if (DEBUG || timelapse)
                 {
-                    candidateMetatile.DepositPayload(placementPositionOriginOffset, rotation, configuration.flipped, this);
+                    candidateMetatile.DepositPayload(placementPositionOriginOffset, rotation, configuration.flipped, this, voxelSize);
                     if (DEBUG)
                     {
                         Debug.Log($"SUCCESS, {candidateMetatile.name}, position={placementPositionOriginOffset}, origin={rotatedOffset}, orientation={configuration.orientation}, flipped = {configuration.flipped}, Count={placedMetatiles.Count}");
@@ -829,6 +946,7 @@ public class MetatileManager : EnvironmentComponent
         }
 
         //mGeneratingEnvironment = false;
+        mGenerationTime = Time.realtimeSinceStartup - startTime;
         Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to generate.");
 
         OnGenerationComplete();
@@ -849,6 +967,8 @@ public class MetatileManager : EnvironmentComponent
 
     void OnMapLoaded()
     {
+        float startTime = Time.realtimeSinceStartup;
+
         //Calculate the heightmap for environment.
         CalculateHeightMap();
 
@@ -857,41 +977,92 @@ public class MetatileManager : EnvironmentComponent
         //Graph Builder
         CreateGraph();
         PrettyPrintEdges();
-        Debug.Log("Abra Dabra");
         // Find the connected components
         var components = FindConnectedComponents(Edges);
 
         // Find the maximum connected component
         var maxComponent = components.OrderByDescending(comp => comp.Count).First();
-
-        Debug.Log("Maximum Connected Component:");
-        foreach (var vertex in maxComponent)
+    
+        Debug.Log($"Maximum Connected Component: {maxComponent.Count}");
+        /*int count = 0;
+        foreach (var component in components)
         {
-            Debug.Log(vertex);
-        }
+            count += 1; 
+            foreach (Vector2Int vertex in component)
+            {
 
-        //TODO: Vedant, add code to populate this list
+                Debug.Log($"CC {count}: {vertex.x} {vertex.y}");
+            }
+     
+        }*/
+        if (saveFile != "")
+        {
+            if ((float)maxComponent.Count / ((float)mWidth * (float)mLength) >= connectivityThreshold)
+            {
+                SavePayloads(saveFile);
+                //EnvironmentManager.Instance.SendEventToPython("save_complete");
+                EnvironmentManager.Instance.SendEventToPython($"save_complete:{mGenerationTime}");
+            }
+            else
+            {
+                Debug.Log("Maximum connectivity too low, did not save");
+                EnvironmentManager.Instance.SendEventToPython("save_failed");
+            }
+        }
+       
+
         mPermissibleSpawns.Clear();
-        for (int x = 0; x < heightMap.GetLength(0); x++)
+        /*for (int x = 0; x < heightMap.GetLength(0); x++)
         {
             for (int z = 0; z < heightMap.GetLength(1); z++)
             {
                 int height = heightMap[x, z];
 
-                EnvironmentTileState thisTile = environment[x, height, z];
+                EnvironmentTileState thisTile = environment[x, Math.Max( height-1, 0 ), z];
 
                 if (thisTile.mTile != null)
                 {
-                    mPermissibleSpawns.Add(new Vector3(x, height, z) * voxelSize);// + new Vector3(0, voxelSize/2, 0));
+                    mPermissibleSpawns.Add(new Vector3(x, Math.Max( height-1, 0 ), z) * voxelSize);// + new Vector3(0, voxelSize/2, 0));
+                }
+            }
+        }*/
+
+        foreach (var node in maxComponent)
+        {
+            int height = Math.Max(heightMap[node.x, node.y], 0) - 1;
+
+            EnvironmentTileState thisTile = environment[node.x, Math.Max(height, 0), node.y];
+
+            if (thisTile.mTileType != "ramp")
+            {
+                mPermissibleSpawns.Add(new Vector3(node.x, height, node.y) * voxelSize);
+
+                if (VISUALIZE_GRAPH)
+                {
+                    Transform DebugNode = Instantiate<Transform>(debugNode);
+                    debugNode.position = new Vector3(node.x, height, node.y) * voxelSize;
+
+                    Renderer[] renderers = DebugNode.GetComponentsInChildren<Renderer>();
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.material.color = Color.red;
+                    }
                 }
             }
         }
+
+        if (mPermissibleSpawns.Count == 0)
+        {
+            Debug.Log("No spawn locations added");
+        }
+
+        Debug.Log($"Took {Time.realtimeSinceStartup - startTime} seconds to calculate permissable area.");
     }
 
-    private static MetatileConfigurationWeights DrawMetaTileWithConfiguration(List<MetatileConfigurationWeights> metatileConfigurationWeights)
+    private MetatileConfigurationWeights DrawMetaTileWithConfiguration(List<MetatileConfigurationWeights> metatileConfigurationWeights)
     {
         float totalWeight = metatileConfigurationWeights.Sum(x => x.weight);
-        float randomWeight = UnityEngine.Random.Range(0, totalWeight);
+        float randomWeight = GetEngine().GetRandomRange(0, totalWeight);
         float currentWeight = 0;
         int metatileConfigurationIndex = 0;
 
@@ -951,6 +1122,11 @@ public class MetatileManager : EnvironmentComponent
         tileState = new TileState[mWidth, mHeight, mLength];
         heightMap = new int[mWidth, mLength];
 
+        Edges = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
+
+        SeenNodes = new HashSet<Vector2Int>();
+        nodeQueue = new Queue<Vector2Int>();
+
         mMetatileList = metatilepool.GetMetatiles();
         mMetatileList.Sort((MetaTile a, MetaTile b) => a.GetConfigurations().Count.CompareTo(b.GetConfigurations().Count));
     }
@@ -982,7 +1158,7 @@ public class MetatileManager : EnvironmentComponent
                 return new Vector3Int(-1, -1, -1); // return invalid position
             }
             // Debug.Log("SelectPlacementPosition() emptyPositions.Count: " + emptyPositions.Count);
-            return emptyPositions[UnityEngine.Random.Range(0, emptyPositions.Count)];
+            return emptyPositions[GetEngine().GetRandomRange(0, emptyPositions.Count)];
         }
         else
         {
@@ -993,7 +1169,7 @@ public class MetatileManager : EnvironmentComponent
             }
 
             float minEntropyValue = wavefront.entropies.Min();
-            int startPoint = UnityEngine.Random.Range(0, wavefront.entropies.Count);
+            int startPoint = GetEngine().GetRandomRange(0, wavefront.entropies.Count);
             int minEntropyIndex = wavefront.entropies.IndexOf(minEntropyValue, startPoint);
             if (minEntropyIndex < 0)
             {
@@ -1154,7 +1330,7 @@ public class MetatileManager : EnvironmentComponent
             {
                 shouldUseConfiguration = false;
 
-                int randomNumber = UnityEngine.Random.Range(0, mUseIndicies.Count);
+                int randomNumber = GetEngine().GetRandomRange(0, mUseIndicies.Count);
                 if (mUseIndicies[randomNumber])
                 {
                     mUseIndicies.RemoveAt(randomNumber);
@@ -1217,6 +1393,7 @@ public class MetatileManager : EnvironmentComponent
             int envZ = environmentPosition.z;
 
             environment[envX, envY, envZ].mTile = tile;
+            environment[envX, envY, envZ].mRotation = OrientationToQuaternion[orientation];
 
 
             if (mGeneratingEnvironment)
@@ -1873,7 +2050,7 @@ public class MetatileManager : EnvironmentComponent
     {
         while (mPotentialConfigurationList.Count > 0)
         {
-            int putativeConfigurationIndex = UnityEngine.Random.Range(0, mPotentialConfigurationList.Count);
+            int putativeConfigurationIndex = GetEngine().GetRandomRange(0, mPotentialConfigurationList.Count);
             int candidateConfigurationIndex = mPotentialConfigurationList[putativeConfigurationIndex];
 
             if (validConfigurations[candidateConfigurationIndex] == ConfigurationValidity.VALID)
@@ -1924,14 +2101,13 @@ public class MetatileManager : EnvironmentComponent
                 placedMetatiles[i].position,
                 placedMetatiles[i].rotation,
                 placedMetatiles[i].flipped,
-                this
+                this,
+                voxelSize
             ));
         }
-
-        SavePayloads();
     }
 
-    void SavePayloads()
+    void SavePayloads(string fileName)
     {
         JSONObject fullComponent = new JSONObject();
 
@@ -1956,14 +2132,24 @@ public class MetatileManager : EnvironmentComponent
         }
         fullComponent.AddField("d", componentList);
 
-        string path = Path.Combine(Application.persistentDataPath, "test.json");
+        //string path = Path.Combine(Application.dataPath, $"{fileName}.json");
+        string path = fileName;
+        path = path.Replace("{dataPath}", $"{Application.dataPath}/../Datasets/");
+
+        string directoryPath = Path.GetDirectoryName(path);
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
 
         // Write the JSON string to a file
         File.WriteAllText(path, fullComponent.ToString());
     }
     void LoadPayloads(string fileName)
     {
-        string path = Path.Combine(Application.persistentDataPath, $"{fileName}.json");
+        //string path = Path.Combine(Application.dataPath, $"{fileName}.json");
+        string path = fileName;
+        path = path.Replace("{dataPath}", $"{Application.dataPath}/../Datasets/");
 
         string jsonData = File.ReadAllText(path);
 
@@ -2007,7 +2193,8 @@ public class MetatileManager : EnvironmentComponent
                 position,
                 OrientationToQuaternion[configuration.orientation],
                 flipped,
-                this
+                this,
+                voxelSize
             ));
         }
     }

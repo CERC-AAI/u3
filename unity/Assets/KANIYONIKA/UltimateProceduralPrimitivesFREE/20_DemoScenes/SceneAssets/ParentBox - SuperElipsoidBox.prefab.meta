@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 436a9abc130ba49439c2c827ce26094a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 227955
+  packageName: FREE Ultimate Procedural Primitives
+  packageVersion: 1.0
+  assetPath: Assets/KANIYONIKA/UltimateProceduralPrimitivesFREE/20_DemoScenes/SceneAssets/ParentBox
+    - SuperElipsoidBox.prefab
+  uploadId: 516907

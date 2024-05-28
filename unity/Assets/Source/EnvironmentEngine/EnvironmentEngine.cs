@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using Unity.MLAgents;
-using UnityEditor.Rendering;
+using Unity.MLAgents.Sensors;
 
 
 public class EnvironmentEngine : EnvironmentComponentHolder
@@ -75,11 +75,51 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     virtual public void InitializeEnvironment(JSONObject loadParams)
     {
+        if (loadParams)
+        {
+            loadParams.GetField(out fixedUpdatesPerSecond, "frames_per_second", fixedUpdatesPerSecond);
+
+            if (loadParams.GetField("world_save_file"))
+            {
+                GetCachedEnvironmentComponent<ProductionRuleManager>().Remove();
+                GetCachedEnvironmentComponent<TrialManager>().Remove();
+                GetCachedEnvironmentComponent<SpawnManager>().Remove();
+            }
+        }
+
+        /*U3DPlayer player = GetCachedEnvironmentComponent<U3DPlayer>();
+
+        for (int i = 0; i < player.mSensors.Count; i++)
+        {
+            if (player.mSensors[i] is CameraSensorInfo)
+            {
+                CameraSensorInfo cameraSensorInfo = (CameraSensorInfo)player.mSensors[i];
+
+                if (cameraSensorInfo != null)
+                {
+                    ObservationSpec observationSpec = cameraSensorInfo.GetObservationSpec();
+
+                    int cameraHeight;
+                    int cameraWidth;
+                    loadParams.GetField(out cameraWidth, "camera_width", observationSpec.Shape[1]);
+                    loadParams.GetField(out cameraHeight, "camera_height", observationSpec.Shape[2]);
+
+                    cameraSensorInfo.UpdateCameraSize(cameraWidth, cameraHeight);
+                }
+            }
+        }*/
 
         CheckInitialized();
         List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
         for (int i = 0; i < tempList.Count; i++)
         {
+            mEnvironmentObjects[i].CheckAll();
+
+            if (loadParams)
+            {
+                mEnvironmentObjects[i].InitParameters(loadParams);
+            }
+
             mEnvironmentObjects[i].CheckInitialized();
         }
     }
@@ -287,6 +327,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
 
     public void DoUpdate()
     {
+        List<EnvironmentObject> tempList;
+
         if (!WaitingForPhysics())
         {
             float deltaTime = 0;
@@ -317,7 +359,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             if (!mIsWaitingForActions || !IsPython())
             {
                 OnObjectUpdate(deltaTime);
-                List<EnvironmentObject> tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+
+                tempList = new List<EnvironmentObject>(mEnvironmentObjects);
                 for (int i = 0; i < tempList.Count; i++)
                 {
                     mEnvironmentObjects[i].OnObjectUpdate(deltaTime);
@@ -327,17 +370,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                 {
                     if (tempList[i].CheckRemove())
                     {
-                        EnvironmentObject removeObject = tempList[i];
-
-                        if (removeObject != this)
-                        {
-                            EnvironmentComponent[] components = removeObject.GetEnvironmentComponents();
-                            foreach (EnvironmentComponent component in components)
-                            {
-                                mEnvironmentComponents.Remove(component);
-                            }
-                        }
-                        mEnvironmentObjects.Remove(removeObject);
+                        DoRemoveObject(tempList[i]);
                     }
                 }
 
@@ -357,7 +390,32 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             }
         }
 
+        tempList = new List<EnvironmentObject>(mEnvironmentObjects);
+        for (int i = 0; i < tempList.Count; i++)
+        {
+            if (tempList[i].CheckRemove())
+            {
+                DoRemoveObject(tempList[i]);
+            }
+        }
+
         //Debug.Log(JsonUtility.ToJson(this, true));
+    }
+
+    void DoRemoveObject(EnvironmentObject removeObject)
+    {
+        if (removeObject != this)
+        {
+            EnvironmentComponent[] components = removeObject.GetEnvironmentComponents();
+            foreach (EnvironmentComponent component in components)
+            {
+                mEnvironmentComponents.Remove(component);
+            }
+        }
+        mEnvironmentObjects.Remove(removeObject);
+        AddToPool(removeObject);
+
+        //Debug.Log($"Remove mEnvironmentObjects: {mEnvironmentObjects.Count}");
     }
 
     public float GetTime()
@@ -555,6 +613,8 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             mEnvironmentObjects.Sort(ComparePriority);
 
             mEnvironmentComponents.AddRange(newObject.GetEnvironmentComponents());
+
+            //Debug.Log($"Add mEnvironmentObjects: {mEnvironmentObjects.Count}");
         }
     }
 
@@ -772,9 +832,12 @@ public class EnvironmentEngine : EnvironmentComponentHolder
             mUnusedObjects.Add(baseObject, new List<EnvironmentObject>());
         }
 
+        //Note that pooling is currently disabled due to bugs. Should fix later.
         EnvironmentObject newObject = null;
         if (mUnusedObjects[baseObject].Count > 0)
         {
+            //Debug.Log($"WAKEUP GetNewObject: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
+
             newObject = mUnusedObjects[baseObject][0];
             mUnusedObjects[baseObject].RemoveAt(0);
 
@@ -783,11 +846,35 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         else
         {
             newObject = ((GameObject)GameObject.Instantiate(baseObject)).GetComponent<EnvironmentObject>();
+
+
+            //Debug.Log($"CREATE GetNewObject: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
         }
 
-        //newObject.mBaseObject = baseObject;
+        newObject.InitalizeBaseObject(baseObject);
 
         return newObject;
+    }
+
+    void AddToPool(EnvironmentObject removeObject)
+    {
+        GameObject baseObject = removeObject.GetBaseObject();
+
+        if (baseObject)
+        {
+            /*if (!mUnusedObjects.ContainsKey(baseObject))
+            {
+                mUnusedObjects.Add(baseObject, new List<EnvironmentObject>());
+            }
+
+            mUnusedObjects[baseObject].Add(removeObject);
+
+            Debug.Log($"AddToPool: {baseObject.name} length: {mUnusedObjects[baseObject].Count}");
+
+            return;    */
+        }
+
+        Destroy(removeObject.gameObject);
     }
 
     //External interface methods
@@ -807,6 +894,10 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         isTraining = training;
     }
 
+    public void SetParameters(JSONObject json)
+    {
+    }
+
     public void SetPhysicsEngine(PhysicsScene physicsScene)
     {
         mPhysicsScene = physicsScene;
@@ -815,6 +906,16 @@ public class EnvironmentEngine : EnvironmentComponentHolder
     public void SetPhysicsEngine2D(PhysicsScene2D physicsScene)
     {
         mPhysicsScene2D = physicsScene;
+    }
+
+    public PhysicsScene GetPhysicsEngine()
+    {
+        return mPhysicsScene;
+    }
+
+    public PhysicsScene2D GetPhysicsEngine2D()
+    {
+        return mPhysicsScene2D;
     }
 
     //Environment specific position and movement logic

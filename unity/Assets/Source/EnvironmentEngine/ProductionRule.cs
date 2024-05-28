@@ -6,6 +6,7 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 
+[Serializable]
 public class ProductionRule
 {
     public List<ProductionRuleCondition> conditions; // may contain multiple CONDITION
@@ -58,7 +59,8 @@ public class ProductionRule
             action.Execute(subject, obj, env);
         }
         // update the graph
-        env.GetCachedEnvironmentComponent<ProductionRuleManager>().UpdateProductionRuleGraph(this); // TODO: this is a hack, we need to update the graph with list of actions
+        // disabled since we aren't using the graph approach
+        // env.GetCachedEnvironmentComponent<ProductionRuleManager>().UpdateProductionRuleGraph(this); // TODO: this is a hack, we need to update the graph with list of actions
     }
 
     public void forwardPropagateState()

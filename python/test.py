@@ -1,5 +1,7 @@
 from mlagents_envs.logging_util import *
 import cv2
+from time import sleep
+import numpy as np
 
 _log_level = INFO
 set_log_level(_log_level)
@@ -7,11 +9,13 @@ set_log_level(_log_level)
 
 import u3_env
 
-env = u3_env.create_environment(0)
+# Note that XLand has 20 frames a second
+env = u3_env.create_environment(0, {"camera_width": 64, "camera_height": 64, "trial_count" : 2, "trial_seconds" : 2.0, "frames_per_second" : 12})
+#env = u3_env.create_environment_by_name("H:/Git/u3/python/XLand/unitylearning2", 0)
 
 for t in range(100):
     # Render the environment (optional, for visualization)
-    env.render()
+    #env.render()
 
     agents = env.possible_agents
 
@@ -32,20 +36,23 @@ for t in range(100):
     }
 
     # Perform the chosen action
+    print(f"Step {t + 1}")
     observation, reward, done, truncation, info = env.step(actions)
 
     # Check if the episode is done (the pole has fallen)
-    """if len(agents) > 0 and done[agents[0]]:
+    if len(agents) > 0 and done[agents[0]]:
         print("Episode finished after {} timesteps".format(t + 1))
-        break"""
-
+        env.reset()
+    
     for agent in agents:
         if not observation[agent] is None:
-            image = cv2.cvtColor(observation[agent], cv2.COLOR_RGB2BGR)
+            image = cv2.cvtColor(np.swapaxes(observation[agent], 0, -1), cv2.COLOR_RGB2BGR)
             frame_name = agent.replace("?", "_")
             frame_name = frame_name.replace(" ", "_")
             frame_name = frame_name.replace("=", "_")
             cv2.imwrite(f"python/Images/{frame_name}-frame{t}.png", image)
-    print(actions)
+    print(observation[agent].shape)
+
+
 
 env.close()

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
+using Unity.MLAgents.Sensors;
 
 public class U3DEnvironment : EnvironmentEngine
 {
@@ -20,6 +21,12 @@ public class U3DEnvironment : EnvironmentEngine
         }
 
         base.Initialize();
+    }
+
+    public override void InitializeEnvironment(JSONObject loadParams)
+    {
+
+        base.InitializeEnvironment(loadParams);
     }
 
     /*public override void OnObjectLateUpdate(float deltaTime)

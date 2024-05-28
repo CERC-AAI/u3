@@ -174,6 +174,11 @@ public class EnvironmentComponent : MonoBehaviour
         }
     }
 
+    public virtual void InitParameters(JSONObject jsonParameters)
+    {
+
+    }
+
     public virtual void StoreUserInputs()
     {
         if (mLocalActionInfos.Count > 0)
@@ -197,13 +202,13 @@ public class EnvironmentComponent : MonoBehaviour
     {
         mIsBeingDestroyed = true;
 
-        if (mEngine && this is EnvironmentObject)
-        {
-            mEngine.RemoveObject((EnvironmentObject)this);
-        }
         if (mEngine && this is EnvironmentAgent)
         {
             mEngine.RemoveAgent((EnvironmentAgent)this);
+        }
+        if (mEngine && this is EnvironmentObject)
+        {
+            mEngine.RemoveObject((EnvironmentObject)this);
         }
 
         for (int i = 0; i < mCallbackReferences.Count; i++)
@@ -215,7 +220,12 @@ public class EnvironmentComponent : MonoBehaviour
         mCallbackTypes.Clear();
     }
 
-    private void CheckEngine()
+    /*virtual public void InvalidateEngine()
+    {
+        mEngine = null;
+    }*/
+
+    protected void CheckEngine()
     {
         if (!mEngine)
         {
