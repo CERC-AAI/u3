@@ -1232,6 +1232,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26ddbb52241a5ec4b981bab6f45ab6a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  saveFile: 
+  loadFile: 
   productionRules: []
   productionRuleObjectPrefab: {fileID: 7393287890859856584, guid: 08cd0431f661e3448b2eafbdabbe3740,
     type: 3}
@@ -1273,7 +1275,7 @@ MonoBehaviour:
         ObjectShape: 
         ObjectColor: 
       action: 3
-      reward: 0
+      floatValue: 1
       debugPrintString: Test debug print string :)
   - conditions:
     - condition: 0
@@ -1289,7 +1291,7 @@ MonoBehaviour:
         ObjectShape: cylinder
         ObjectColor: green
       action: 0
-      reward: 5
+      floatValue: 0
       debugPrintString: Agent rewarded :)
   - conditions:
     - condition: 5
@@ -1305,7 +1307,7 @@ MonoBehaviour:
         ObjectShape: sphere
         ObjectColor: green
       action: 0
-      reward: 0
+      floatValue: 0
       debugPrintString: Test debug print string :)
   - conditions:
     - condition: 4
@@ -1321,7 +1323,7 @@ MonoBehaviour:
         ObjectShape: cube
         ObjectColor: blue
       action: 1
-      reward: 0
+      floatValue: 0
       debugPrintString: Test debug print string :)
 --- !u!114 &1447110063
 MonoBehaviour:
@@ -1349,9 +1351,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceead997d5f8ac94690fea53adbdbe71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minInitialObjects: 1
+  minInitialObjects: 3
   maxInitialObjects: 3
-  minRules: 1
+  minRules: 2
   maxRules: 2
   minDeadends: 0
   maxDeadends: 0

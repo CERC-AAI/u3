@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 [Serializable]
 public class ProductionRule
 {
-    public List<ProductionRuleCondition> conditions; // may contain multiple CONDITION
+    public List<ProductionRuleCondition> conditions; // may contain multiple CONDITION. These use AND logic.
     public List<ProductionRuleAction> actions;
 
 
@@ -28,7 +28,7 @@ public class ProductionRule
     }
 
 
-    public bool CheckCallback(CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
+    public bool CheckCallback(ProductionRuleManager.CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
         foreach (ProductionRuleCondition condition in conditions)
         {
@@ -44,7 +44,7 @@ public class ProductionRule
     {
         foreach (ProductionRuleCondition condition in conditions)
         {
-            if (!condition.IsSatisfied(CONDITION.NONE, subject, obj, env))
+            if (!condition.IsSatisfied(ProductionRuleManager.CONDITION.NONE, subject, obj, env))
             {
                 return false;
             }
@@ -98,6 +98,18 @@ public class ProductionRule
         }
         return encoded;
 
+    }
+
+    public void OnTrialOver()
+    {
+        for (int i = 0; i < conditions.Count; i++)
+        {
+            conditions[i].OnTrialOver();
+        }
+        for (int i = 0; i < actions.Count; i++)
+        {
+            actions[i].OnTrialOver();
+        }
     }
 
 }

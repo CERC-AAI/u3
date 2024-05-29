@@ -73,7 +73,7 @@ public class ProductionRuleObject : EnvironmentComponent
     {
 
         ProductionRuleObject productionRuleObject = otherObject.GetComponentInParent<ProductionRuleObject>();
-        GetProductionRuleManager().CheckCallback(CONDITION.CONTACT, this, productionRuleObject, GetEngine());
+        GetProductionRuleManager().CheckCallback(ProductionRuleManager.CONDITION.CONTACT, this, productionRuleObject, GetEngine());
         base.OnCollision(otherObject);
         //Debug.Log("Object Collided");
     }
