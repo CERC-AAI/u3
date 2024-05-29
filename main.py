@@ -1,5 +1,3 @@
-import imageio
-from python.gym_wrapper import U3GymEnv
 import numpy as np
 import time
 import gymnasium as gym
@@ -8,7 +6,7 @@ def time_f(n_envs):
     env = gym.vector.AsyncVectorEnv([
         lambda i=i: gym.make(
             "U3GymEnv-v0",
-            worker_id=i + 2,
+            worker_id=i,
             disable_env_checker=True,
             camera_width=64,
             camera_height=64

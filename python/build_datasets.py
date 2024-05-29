@@ -77,9 +77,9 @@ base_parameters = {"env_width": env_width, "env_length": env_length, "env_height
 if build_type == "editor":
     env = u3_env.create_environment(worker_id, base_parameters)
 elif build_type == "linux":
-    env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGenerator/XLand", worker_id=worker_id, parameters=base_parameters)
+    env = u3_env.create_environment(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGenerator/XLand", worker_id=worker_id, parameters=base_parameters)
 elif build_type == "windows":
-    env = u3_env.create_environment_by_name(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGeneratorWindows/unitylearning2", worker_id=worker_id, parameters=base_parameters)
+    env = u3_env.create_environment(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGeneratorWindows/unitylearning2", worker_id=worker_id, parameters=base_parameters)
 
 root_folder = f"{os.path.dirname(os.path.abspath(__file__))}/../Datasets/"
 save_folder = f"{root_folder}{dataset_name}/"

@@ -16,19 +16,12 @@
 
 from mlagents_envs.environment import UnityEnvironment
 from absl import flags
-import uuid
 import json
 
 
-from typing import Dict, List, Optional, Any, Tuple
-from mlagents_envs.side_channel.side_channel import (
-    SideChannel,
-    IncomingMessage,
-    OutgoingMessage,
-)
+from typing import Dict, Any
 from mlagents_envs.base_env import BaseEnv
-
-from gym_wrapper import UnityToGymWrapper
+from python.side_channel import U3SideChannel
 from unity_gym_env_pettingzoo_rewrite import UnityToPettingzooWrapper
 
 
@@ -42,93 +35,6 @@ flags.DEFINE_integer(
     30,
     "Maximal number of random no-ops at the beginning of each " "episode.",
 )
-
-
-# Create the StringLogChannel class
-class U3SideChannel(SideChannel):
-    def __init__(self) -> None:
-        super().__init__(uuid.UUID("621f0a70-4f87-11ea-a6bf-784f4387d1f7"))
-
-    def on_message_received(self, msg: IncomingMessage) -> None:
-        """
-        Note: We must implement this method of the SideChannel interface to
-        receive messages from Unity
-        """
-        # We simply read a string from the message and print it.
-        message = str(msg.get_raw_bytes()[4:], "utf_8")
-        if (not self.environment.current_step in self.environment.env_messages):
-            self.environment.env_messages[self.environment.current_step] = []
-        self.environment.env_messages[self.environment.current_step].append(message)
-        # print('Unity output: {}'.format(message[0:100]))
-
-    def send_string(self, data: str) -> None:
-        # Add the string to an OutgoingMessage
-        msg = OutgoingMessage()
-        msg.write_string(data)
-        # We call this method to queue the data we want to send
-        super().queue_message_to_send(msg)
-
-    def set_environment(self, environment):
-        self.environment = environment
-        self.environment.env_messages = {}
-        self.environment.last_env_messages = {}
-
-
-class U3Environment(UnityEnvironment):
-    def __init__(
-        self,
-        file_name: Optional[str] = None,
-        worker_id: int = 0,
-        base_port: Optional[int] = None,
-        seed: int = 0,
-        no_graphics: bool = False,
-        timeout_wait: int = 60,
-        args: Optional[List[str]] = None,
-        side_channels: Optional[List[SideChannel]] = None,
-    ):
-        super(U3Environment, self).__init__(
-            file_name=file_name,
-            worker_id=worker_id,
-            base_port=base_port,
-            seed=seed,
-            no_graphics=no_graphics,
-            timeout_wait=timeout_wait,
-            side_channels=side_channels,
-        )
-
-    """def executable_launcher(self, file_name, no_graphics, args):
-		launch_string = self.validate_environment_path(file_name)
-		if launch_string is None:
-			self._close(0)
-			raise UnityEnvironmentException(
-				f"Couldn't launch the {file_name} environment. Provided filename does not match any environments."
-			)
-		else:
-			logger.debug("This is the launch string {}".format(launch_string))
-			# Launch Unity environment
-			subprocess_args = ['export LD_LIBRARY_PATH=/usr/lib/mesa-diverted/x86_64-linux-gnu;', 'xvfb-run', '--auto-servernum', '--server-args="-screen 0 100x100x24"', launch_string]
-			if no_graphics:
-				subprocess_args += ["-nographics", "-batchmode"]
-			subprocess_args += [UnityEnvironment.PORT_COMMAND_LINE_ARG, str(self.port)]
-			subprocess_args += args
-
-			try:
-				self.proc1 = subprocess.Popen(
-					" ".join(subprocess_args),
-					# start_new_session=True means that signals to the parent python process
-					# (e.g. SIGINT from keyboard interrupt) will not be sent to the new process on POSIX platforms.
-					# This is generally good since we want the environment to have a chance to shutdown,
-					# but may be undesirable in come cases; if so, we'll add a command-line toggle.
-					# Note that on Windows, the CTRL_C signal will still be sent.
-					start_new_session=True, shell=True
-				)
-			except PermissionError as perm:
-				# This is likely due to missing read or execute permissions on file.
-				raise UnityEnvironmentException(
-					f"Error when trying to launch environment - make sure "
-					f"permissions are set correctly. For example "
-					f'"chmod -R 755 {launch_string}"'
-				) from perm"""
 
 
 class U3Wrapper(UnityToPettingzooWrapper):
@@ -232,17 +138,19 @@ class U3Wrapper(UnityToPettingzooWrapper):
         self.env_messages = {}
 
 
-def create_environment(worker_id, parameters : Dict[str, object] = {}, seed : int = 0):
-    return create_environment_by_name("", "xland", worker_id, parameters)
-
-def create_environment_by_name(file_name, task_name = "xland", worker_id = 0, parameters : Dict[str, object] = {}, seed : int = 0):
+def create_environment(
+    file_name=None,
+    task_name="xland",
+    worker_id=0,
+    parameters={},
+    seed=0,
+    uint8_visual=True
+):
     environmentChannel = U3SideChannel()
-    if file_name == "":
-        unity_env = U3Environment(seed=seed, side_channels=[environmentChannel], worker_id=worker_id)
-    else:
-        unity_env = U3Environment(file_name=file_name, seed=seed, side_channels=[environmentChannel], worker_id=worker_id)
+    unity_env = UnityEnvironment(file_name=file_name, seed=seed, side_channels=[environmentChannel], worker_id=worker_id)
+    
     env = U3Wrapper(
-        unity_env, environmentChannel, flatten_branched=True, uint8_visual=True, parameters=parameters, task_name=task_name
+        unity_env, environmentChannel, flatten_branched=True, uint8_visual=uint8_visual, parameters=parameters, task_name=task_name
     )
     env.seed(seed)
 

@@ -1,6 +1,7 @@
 import itertools
 import json
 import uuid
+from venv import logger
 
 import numpy as np
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -12,45 +13,11 @@ from mlagents_envs.base_env import ActionTuple, BaseEnv
 from mlagents_envs.base_env import DecisionSteps, TerminalSteps
 from mlagents_envs import logging_util
 from mlagents_envs.environment import UnityEnvironment
-from mlagents_envs.side_channel.side_channel import IncomingMessage, SideChannel, OutgoingMessage
 
-
-
-class UnityGymException(error.Error):
-    """
-    Any error related to the gym wrapper of ml-agents.
-    """
-
-    pass
-
+from python.side_channel import U3SideChannel
 
 logger = logging_util.get_logger(__name__)
 GymStepResult = Tuple[np.ndarray, float, bool, Dict]
-
-class U3SideChannel(SideChannel):
-    def __init__(self) -> None:
-        super().__init__(uuid.UUID("621f0a70-4f87-11ea-a6bf-784f4387d1f7"))
-
-    def on_message_received(self, msg: IncomingMessage) -> None:
-        """
-        Note: We must implement this method of the SideChannel interface to
-        receive messages from Unity
-        """
-        # We simply read a string from the message and print it.
-        message = str(msg.get_raw_bytes()[4:], "utf_8")
-        self.environment.lastEnvironment = message
-        # print('Unity output: {}'.format(message[0:100]))
-
-    def send_string(self, data: str) -> None:
-        # Add the string to an OutgoingMessage
-        msg = OutgoingMessage()
-        msg.write_string(data)
-        # We call this method to queue the data we want to send
-        super().queue_message_to_send(msg)
-
-    def set_environment(self, environment):
-        self.environment = environment
-
 
 class U3GymEnv(gym.Env):
 
@@ -151,7 +118,7 @@ class UnityToGymWrapper(gym.Env):
 
         # Check brain configuration
         if len(self._env.behavior_specs) != 1:
-            raise UnityGymException(
+            raise ValueError(
                 "There can only be one behavior in a UnityEnvironment "
                 "if it is wrapped in a gym."
             )
@@ -160,7 +127,7 @@ class UnityToGymWrapper(gym.Env):
         self.group_spec = self._env.behavior_specs[self.name]
 
         if self._get_n_vis_obs() == 0 and self._get_vec_obs_size() == 0:
-            raise UnityGymException(
+            raise ValueError(
                 "There are no observations provided by the environment."
             )
 
@@ -238,7 +205,7 @@ class UnityToGymWrapper(gym.Env):
             info (dict): contains auxiliary diagnostic information.
         """
         if self.game_over:
-            raise UnityGymException(
+            raise Exception(
                 "You are calling 'step()' even though this environment has already "
                 "returned done = True. You must always call 'reset()' once you "
                 "receive 'done = True'."
@@ -358,7 +325,7 @@ class UnityToGymWrapper(gym.Env):
     @staticmethod
     def _check_agents(n_agents: int) -> None:
         if n_agents > 1:
-            raise UnityGymException(
+            raise ValueError(
                 f"There can only be one Agent in the environment but {n_agents} were detected."
             )
 
