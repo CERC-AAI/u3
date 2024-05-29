@@ -44,19 +44,22 @@ public class SpawnManager : EnvironmentComponent
             agent.LoadTrialData(agentState);
         }
 
-        ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
-        foreach (ProductionRuleIdentifier productionRuleIdentifier in mProductionRuleObjectsToSpawn)
+        if (spawnLocations.Count > 0)
         {
-            EnvironmentObject prodRuleObject = GetEngine().CreateEnvironmentObject(productionRuleManager.productionRuleObjectPrefab.gameObject);
-            ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
-            prodRuleObj.ProductionRuleObjectInitialize(productionRuleIdentifier.ObjectShape, productionRuleIdentifier.ObjectColor);
+            ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
+            foreach (ProductionRuleIdentifier productionRuleIdentifier in mProductionRuleObjectsToSpawn)
+            {
+                EnvironmentObject prodRuleObject = GetEngine().CreateEnvironmentObject(productionRuleManager.productionRuleObjectPrefab.gameObject);
+                ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
+                prodRuleObj.ProductionRuleObjectInitialize(productionRuleIdentifier.ObjectShape, productionRuleIdentifier.ObjectColor);
 
-            int spawnRandom = GetEngine().GetRandomRange(0, spawnLocations.Count);
-            Vector3 randomLocation = spawnLocations[spawnRandom];
-            spawnLocations.RemoveAt(spawnRandom);
+                int spawnRandom = GetEngine().GetRandomRange(0, spawnLocations.Count);
+                Vector3 randomLocation = spawnLocations[spawnRandom];
+                spawnLocations.RemoveAt(spawnRandom);
 
-            prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f);
-            prodRuleObj.transform.rotation = Quaternion.Euler(GetEngine().GetRandomRange(0.0f, 360.0f), GetEngine().GetRandomRange(0.0f, 360.0f), GetEngine().GetRandomRange(0.0f, 360.0f));
+                prodRuleObj.transform.position = randomLocation + new Vector3(0f, 1.0f);
+                prodRuleObj.transform.rotation = Quaternion.Euler(GetEngine().GetRandomRange(0.0f, 360.0f), GetEngine().GetRandomRange(0.0f, 360.0f), GetEngine().GetRandomRange(0.0f, 360.0f));
+            }
         }
 
         base.OnRunStarted();

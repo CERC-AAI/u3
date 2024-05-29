@@ -17,43 +17,75 @@ public enum PredicateObjects
 [Serializable]
 public class ProductionRuleAction
 {
-
+    const int MAX_SPAWNS = 3; 
 
     public PredicateObjects predicateObjects;
 
     public ProductionRuleIdentifier identifier;
 
-    public ACTION action;
-    // private List<object> actionParameters;
+    public ProductionRuleManager.ACTION action;
 
-    public float reward;
+    public float floatValue;
 
 
     public string debugPrintString = "Test print";
 
-    public ProductionRuleAction(ACTION action, float reward, PredicateObjects predicateObjects, ProductionRuleIdentifier identifier = null)
+    [HideInInspector]
+    int mTotalSpawns = 0;
+
+    public static ProductionRuleAction GetProductionRuleAction(ProductionRuleManager.ACTION action, PredicateObjects predicateObjects = PredicateObjects.NONE, float floatValue = 0.0f, ProductionRuleIdentifier identifier = null)
+    {
+        /*ProductionRuleAction newAction = null;
+
+        string className = action.ToString().ToLower();
+        className = char.ToUpper(className[0]) + className.Substring(1) + "Action";
+
+        Type classType = Type.GetType(className);
+        if (classType != null)
+        {
+            newAction = (ProductionRuleAction)Activator.CreateInstance(classType);
+        }
+        else
+        {
+            Debug.LogError($"Could not find class for ProductionRule action: {action}. Expected class to be named: {className}");
+        }
+
+        return newAction;*/
+
+        ProductionRuleAction newRule = new ProductionRuleAction();
+        newRule.Initialize(action, predicateObjects, floatValue, identifier);
+
+        return newRule;
+    }
+
+    virtual public void Initialize(ProductionRuleManager.ACTION action, PredicateObjects predicateObjects, float floatValue, ProductionRuleIdentifier identifier = null)
     {
         this.action = action;
-        this.reward = reward;
+        this.floatValue = floatValue;
         this.predicateObjects = predicateObjects;
         this.identifier = identifier;
     }
 
-    public void Execute(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
+    virtual public void Execute(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
         ProductionRuleManager productionRuleManager = env.GetCachedEnvironmentComponent<ProductionRuleManager>();
 
-        if (predicateObjects == PredicateObjects.SUBJECT)
+        // Make sure predicate is valid
+        if (predicateObjects == PredicateObjects.OBJECT && obj == null)
         {
-            if (action != ACTION.SPAWN && action != ACTION.SWAP)
+            if (subject != null)
             {
-                ExecuteAction(subject, env, subject, obj);
+                predicateObjects = PredicateObjects.SUBJECT;
             }
             else
             {
-                ProductionRuleObject productionRulePrefab = productionRuleManager.productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
-                ExecuteAction(productionRulePrefab, env, subject, obj);
+                predicateObjects = PredicateObjects.NONE;
             }
+        }
+
+        if (predicateObjects == PredicateObjects.SUBJECT)
+        {
+            ExecuteAction(subject, env, subject, obj);
         }
         else if (predicateObjects == PredicateObjects.OBJECT)
         {
@@ -62,63 +94,81 @@ public class ProductionRuleAction
         else if (predicateObjects == PredicateObjects.BOTH)
         {
             ExecuteAction(subject, env, subject, obj);
-            ExecuteAction(obj, env, subject, obj);
+            if (obj)
+            {
+                ExecuteAction(obj, env, subject, obj);
+            }
         }
         else if (predicateObjects == PredicateObjects.NONE)
         {
-            if (action != ACTION.SPAWN)
+            if (action != ProductionRuleManager.ACTION.SPAWN && action != ProductionRuleManager.ACTION.SWAP)
             {
                 ProductionRuleObject productionRuleObject = productionRuleManager.GetProductionRuleObjectByIdentifier(identifier);
                 ExecuteAction(productionRuleObject, env, subject, obj);
-            }
-            else
-            {
-                ProductionRuleObject productionRulePrefab = productionRuleManager.productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
-                ExecuteAction(productionRulePrefab, env, subject, obj);
             }
         }
         else
         {
             throw new ArgumentException("PredicateObjects not recognized");
         }
+
+        if (action == ProductionRuleManager.ACTION.SPAWN || action == ProductionRuleManager.ACTION.SWAP)
+        {
+            ProductionRuleObject productionRulePrefab = productionRuleManager.productionRuleObjectPrefab.GetComponent<ProductionRuleObject>();
+            ExecuteAction(productionRulePrefab, env, subject, obj);
+        }
     }
 
-    public void ExecuteAction(ProductionRuleObject productionRuleObject, EnvironmentEngine env, ProductionRuleObject subject, ProductionRuleObject obj)
+    virtual public void ExecuteAction(ProductionRuleObject productionRuleObject, EnvironmentEngine env, ProductionRuleObject subject, ProductionRuleObject obj)
     {
+        //CheckParameterValidity(productionRuleObject, env);
 
-        CheckParameterValidity(productionRuleObject, env);
+        Vector3 subjectPosition = Vector3.zero;
+        if (subject)
+        {
+            subjectPosition = subject.transform.position;
+        }
+
+        bool isNewObject = productionRuleObject != subject && productionRuleObject != obj;
+
         switch (action)
         {
-            case ACTION.SPAWN:
-                Debug.Log(debugPrintString);
-                if (subject == null)
+            case ProductionRuleManager.ACTION.SPAWN:
+                if (isNewObject && productionRuleObject)
                 {
-                    Spawn(productionRuleObject, env, Vector3.zero);
-                }
-                else
-                {
-                    Spawn(productionRuleObject, env, subject.transform.position);
+                    Spawn(productionRuleObject, env, subjectPosition);
                 }
                 break;
 
-            case ACTION.REMOVE:
-                Debug.Log(debugPrintString);
+            case ProductionRuleManager.ACTION.REMOVE:
+                //Debug.Log(debugPrintString);
                 Remove(productionRuleObject, env);
                 break;
 
-            case ACTION.SWAP:
-                Debug.Log(debugPrintString);
-                Swap(productionRuleObject, env, subject, obj);
+            case ProductionRuleManager.ACTION.SWAP:
+                //Debug.Log(debugPrintString);
+                if (productionRuleObject)
+                {
+                    if (isNewObject)
+                    {
+                        Spawn(productionRuleObject, env, subjectPosition);
+                    }
+                    else
+                    {
+                        Remove(productionRuleObject, env);
+                    }
+                }
                 break;
 
-            case ACTION.REWARD:
-                Debug.Log(debugPrintString);
+            case ProductionRuleManager.ACTION.REWARD:
+                Debug.Log($"Reward: {floatValue}");
                 Reward(env);
                 break;
 
-            case ACTION.PRINT:
+            case ProductionRuleManager.ACTION.PRINT:
                 Debug.Log(debugPrintString);
                 break;
+
             default:
                 throw new ArgumentException("ACTION not recognized");
         }
@@ -133,15 +183,20 @@ public class ProductionRuleAction
         // Get the agent from the environment engine
         var playerObject = env.GetEnvironmentComponent<U3DPlayer>("Player");
         U3Agent u3Agent = playerObject.GetComponent<U3Agent>();
-        u3Agent.AddReward(reward);
+        u3Agent.AddReward(floatValue);
     }
     public void Spawn(ProductionRuleObject productionRuleObjectPrefab, EnvironmentEngine env, Vector3 position)
     {
-        // Instantiate the production rule object
-        EnvironmentObject prodRuleObject = env.GetEngine().CreateEnvironmentObject(productionRuleObjectPrefab.gameObject);
-        ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
-        prodRuleObj.ProductionRuleObjectInitialize(identifier.ObjectShape, identifier.ObjectColor);
-        prodRuleObj.transform.position = position;
+        if (mTotalSpawns < MAX_SPAWNS)
+        {
+            // Instantiate the production rule object
+            EnvironmentObject prodRuleObject = env.GetEngine().CreateEnvironmentObject(productionRuleObjectPrefab.gameObject);
+            ProductionRuleObject prodRuleObj = prodRuleObject.GetComponent<ProductionRuleObject>();
+            prodRuleObj.ProductionRuleObjectInitialize(identifier.ObjectShape, identifier.ObjectColor);
+            prodRuleObj.transform.position = position;
+
+            mTotalSpawns++;
+        }
     }
 
     public void Remove(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
@@ -149,7 +204,7 @@ public class ProductionRuleAction
         env.RemoveObject(productionRuleObject);
     }
 
-    public void Swap(ProductionRuleObject productionRuleObjectPrefab, EnvironmentEngine env, ProductionRuleObject subject, ProductionRuleObject obj)
+    /*public void Swap(ProductionRuleObject productionRuleObjectPrefab, EnvironmentEngine env, ProductionRuleObject subject, ProductionRuleObject obj)
     {
         Vector3 subjectPosition = subject.transform.position;
 
@@ -159,12 +214,22 @@ public class ProductionRuleAction
         }
         else if (predicateObjects == PredicateObjects.OBJECT)
         {
-            Remove(obj, env);
+            if (obj)
+            {
+                Remove(obj, env);
+            }
+            else
+            {
+                Remove(subject, env);
+            }
         }
         else if (predicateObjects == PredicateObjects.BOTH)
         {
             Remove(subject, env);
-            Remove(obj, env);
+            if (obj)
+            {
+                Remove(obj, env);
+            }
         }
         else
         {
@@ -172,40 +237,40 @@ public class ProductionRuleAction
         }
 
         Spawn(productionRuleObjectPrefab, env, subjectPosition);
-    }
+    }*/
 
-    public void CheckParameterValidity(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
+    /*virtual public void CheckParameterValidity(ProductionRuleObject productionRuleObject, EnvironmentEngine env)
     {
         switch (action)
         {
-            case ACTION.SPAWN:
-            case ACTION.REMOVE:
-            case ACTION.SWAP:
+            case ProductionRuleManager.ACTION.SPAWN:
+            case ProductionRuleManager.ACTION.REMOVE:
+            case ProductionRuleManager.ACTION.SWAP:
                 if (productionRuleObject == null)
                 {
                     throw new ArgumentException("Invalid call to ExecuteAction: ProductionRuleObject is null");
                 }
                 break;
-            case ACTION.REWARD:
-            case ACTION.PRINT:
+            case ProductionRuleManager.ACTION.REWARD:
+            case ProductionRuleManager.ACTION.PRINT:
                 break;
             default:
                 throw new ArgumentException("ACTION not recognized");
         }
 
-    }
+    }*/
 
-    public string Encode()
+    virtual public string Encode()
     {
-        if (action == ACTION.SPAWN)
+        if (action == ProductionRuleManager.ACTION.SPAWN)
         {
             return $"spawn a {this.identifier.Encode()}";
         }
-        else if (action == ACTION.REMOVE)
+        else if (action == ProductionRuleManager.ACTION.REMOVE)
         {
             return $"remove a {this.identifier.Encode()}";
         }
-        else if (action == ACTION.SWAP)
+        else if (action == ProductionRuleManager.ACTION.SWAP)
         {
             if (predicateObjects == PredicateObjects.SUBJECT)
             {
@@ -225,18 +290,23 @@ public class ProductionRuleAction
             }
 
         }
-        else if (action == ACTION.REWARD)
+        else if (action == ProductionRuleManager.ACTION.REWARD)
         {
-            return $"reward {this.reward}";
+            return $"reward {this.floatValue}";
         }
-        else if (action == ACTION.PRINT)
+        else if (action == ProductionRuleManager.ACTION.PRINT)
         {
-            return $"print {this.reward}";
+            return $"print {this.debugPrintString}";
         }
         else
         {
             throw new ArgumentException("ACTION not recognized");
         }
 
+    }
+
+    virtual public void OnTrialOver()
+    {
+        mTotalSpawns = 0;
     }
 }

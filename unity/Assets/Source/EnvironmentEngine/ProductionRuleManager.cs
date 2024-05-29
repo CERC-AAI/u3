@@ -2,12 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Reflection;
-using Unity.MLAgents.Sensors;
-using UnityEngine.InputSystem;
-using Unity.Mathematics;
-using UnityEngine.UIElements;
-// using NUnit;
 
 // Class structure is fine, but start from scratch
 // ProductionRuleComponent that attaches to the MetatileEnvironment
@@ -23,27 +17,6 @@ using UnityEngine.UIElements;
 // ProductionRuleObject overrides EnvironmentComponent OnCollision, the parameter will be the other object collided with.
 // If you're a productionRuleObject, do you match my identifier? If so, then if we have a production rule for our collision, then do X.
 
-public enum ACTION
-{
-    SWAP,
-    SPAWN,
-    REMOVE,
-    REWARD,
-    PRINT
-}
-
-public enum CONDITION
-{
-    NEAR,
-    CONTACT,
-    USE,
-    DROP,
-    PICKUP,
-    THROW,
-    HOLD,
-    SEE,
-    NONE
-}
 
 
 
@@ -64,6 +37,31 @@ public enum CONDITION
 
 public class ProductionRuleManager : EnvironmentComponent
 {
+    //Requires a new class that extends ProductionRuleAction. Name should be SWAP -> SwapAction, SPAWN -> SpawnAction, etc
+    public enum ACTION
+    {
+        SWAP,
+        SPAWN,
+        REMOVE,
+        REWARD,
+        PRINT,
+        NONE
+    }
+
+    //Requires a new class that extends ProductionRuleCondition. Name should be NEAR -> NearCondition, CONTACT -> ContactCondition, etc
+    public enum CONDITION
+    {
+        NEAR,
+        CONTACT,
+        DROP,
+        PICKUP,
+        THROW,
+        HOLD,
+        UNUSED,
+        USE,
+        SEE,
+        NONE
+    }
 
     public string saveFile = "";
     public string loadFile = "";
@@ -126,17 +124,30 @@ public class ProductionRuleManager : EnvironmentComponent
         }
         else
         {
+            float startTime = Time.realtimeSinceStartup;
             // New ProductionRuleGraph
             initialState = productionRuleGraph.GetRandomInitialState();
 
             productionRules = productionRuleGraph.BuildProductionRuleSet(initialState);
+
+            float generationTime = Time.realtimeSinceStartup - startTime;
+
+            if (saveFile != "")
+            {
+                productionRuleGraph.SavePayloads(saveFile, productionRules, initialState);
+
+                EnvironmentManager.Instance.SendEventToPython($"save_complete:{generationTime}");
+            }
         }
 
         SpawnManager spawnManager = GetEngine().GetCachedEnvironmentComponent<SpawnManager>();
 
-        foreach (ProductionRuleIdentifier ruleIdentifier in initialState)
+        if (spawnManager)
         {
-            spawnManager.AddProductionRuleObjectToSpawn(ruleIdentifier);
+            foreach (ProductionRuleIdentifier ruleIdentifier in initialState)
+            {
+                spawnManager.AddProductionRuleObjectToSpawn(ruleIdentifier);
+            }
         }
     }
 
@@ -144,6 +155,8 @@ public class ProductionRuleManager : EnvironmentComponent
     {
         if (jsonParameters)
         {
+            jsonParameters.GetField(out loadFile, "rule_load_file", loadFile);
+            jsonParameters.GetField(out saveFile, "rule_save_file", saveFile);
             jsonParameters.GetField(out NEAR_DISTANCE, "prod_rule_near_distance", NEAR_DISTANCE);
         }
 
@@ -183,6 +196,11 @@ public class ProductionRuleManager : EnvironmentComponent
         {
             ProductionRuleObject productionRuleObject = allProdRuleObjects[0];
             productionRuleObject.Remove();
+        }
+
+        for (int i = 0; i < productionRules.Count; i++)
+        {
+            productionRules[i].OnTrialOver();
         }
     }
 
@@ -253,7 +271,7 @@ public class ProductionRuleManager : EnvironmentComponent
         return NEAR_DISTANCE;
     }
 
-    public void CheckCallback(CONDITION condition, ProductionRuleObject sub, ProductionRuleObject obj, EnvironmentEngine env)
+    public void CheckCallback(ProductionRuleManager.CONDITION condition, ProductionRuleObject sub, ProductionRuleObject obj, EnvironmentEngine env)
     {
         foreach (ProductionRule rule in productionRules)
         {
@@ -280,7 +298,6 @@ public class ProductionRuleManager : EnvironmentComponent
                     if (subject != obj && rule.CheckRule(subject, obj, env))
                     {
                         rule.ExecuteRule(subject, obj, env);
-
                     }
                 }
             }

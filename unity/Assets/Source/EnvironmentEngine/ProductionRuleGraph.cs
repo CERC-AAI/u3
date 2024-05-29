@@ -6,48 +6,88 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
-using System.Reflection;
-using Unity.MLAgents.Sensors;
-using UnityEngine.InputSystem;
-using Unity.Mathematics;
 using static ProductionRuleManager;
-using System.IO.Abstractions;
 
 [Serializable]
 public class ProductionRuleGraph : EnvironmentComponent
 {
 
-    public Dictionary<CONDITION, int> necessaryObjectCountForCondition = new Dictionary<CONDITION, int>()
+    public Dictionary<ProductionRuleManager.CONDITION, int> necessaryObjectCountForCondition = new Dictionary<ProductionRuleManager.CONDITION, int>()
     {
-        {CONDITION.NEAR, 2},
-        {CONDITION.CONTACT, 2},
-        {CONDITION.USE, 1},
-        {CONDITION.DROP, 1},
-        {CONDITION.PICKUP, 1},
-        {CONDITION.THROW, 1},
-        {CONDITION.HOLD, 1},
-        {CONDITION.SEE, 1},
-        {CONDITION.NONE, 0}
+        {ProductionRuleManager.CONDITION.NEAR, 2},
+        {ProductionRuleManager.CONDITION.CONTACT, 2},
+        {ProductionRuleManager.CONDITION.USE, 1},
+        {ProductionRuleManager.CONDITION.DROP, 1},
+        {ProductionRuleManager.CONDITION.PICKUP, 1},
+        {ProductionRuleManager.CONDITION.THROW, 1},
+        {ProductionRuleManager.CONDITION.HOLD, 1},
+        {ProductionRuleManager.CONDITION.SEE, 1},
+        {ProductionRuleManager.CONDITION.NONE, 0}
     };
 
-    public Dictionary<ACTION, int> necessaryObjectCountForAction = new Dictionary<ACTION, int>()
+    public Dictionary<ProductionRuleManager.ACTION, int> necessaryObjectCountForAction = new Dictionary<ProductionRuleManager.ACTION, int>()
     {
-        {ACTION.SPAWN, 0},
-        {ACTION.REMOVE, 2}, // don't want to end up with no objects in the environment
-        {ACTION.SWAP, 1}, // don't want to end up with no objects in the environment
-        {ACTION.REWARD, 0},
-        {ACTION.PRINT, 0}
+        {ProductionRuleManager.ACTION.SPAWN, 0},
+        {ProductionRuleManager.ACTION.REMOVE, 2}, // don't want to end up with no objects in the environment
+        {ProductionRuleManager.ACTION.SWAP, 1},
+        {ProductionRuleManager.ACTION.REWARD, 0},
+        {ProductionRuleManager.ACTION.PRINT, 0}
     };
 
-    public Dictionary<ACTION, List<PredicateObjects>> PermissiblepredicateObjectsForAction = new Dictionary<ACTION, List<PredicateObjects>>()
+    public Dictionary<ProductionRuleManager.ACTION, List<PredicateObjects>> PermissiblepredicateObjectsForAction = new Dictionary<ProductionRuleManager.ACTION, List<PredicateObjects>>()
     {
-        {ACTION.SPAWN, new List<PredicateObjects>(){PredicateObjects.NONE, PredicateObjects.SUBJECT}},
-        // {ACTION.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}}, # TODO: fix double-predicate necessaryObjectCountForAction conflict
-        {ACTION.SWAP, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
-        {ACTION.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT}},
-        {ACTION.REWARD, new List<PredicateObjects>(){PredicateObjects.NONE}},
-        {ACTION.PRINT, new List<PredicateObjects>(){PredicateObjects.NONE}}
+        {ProductionRuleManager.ACTION.SPAWN, new List<PredicateObjects>(){PredicateObjects.NONE}},
+        // {ProductionRuleManager.ACTION.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.BOTH}}, # TODO: fix double-predicate necessaryObjectCountForAction conflict
+        {ProductionRuleManager.ACTION.SWAP, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.OBJECT, PredicateObjects.BOTH}},
+        {ProductionRuleManager.ACTION.REMOVE, new List<PredicateObjects>(){PredicateObjects.SUBJECT, PredicateObjects.OBJECT}},
+        {ProductionRuleManager.ACTION.REWARD, new List<PredicateObjects>(){PredicateObjects.NONE}},
+        {ProductionRuleManager.ACTION.PRINT, new List<PredicateObjects>(){PredicateObjects.NONE}}
     };
+
+    List<ProductionRuleManager.CONDITION> deadEndConditions = new List<ProductionRuleManager.CONDITION> {
+        ProductionRuleManager.CONDITION.NEAR,
+        ProductionRuleManager.CONDITION.CONTACT,
+        ProductionRuleManager.CONDITION.DROP,
+        ProductionRuleManager.CONDITION.PICKUP,
+        ProductionRuleManager.CONDITION.THROW,
+        ProductionRuleManager.CONDITION.HOLD,
+    };
+
+    List<ProductionRuleManager.ACTION> deadEndActions = new List<ProductionRuleManager.ACTION> {
+        ProductionRuleManager.ACTION.REMOVE,
+        ProductionRuleManager.ACTION.SWAP,
+        ProductionRuleManager.ACTION.SPAWN,
+    };
+
+    List<ProductionRuleManager.CONDITION> rewardConditions = new List<ProductionRuleManager.CONDITION> {
+        ProductionRuleManager.CONDITION.NEAR,
+        ProductionRuleManager.CONDITION.CONTACT,
+        ProductionRuleManager.CONDITION.HOLD,
+    };
+
+    List<ProductionRuleManager.ACTION> rewardActions = new List<ProductionRuleManager.ACTION> {
+        ProductionRuleManager.ACTION.REWARD,
+    };
+
+    List<ProductionRuleManager.CONDITION> chainConditions = new List<ProductionRuleManager.CONDITION> {
+        ProductionRuleManager.CONDITION.CONTACT,
+        ProductionRuleManager.CONDITION.NEAR,
+        ProductionRuleManager.CONDITION.CONTACT,
+        ProductionRuleManager.CONDITION.NEAR,
+        ProductionRuleManager.CONDITION.CONTACT,
+        ProductionRuleManager.CONDITION.NEAR,
+        ProductionRuleManager.CONDITION.PICKUP,
+        ProductionRuleManager.CONDITION.THROW,
+        ProductionRuleManager.CONDITION.DROP,
+        ProductionRuleManager.CONDITION.HOLD,
+    };
+
+    List<ProductionRuleManager.ACTION> chainActions = new List<ProductionRuleManager.ACTION> {
+        ProductionRuleManager.ACTION.SWAP,
+        ProductionRuleManager.ACTION.SPAWN,
+    };
+
+
 
     //Node currentNode; // points to the current state of the environment
 
@@ -56,6 +96,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     public int minRules = 1;
     public int maxRules = 6;
     public int minDeadends = 0;
+    public int maxDeadends = 0;
 
 
     /*[Serializable]
@@ -143,42 +184,49 @@ public class ProductionRuleGraph : EnvironmentComponent
             jsonParameters.GetField(out minRules, "min_rules", minRules);
             jsonParameters.GetField(out maxRules, "max_rules", maxRules);
             jsonParameters.GetField(out minDeadends, "min_deadends", minDeadends);
-            // jsonParameters.GetField(out maxDeadends, "max_deadends", maxDeadends);
+            jsonParameters.GetField(out maxDeadends, "max_deadends", maxDeadends);
         }
 
         base.InitParameters(jsonParameters);
     }
 
-    public List<ProductionRuleIdentifier> GetRandomInitialState()
+    public ProductionRuleIdentifier GetRandomIdentifier()
     {
         ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
 
         List<string> shapeKeys = new List<string>();
 
-        foreach (ProductionRulePrefab prefab in productionRuleManager.productionRulePrefabs)
+        foreach (ProductionRuleManager.ProductionRulePrefab prefab in productionRuleManager.productionRulePrefabs)
         {
             shapeKeys.Add(prefab.name);
         }
+
+        List<string> colorKeys = new List<string>(ProductionRuleIdentifier.colorDict.Keys);
+
+        string shape = shapeKeys[GetEngine().GetRandomRange(0, shapeKeys.Count)];
+        string color = colorKeys[GetEngine().GetRandomRange(0, colorKeys.Count)];
+
+        return new ProductionRuleIdentifier(shape, color);
+    }
+
+    public List<ProductionRuleIdentifier> GetRandomInitialState()
+    {
 
         List<ProductionRuleIdentifier> initialState = new List<ProductionRuleIdentifier>();
         int numObjects = GetEngine().GetRandomRange(minInitialObjects, maxInitialObjects + 1);
         numObjects = Mathf.Max(numObjects, 1);
         for (int i = 0; i < numObjects; i++)
         {
-            List<string> colorKeys = new List<string>(ProductionRuleIdentifier.colorDict.Keys);
-            string shape = shapeKeys[GetEngine().GetRandomRange(0, shapeKeys.Count)];
-            string color = colorKeys[GetEngine().GetRandomRange(0, colorKeys.Count)];
-            ProductionRuleIdentifier productionRuleIdentifier = new ProductionRuleIdentifier(shape, color);
-            initialState.Add(productionRuleIdentifier);
+            initialState.Add(GetRandomIdentifier());
         }
+
         return initialState;
     }
 
     public List<ProductionRule> BuildProductionRuleSet(List<ProductionRuleIdentifier> initialState)
     {
         int numRules = GetEngine().GetRandomRange(minRules, maxRules + 1);
-        int maxDeadEnds = maxRules / 2;
-        int numDeadEnds = GetEngine().GetRandomRange(minDeadends, maxDeadEnds + 1);
+        int numDeadEnds = GetEngine().GetRandomRange(minDeadends, maxDeadends + 1);
 
         List<ProductionRule> productionRules = new List<ProductionRule>();
         List<List<ProductionRuleIdentifier>> stateSpace = new List<List<ProductionRuleIdentifier>>();
@@ -243,6 +291,18 @@ public class ProductionRuleGraph : EnvironmentComponent
     }
 
 
+    string SHAPE_TEXT = "s";
+    string COLOR_TEXT = "c";
+    string CONDITION_TEXT = "c";
+    string SUBJECT_TEXT = "s";
+    string OBJECT_TEXT = "o";
+    string ACTION_TEXT = "a";
+    string PREDICATE_OBJECTS_TEXT = "p";
+    string FLOAT_TEXT = "f";
+    string INITIAL_STATE_TEXT = "i";
+    string RULE_SET_TEXT = "r";
+
+
 
     public void SavePayloads(string filename, List<ProductionRule> productionRules, List<ProductionRuleIdentifier> initialState)
     {
@@ -254,9 +314,9 @@ public class ProductionRuleGraph : EnvironmentComponent
         for (int i = 0; i < initialState.Count; i++)
         {
             JSONObject identifierJson = new JSONObject();
-            identifierJson.AddField("shape", initialState[i].ObjectShape);
-            identifierJson.AddField("color", initialState[i].ObjectColor);
-            initialStateJson.AddField($"object{i}", identifierJson);
+            identifierJson.AddField($"{SHAPE_TEXT}", initialState[i].ObjectShape);
+            identifierJson.AddField($"{COLOR_TEXT}", initialState[i].ObjectColor);
+            initialStateJson.Add(identifierJson);
         }
 
         // Serialize Production Rules
@@ -270,10 +330,16 @@ public class ProductionRuleGraph : EnvironmentComponent
             {
                 JSONObject conditionJson = new JSONObject();
                 ProductionRuleCondition condition = productionRule.conditions[j];
-                conditionJson.AddField("condition", condition.condition.ToString());
-                conditionJson.AddField("subjectIdentifier", SerializeIdentifier(condition.subjectIdentifier));
-                conditionJson.AddField("objectIdentifier", SerializeIdentifier(condition.objectIdentifier));
-                productionRuleJson.AddField($"condition{j}", conditionJson);
+                conditionJson.AddField($"{CONDITION_TEXT}", condition.condition.ToString());
+                if (condition.subjectIdentifier != null)
+                {
+                    conditionJson.AddField($"{SUBJECT_TEXT}", SerializeIdentifier(condition.subjectIdentifier));
+                }
+                if (condition.objectIdentifier != null)
+                {
+                    conditionJson.AddField($"{OBJECT_TEXT}", SerializeIdentifier(condition.objectIdentifier));
+                }
+                productionRuleJson.AddField($"{CONDITION_TEXT}{j}", conditionJson);
             }
 
             // Serialize Actions
@@ -281,30 +347,37 @@ public class ProductionRuleGraph : EnvironmentComponent
             {
                 JSONObject actionJson = new JSONObject();
                 ProductionRuleAction action = productionRule.actions[j];
-                actionJson.AddField("action", action.action.ToString());
-                actionJson.AddField("predicateObjects", action.predicateObjects.ToString());
-                actionJson.AddField("identifier", SerializeIdentifier(action.identifier));
-                productionRuleJson.AddField($"action{j}", actionJson);
+                actionJson.AddField($"{ACTION_TEXT}", action.action.ToString());
+                actionJson.AddField($"{PREDICATE_OBJECTS_TEXT}", action.predicateObjects.ToString());
+                if (action.identifier != null)
+                {
+                    actionJson.AddField($"{OBJECT_TEXT}", SerializeIdentifier(action.identifier));
+                }
+                if (action.floatValue != 0)
+                {
+                    actionJson.AddField($"{FLOAT_TEXT}", action.floatValue);
+                }
+                productionRuleJson.AddField($"{ACTION_TEXT}{j}", actionJson);
             }
 
-            productionRulesJson.AddField($"productionRule{i}", productionRuleJson);
+            productionRulesJson.Add(productionRuleJson);
         }
 
         // Combine both JSON objects into a single object
         JSONObject combinedJson = new JSONObject();
-        combinedJson.AddField("initialState", initialStateJson);
-        combinedJson.AddField("productionRules", productionRulesJson);
+        combinedJson.AddField($"{INITIAL_STATE_TEXT}", initialStateJson);
+        combinedJson.AddField($"{RULE_SET_TEXT}", productionRulesJson);
 
         // Save JSON to file
         System.IO.File.WriteAllText(filename, combinedJson.ToString());
     }
 
-    private string SerializeIdentifier(ProductionRuleIdentifier identifier)
+    private JSONObject SerializeIdentifier(ProductionRuleIdentifier identifier)
     {
         JSONObject identifierJson = new JSONObject();
-        identifierJson.AddField("shape", identifier.ObjectShape);
-        identifierJson.AddField("color", identifier.ObjectColor);
-        return identifierJson.ToString();
+        identifierJson.AddField($"{SHAPE_TEXT}", identifier.ObjectShape);
+        identifierJson.AddField($"{COLOR_TEXT}", identifier.ObjectColor);
+        return identifierJson;
     }
 
 
@@ -319,51 +392,48 @@ public class ProductionRuleGraph : EnvironmentComponent
         List<ProductionRule> productionRules = new List<ProductionRule>();
 
         // Deserialize Initial State
-        JSONObject initialStateJson = jsonObject.GetField("initialState");
-        foreach (string key in initialStateJson.keys)
+        JSONObject initialStateJson = jsonObject.GetField($"{INITIAL_STATE_TEXT}");
+        foreach (JSONObject identifierJson in initialStateJson.list)
         {
-            JSONObject identifierJson = initialStateJson.GetField(key);
             ProductionRuleIdentifier identifier = new ProductionRuleIdentifier(
-                identifierJson.GetField("shape").str,
-                identifierJson.HasField("color") ? identifierJson.GetField("color").str : null
+                identifierJson.GetField($"{SHAPE_TEXT}").str,
+                identifierJson.HasField($"{COLOR_TEXT}") ? identifierJson.GetField($"{COLOR_TEXT}").str : null
             );
             initialState.Add(identifier);
         }
 
         // Deserialize Production Rules
-        JSONObject productionRulesJson = jsonObject.GetField("productionRules");
-        foreach (string key in productionRulesJson.keys)
+        JSONObject productionRulesJson = jsonObject.GetField($"{RULE_SET_TEXT}");
+        foreach (JSONObject productionRuleJson in productionRulesJson.list)
         {
-            JSONObject productionRuleJson = productionRulesJson.GetField(key);
-
             List<ProductionRuleCondition> conditions = new List<ProductionRuleCondition>();
             List<ProductionRuleAction> actions = new List<ProductionRuleAction>();
 
             // Deserialize Conditions
-            foreach (string conditionKey in productionRuleJson.keys)
+            foreach (string ruleKey in productionRuleJson.keys)
             {
-                if (conditionKey.StartsWith("condition"))
+                if (ruleKey.StartsWith($"{CONDITION_TEXT}"))
                 {
-                    JSONObject conditionJson = productionRuleJson.GetField(conditionKey);
-                    CONDITION condition = Enum.Parse<CONDITION>(conditionJson.GetField("condition").str);
-                    ProductionRuleIdentifier subjectIdentifier = DeserializeIdentifier(conditionJson.GetField("subjectIdentifier").str);
-                    ProductionRuleIdentifier objectIdentifier = conditionJson.HasField("objectIdentifier") ? DeserializeIdentifier(conditionJson.GetField("objectIdentifier").str) : null;
+                    JSONObject conditionJson = productionRuleJson.GetField(ruleKey);
+                    ProductionRuleManager.CONDITION condition = Enum.Parse<ProductionRuleManager.CONDITION>(conditionJson.GetField($"{CONDITION_TEXT}").str);
+                    ProductionRuleIdentifier subjectIdentifier = DeserializeIdentifier(conditionJson.GetField($"{SUBJECT_TEXT}"));
+                    ProductionRuleIdentifier objectIdentifier = conditionJson.HasField($"{OBJECT_TEXT}") ? DeserializeIdentifier(conditionJson.GetField($"{OBJECT_TEXT}")) : null;
                     ProductionRuleCondition conditionObj = new ProductionRuleCondition(condition, subjectIdentifier, objectIdentifier);
                     conditions.Add(conditionObj);
                 }
-            }
+            /*}
 
             // Deserialize Actions
             foreach (string actionKey in productionRuleJson.keys)
-            {
-                if (actionKey.StartsWith("action"))
+            {*/
+                if (ruleKey.StartsWith($"{ACTION_TEXT}"))
                 {
-                    JSONObject actionJson = productionRuleJson.GetField(actionKey);
-                    ACTION action = (ACTION)Enum.Parse(typeof(ACTION), actionJson.GetField("action").str);
-                    float reward = action == ACTION.REWARD ? actionJson.GetField("reward").f : 0.0f;
-                    PredicateObjects predicateObjects = (PredicateObjects)Enum.Parse(typeof(PredicateObjects), actionJson.GetField("predicateObjects").str);
-                    ProductionRuleIdentifier identifier = DeserializeIdentifier(actionJson.GetField("identifier").str);
-                    ProductionRuleAction actionObj = new ProductionRuleAction(action, reward, predicateObjects, identifier);
+                    JSONObject actionJson = productionRuleJson.GetField(ruleKey);
+                    ProductionRuleManager.ACTION action = (ProductionRuleManager.ACTION)Enum.Parse(typeof(ProductionRuleManager.ACTION), actionJson.GetField($"{ACTION_TEXT}").str);
+                    PredicateObjects predicateObjects = (PredicateObjects)Enum.Parse(typeof(PredicateObjects), actionJson.GetField($"{PREDICATE_OBJECTS_TEXT}").str);
+                    ProductionRuleIdentifier identifier = actionJson.HasField($"{OBJECT_TEXT}") ? DeserializeIdentifier(actionJson.GetField($"{OBJECT_TEXT}")) : null;
+                    float floatValue = actionJson.HasField($"{FLOAT_TEXT}") ? actionJson.GetField($"{FLOAT_TEXT}").f : 0.0f;
+                    ProductionRuleAction actionObj = ProductionRuleAction.GetProductionRuleAction(action, predicateObjects, floatValue, identifier);
                     actions.Add(actionObj);
                 }
             }
@@ -375,11 +445,10 @@ public class ProductionRuleGraph : EnvironmentComponent
         return new Tuple<List<ProductionRule>, List<ProductionRuleIdentifier>>(productionRules, initialState);
     }
 
-    private ProductionRuleIdentifier DeserializeIdentifier(string json)
+    private ProductionRuleIdentifier DeserializeIdentifier(JSONObject identifierJson)
     {
-        JSONObject identifierJson = new JSONObject(json);
-        string shape = identifierJson.GetField("shape").str;
-        string color = identifierJson.HasField("color") ? identifierJson.GetField("color").str : null;
+        string shape = identifierJson.GetField($"{SHAPE_TEXT}").str;
+        string color = identifierJson.HasField($"{COLOR_TEXT}") ? identifierJson.GetField($"{COLOR_TEXT}").str : null;
         return new ProductionRuleIdentifier(shape, color);
     }
 
@@ -448,7 +517,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     public ProductionRule SampleForwardRule(List<ProductionRuleIdentifier> currentState, bool actionIsReward = false, bool actionNotReward = false)
     {
         List<ProductionRuleCondition> conditions = new List<ProductionRuleCondition>();
-        ProductionRuleCondition productionRuleCondition = sampleForwardProductionRuleCondition(currentState);
+        ProductionRuleCondition productionRuleCondition = sampleForwardProductionRuleCondition(currentState, actionIsReward, actionNotReward);
         conditions.Add(productionRuleCondition);
 
         List<ProductionRuleAction> actions = new List<ProductionRuleAction>();
@@ -460,24 +529,27 @@ public class ProductionRuleGraph : EnvironmentComponent
         return productionRule;
     }
 
-    public ProductionRuleCondition sampleForwardProductionRuleCondition(List<ProductionRuleIdentifier> currentState)
+    public ProductionRuleCondition sampleForwardProductionRuleCondition(List<ProductionRuleIdentifier> currentState, bool isReward = false, bool notReward = false)
     {
-        CONDITION condition = (CONDITION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
-        int neededObjectCount = necessaryObjectCountForCondition[condition];
+        ProductionRuleManager.CONDITION condition = ProductionRuleManager.CONDITION.NONE;
+        int neededObjectCount = 0;
 
-        while (condition == CONDITION.NONE || neededObjectCount > currentState.Count)
+        do
         {
-            if (condition == CONDITION.NONE)
+            if (isReward) // End of chain
             {
-                Debug.Log("Sampled NONE condition, sampling again.");
+                condition = rewardConditions[GetEngine().GetRandomRange(0, rewardConditions.Count)];
             }
-            else
+            else if (notReward) // Dead ends
             {
-                Debug.Log($"Not enough objects for condition {condition}, sampling again.");
+                condition = deadEndConditions[GetEngine().GetRandomRange(0, deadEndConditions.Count)];
             }
-            condition = (CONDITION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(CONDITION)).Length - 1);
+            else // Middle of chains
+            {
+                condition = chainConditions[GetEngine().GetRandomRange(0, chainConditions.Count)];
+            }
             neededObjectCount = necessaryObjectCountForCondition[condition];
-        }
+        } while (neededObjectCount > currentState.Count);
 
         ProductionRuleIdentifier subjectIdentifier = null;
         ProductionRuleIdentifier objectIdentifier = null;
@@ -509,37 +581,43 @@ public class ProductionRuleGraph : EnvironmentComponent
     }
     public ProductionRuleAction SampleForwardProductionRuleAction(List<ProductionRuleIdentifier> currentState, bool isReward = false, bool notReward = false)
     {
-        ACTION action = (ACTION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(ACTION)).Length);
+        ProductionRuleManager.ACTION action = ProductionRuleManager.ACTION.NONE;
         if (isReward && notReward)
         {
             throw new ArgumentException("isReward and notReward cannot both be true");
         }
-        if (isReward)
+
+        do
         {
-            action = ACTION.REWARD;
-        }
-        else if (notReward)
-        {
-            action = (ACTION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(ACTION)).Length);
-            while (action == ACTION.REWARD)
+            if (isReward) // End of chain
             {
-                action = (ACTION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(ACTION)).Length);
+                action = rewardActions[GetEngine().GetRandomRange(0, rewardActions.Count)];
+            }
+            else if (notReward) // Dead ends
+            {
+                action = deadEndActions[GetEngine().GetRandomRange(0, deadEndActions.Count)];
+            }
+            else // Middle of chains
+            {
+                action = chainActions[GetEngine().GetRandomRange(0, chainActions.Count)];
             }
         }
+        while (necessaryObjectCountForAction[action] > currentState.Count);
 
-        while (currentState.Count - necessaryObjectCountForAction[action] < 0)
-        {
-            Debug.Log($"Not enough objects for action {action}, sampling again.");
-            action = (ACTION)GetEngine().GetRandomRange(0, Enum.GetValues(typeof(ACTION)).Length);
-        }
-
-        float reward = GetEngine().GetRandomRange(0.0f, 1.0f);
+        float floatValue = 1.0f;// TODO: Figure out float values GetEngine().GetRandomRange(0.0f, 1.0f);
 
         List<PredicateObjects> permissiblePredicateObjects = PermissiblepredicateObjectsForAction[action];
         PredicateObjects predicateObjects = permissiblePredicateObjects[GetEngine().GetRandomRange(0, permissiblePredicateObjects.Count)];
         ProductionRuleIdentifier identifier = currentState[GetEngine().GetRandomRange(0, currentState.Count)];
+        switch (action)
+        {
+            case ProductionRuleManager.ACTION.SWAP:
+            case ProductionRuleManager.ACTION.SPAWN:
+                identifier = GetRandomIdentifier();
+                break;
+        }
 
-        ProductionRuleAction productionRuleAction = new ProductionRuleAction(action, reward, predicateObjects, identifier);
+        ProductionRuleAction productionRuleAction = ProductionRuleAction.GetProductionRuleAction(action, predicateObjects, floatValue, identifier);
 
         return productionRuleAction;
     }
@@ -547,7 +625,7 @@ public class ProductionRuleGraph : EnvironmentComponent
     public List<ProductionRuleIdentifier> GetNextState(List<ProductionRuleIdentifier> currentState, ProductionRule forwardProductionRule)
     {
         // TODO: move to ProductionRuleAction
-        ACTION action = forwardProductionRule.actions[0].action;
+        ProductionRuleManager.ACTION action = forwardProductionRule.actions[0].action;
         ProductionRuleIdentifier actionTargetIdentifier = null;
         if (forwardProductionRule.actions[0].predicateObjects == PredicateObjects.SUBJECT)
         {
@@ -576,24 +654,36 @@ public class ProductionRuleGraph : EnvironmentComponent
         {
             nextState.Add(identifier);
         }
-        if (action == ACTION.SPAWN)
+
+        if (action == ProductionRuleManager.ACTION.SPAWN)
         {
-            nextState.Add(actionTargetIdentifier);
-        }
-        else if (action == ACTION.REMOVE)
-        {
-            nextState.Remove(actionTargetIdentifier);
-        }
-        else if (action == ACTION.SWAP)
-        {
-            nextState.Remove(forwardProductionRule.conditions[0].subjectIdentifier);
             nextState.Add(forwardProductionRule.actions[0].identifier);
         }
-        else if (action == ACTION.REWARD)
+        else if (action == ProductionRuleManager.ACTION.REMOVE)
+        {
+            nextState.Remove(actionTargetIdentifier);
+            if (forwardProductionRule.actions[0].predicateObjects == PredicateObjects.BOTH)
+            {
+                nextState.Remove(forwardProductionRule.conditions[0].objectIdentifier);
+            }
+        }
+        else if (action == ProductionRuleManager.ACTION.SWAP)
+        {
+            if (forwardProductionRule.actions[0].predicateObjects != PredicateObjects.NONE)
+            {
+                nextState.Remove(actionTargetIdentifier);
+                if (forwardProductionRule.actions[0].predicateObjects == PredicateObjects.BOTH)
+                {
+                    nextState.Remove(forwardProductionRule.conditions[0].objectIdentifier);
+                }
+            }
+            nextState.Add(forwardProductionRule.actions[0].identifier);
+        }
+        else if (action == ProductionRuleManager.ACTION.REWARD)
         {
             // do nothing
         }
-        else if (action == ACTION.PRINT)
+        else if (action == ProductionRuleManager.ACTION.PRINT)
         {
             // do nothing
         }
@@ -604,9 +694,9 @@ public class ProductionRuleGraph : EnvironmentComponent
         return nextState;
     }
 
-    public List<ProductionRuleIdentifier> GetPreviousState(List<ProductionRuleIdentifier> currentState, ProductionRule backwardProductionRule)
+    /*public List<ProductionRuleIdentifier> GetPreviousState(List<ProductionRuleIdentifier> currentState, ProductionRule backwardProductionRule)
     {
-        ACTION action = backwardProductionRule.actions[0].action;
+        ProductionRuleManager.ACTION action = backwardProductionRule.actions[0].action;
         ProductionRuleIdentifier actionTargetIdentifier = null;
         if (backwardProductionRule.actions[0].predicateObjects == PredicateObjects.SUBJECT)
         {
@@ -635,11 +725,11 @@ public class ProductionRuleGraph : EnvironmentComponent
         {
             previousState.Add(identifier);
         }
-        if (action == ACTION.SPAWN)
+        if (action == ProductionRuleManager.ACTION.SPAWN)
         {
             previousState.Remove(actionTargetIdentifier);
         }
-        else if (action == ACTION.REMOVE)
+        else if (action == ProductionRuleManager.ACTION.REMOVE)
         {
             previousState.Add(actionTargetIdentifier);
         }
@@ -648,6 +738,6 @@ public class ProductionRuleGraph : EnvironmentComponent
             throw new ArgumentException("ACTION not recognized");
         }
         return previousState;
-    }
+    }*/
 
 }
