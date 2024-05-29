@@ -14,10 +14,10 @@ import u3_env
 
 parser = argparse.ArgumentParser(description='Build a dataset of worlds for the XLand env. Specific a dataset to append to with "--dataset <difficulty>_<height>"')
 parser.add_argument('--worker_id', type=int, help='Worker identifier. Use this to have multiple runs on the same machine', default='0')
-#parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_low')
-#parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='linux')
-parser.add_argument('--dataset', type=str, help='Name of dataset', default='long_many')
-parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='windows')
+parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_low')
+parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='linux')
+#parser.add_argument('--dataset', type=str, help='Name of dataset', default='long_many')
+#parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='windows')
 args = parser.parse_args()
 
 dataset_name = args.dataset
