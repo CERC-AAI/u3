@@ -1,6 +1,8 @@
 import numpy as np
 import time
 import gymnasium as gym
+import python
+
 
 def time_f(n_envs):
     env = gym.vector.AsyncVectorEnv([

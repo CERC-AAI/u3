@@ -63,11 +63,16 @@ class U3GymEnv(gym.Env):
         self._env = UnityToGymWrapper(unity_env, uint8_visual=False)
     
     def reset(self, seed=None, options=None): 
-        json_data = json.dumps({
+        json_data = {
             "env": "xland",
             "msg": "reset"
-        })
-        self.side_channel.send_string(json_data)        
+        }
+        if options is not None and "parameters" in options:
+            json_data["data"] = options["parameters"]
+        json_data = json.dumps(json_data)
+        self.side_channel.send_string(json_data)
+        if seed is not None:
+            self.side_channel.send_string("seed{}".format(seed))       
         return self._env.reset()
 
     def step(self, action):
