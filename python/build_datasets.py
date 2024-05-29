@@ -14,8 +14,10 @@ import u3_env
 
 parser = argparse.ArgumentParser(description='Build a dataset of worlds for the XLand env. Specific a dataset to append to with "--dataset <difficulty>_<height>"')
 parser.add_argument('--worker_id', type=int, help='Worker identifier. Use this to have multiple runs on the same machine', default='0')
-parser.add_argument('--dataset', type=str, help='Name of dataset', default='easy_low')
-parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='linux')
+parser.add_argument('--dataset', type=str, help='Name of dataset', default='hard_high')
+parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='windows')
+parser.add_argument('--start_index', type=int, help='Which index to start from?', default=500000)
+parser.add_argument('--end_index', type=int, help='Which index to end at?', default=1000000)
 #parser.add_argument('--dataset', type=str, help='Name of dataset', default='long_many')
 #parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='windows')
 args = parser.parse_args()
@@ -23,6 +25,8 @@ args = parser.parse_args()
 dataset_name = args.dataset
 worker_id = args.worker_id
 build_type = args.build_type
+start_index = args.start_index
+end_index = args.end_index
 
 env_width = 1
 env_width_var = 0
@@ -120,7 +124,6 @@ else:
 
 dataset_folder = f"{dataset_type}s/{dataset_name}/"
 min_connectivity = 0.5
-total_count = 1000000
 
 
 # Note that XLand has 12 frames a second
@@ -141,9 +144,6 @@ save_folder = f"{root_folder}{dataset_name}/"
 
 os.makedirs(save_folder, exist_ok=True)
 
-def count_files_in_directory(directory):
-    return len([name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
-
 def get_missing_files(directory):
     # Get a list of all files in the directory
     files = os.listdir(directory)
@@ -154,15 +154,8 @@ def get_missing_files(directory):
     # Extract the numeric part from the filenames
     file_numbers = [int(f.split('.')[0]) for f in json_files]
     
-    # Determine the maximum file number
-    if not file_numbers:
-        print("No JSON files found in the directory.")
-        return []
-    
-    max_file_number = max(file_numbers)
-    
     # Create a set of all expected file numbers
-    expected_files = set(range(max_file_number + 1))
+    expected_files = set(range(start_index, end_index + 1))
     
     # Create a set of actual file numbers
     actual_files = set(file_numbers)
@@ -177,16 +170,23 @@ def get_missing_files(directory):
 
 missing_files = get_missing_files(save_folder)
 
+total_count = len(missing_files)
 
-pbar = tqdm(total=total_count)
+pbar = tqdm(total=end_index)
 
-file_index = count_files_in_directory(save_folder) - len(missing_files)
-pbar.n = file_index
-pbar.last_print_n = file_index  # This ensures the average iteration speed calculation starts correctly
+file_index = end_index
+pbar.n = start_index
+pbar.last_print_n = start_index  # This ensures the average iteration speed calculation starts correctly
 pbar.refresh()  # Refresh the progress bar to show the initial value
+use_index = 0
 for t in range(total_count * 2):
+    if len(missing_files) > 0:
+        use_index = missing_files[0]
+    else:
+        break
+
     if dataset_type == "world":
-        save_paramers = {"world_save_file" : f"{save_folder}{file_index}.json"}
+        save_paramers = {"world_save_file" : f"{save_folder}{use_index}.json"}
 
         if env_width_var > 0:
             while True:
@@ -210,7 +210,7 @@ for t in range(total_count * 2):
             save_paramers["env_height"] = next_height.astype(int).item()
 
     elif dataset_type == "rule":
-        save_paramers = {"rule_save_file" : f"{save_folder}{file_index}.json"}
+        save_paramers = {"rule_save_file" : f"{save_folder}{use_index}.json"}
 
         if rule_start_objs_var > 0:
             while True:
@@ -247,8 +247,9 @@ for t in range(total_count * 2):
         if (last_message.startswith("save_complete")):
             file_index += 1
             pbar.update(1)
+            del missing_files[0]
             
-    if file_index > total_count:
+    if len(missing_files) == 0:
         break
 
 
