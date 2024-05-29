@@ -144,9 +144,43 @@ os.makedirs(save_folder, exist_ok=True)
 def count_files_in_directory(directory):
     return len([name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
 
+def get_missing_files(directory):
+    # Get a list of all files in the directory
+    files = os.listdir(directory)
+    
+    # Filter the list to include only .json files
+    json_files = [f for f in files if f.endswith('.json')]
+    
+    # Extract the numeric part from the filenames
+    file_numbers = [int(f.split('.')[0]) for f in json_files]
+    
+    # Determine the maximum file number
+    if not file_numbers:
+        print("No JSON files found in the directory.")
+        return []
+    
+    max_file_number = max(file_numbers)
+    
+    # Create a set of all expected file numbers
+    expected_files = set(range(max_file_number + 1))
+    
+    # Create a set of actual file numbers
+    actual_files = set(file_numbers)
+    
+    # Find the missing files by subtracting the sets
+    missing_files = expected_files - actual_files
+    
+    # Return the sorted list of missing file names
+    missing_file_names = sorted([num for num in missing_files])
+    
+    return missing_file_names
+
+missing_files = get_missing_files(save_folder)
+
+
 pbar = tqdm(total=total_count)
 
-file_index = count_files_in_directory(save_folder)
+file_index = count_files_in_directory(save_folder) - len(missing_files)
 pbar.n = file_index
 pbar.last_print_n = file_index  # This ensures the average iteration speed calculation starts correctly
 pbar.refresh()  # Refresh the progress bar to show the initial value
@@ -201,7 +235,6 @@ for t in range(total_count * 2):
                     break
             save_paramers["min_deadends"] = next_deadends.astype(int).item()
             save_paramers["max_deadends"] = next_deadends.astype(int).item()
-            
 
     
     start_time = time.time()
