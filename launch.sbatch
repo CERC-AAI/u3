@@ -5,4 +5,4 @@
 #SBATCH --time=4:00:00
 
 echo CPUS: $SLURM_CPUS_ON_NODE
-srun xvfb-run python main.py
+srun xvfb-run -a python main.py

@@ -14,7 +14,7 @@ from mlagents_envs.base_env import DecisionSteps, TerminalSteps
 from mlagents_envs import logging_util
 from mlagents_envs.environment import UnityEnvironment
 
-from python.side_channel import U3SideChannel
+from u3gym.side_channel import U3SideChannel
 
 logger = logging_util.get_logger(__name__)
 GymStepResult = Tuple[np.ndarray, float, bool, Dict]
@@ -23,6 +23,7 @@ class U3GymEnv(gym.Env):
 
     def __init__(
         self,
+        file_name='unity/Builds/LinuxTraining/XLand',
         worker_id=0,
         seed=0,
         camera_width=128,
@@ -40,7 +41,7 @@ class U3GymEnv(gym.Env):
 
         self.side_channel = U3SideChannel()
         unity_env = UnityEnvironment(
-            file_name='unity/Builds/LinuxTraining/XLand',
+            file_name=file_name,
             worker_id=worker_id,
             seed=seed + worker_id,
             side_channels=[self.side_channel],
