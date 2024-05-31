@@ -30,7 +30,9 @@ class U3GymEnv(gym.Env):
         camera_height=128,
         trial_count=8,
         trial_seconds=256,
-        frames_per_second=12
+        frames_per_second=12,
+        world_folder='u3-datasets/easy_low',
+        rule_folder='u3-datasets/short_few'
     ):
         super(U3GymEnv, self).__init__()
         self.action_space = spaces.Tuple((
@@ -38,6 +40,8 @@ class U3GymEnv(gym.Env):
             spaces.MultiDiscrete([1, 1, 1, 1])
         ))
         self.observation_space = spaces.Box(-1, 1, shape=(3, camera_height, camera_width))
+        self.world_folder = world_folder
+        self.rule_folder = rule_folder
 
         self.side_channel = U3SideChannel()
         unity_env = UnityEnvironment(
@@ -63,10 +67,14 @@ class U3GymEnv(gym.Env):
 
         self._env = UnityToGymWrapper(unity_env, uint8_visual=False)
     
-    def reset(self, seed=None, options=None): 
+    def reset(self, seed=None, options=None):
+        np.random.seed(seed)
+        world_id, rule_id = np.random.randint(0, 1000001, size=2)
         json_data = {
             "env": "xland",
-            "msg": "reset"
+            "msg": "reset",
+            "world_load_file": f"{self.world_folder}/{world_id}.json",
+            "rule_load_file": f"{self.rule_folder}/{rule_id}.json"
         }
         if options is not None and "parameters" in options:
             json_data["data"] = options["parameters"]
