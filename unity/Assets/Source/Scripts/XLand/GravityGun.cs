@@ -157,10 +157,10 @@ public class GravityGun : EnvironmentComponent
                 {
                     OnGravityGunThrow(tempHeldObject);
                 }
-                if (OnGravityGunDrop != null)
+                /*if (OnGravityGunDrop != null)
                 {
                     OnGravityGunDrop(tempHeldObject);
-                }
+                }*/
                 /*ProductionRuleManager productionRuleManager = GetEngine().GetCachedEnvironmentComponent<ProductionRuleManager>();
                 productionRuleManager.SendMessage("OnGravityGunThrow", tempHeldObject, SendMessageOptions.DontRequireReceiver);
                 productionRuleManager.SendMessage("OnGravityGunDrop", tempHeldObject, SendMessageOptions.DontRequireReceiver);*/

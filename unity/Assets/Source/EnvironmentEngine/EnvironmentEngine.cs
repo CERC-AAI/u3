@@ -85,6 +85,12 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                 GetCachedEnvironmentComponent<TrialManager>().Remove();
                 GetCachedEnvironmentComponent<SpawnManager>().Remove();
             }
+            else if (loadParams.GetField("rule_save_file"))
+            {
+                GetCachedEnvironmentComponent<MetatileManager>().Remove();
+                GetCachedEnvironmentComponent<TrialManager>().Remove();
+                GetCachedEnvironmentComponent<SpawnManager>().Remove();
+            }
         }
 
         /*U3DPlayer player = GetCachedEnvironmentComponent<U3DPlayer>();

@@ -151,6 +151,7 @@
     <Compile Include="Assets\ML-Agents\Examples\SharedAssets\Scripts\AdjustTrainingTimescale.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\9- Custom collision filtering\Scripts\MyPlayer.cs" />
     <Compile Include="Assets\Source\Scripts\LineGame\NoInput.cs" />
+    <Compile Include="Assets\Source\Scripts\XLand\ProductionRuleActions\RemoveAction.cs" />
     <Compile Include="Assets\KinematicCharacterController\Walkthrough\5- Adding velocities and impulses\Scripts\MyCharacterController.cs" />
     <Compile Include="Assets\Source\EnvironmentEngine\SensorInfo.cs" />
     <Compile Include="Assets\StarterAssets\TutorialInfo\Scripts\Readme.cs" />

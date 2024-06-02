@@ -10,18 +10,18 @@ using UnityEngine.InputSystem;
 public class ProductionRuleCondition
 {
 
-    public CONDITION condition;
+    public ProductionRuleManager.CONDITION condition;
     public ProductionRuleIdentifier subjectIdentifier;
     public ProductionRuleIdentifier objectIdentifier;
 
-    public ProductionRuleCondition(CONDITION condition, ProductionRuleIdentifier subjectIdentifier, ProductionRuleIdentifier objectIdentifier = null)
+    public ProductionRuleCondition(ProductionRuleManager.CONDITION condition, ProductionRuleIdentifier subjectIdentifier, ProductionRuleIdentifier objectIdentifier = null)
     {
         this.condition = condition;
         this.subjectIdentifier = subjectIdentifier;
         this.objectIdentifier = objectIdentifier;
     }
 
-    public bool IsSatisfied(CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
+    public bool IsSatisfied(ProductionRuleManager.CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
         if (CheckObject(subject, obj) && CheckCondition(callbackCondition, subject, obj))
         {
@@ -37,18 +37,18 @@ public class ProductionRuleCondition
 
         switch (condition)
         {
-            case CONDITION.NEAR:
-            case CONDITION.CONTACT:
+            case ProductionRuleManager.CONDITION.NEAR:
+            case ProductionRuleManager.CONDITION.CONTACT:
                 subjectIsPermissible = subject != null && subjectIdentifier.CompareTo(subject.identifier);
                 objectIsPermissible = obj != null && objectIdentifier.CompareTo(obj.identifier);
                 break;
 
-            case CONDITION.HOLD:
-            case CONDITION.DROP:
-            case CONDITION.PICKUP:
-            case CONDITION.SEE:
-            case CONDITION.USE:
-            case CONDITION.THROW:
+            case ProductionRuleManager.CONDITION.HOLD:
+            case ProductionRuleManager.CONDITION.DROP:
+            case ProductionRuleManager.CONDITION.PICKUP:
+            case ProductionRuleManager.CONDITION.SEE:
+            case ProductionRuleManager.CONDITION.USE:
+            case ProductionRuleManager.CONDITION.THROW:
                 subjectIsPermissible = subject != null && subjectIdentifier.CompareTo(subject.identifier);
                 break;
 
@@ -61,7 +61,7 @@ public class ProductionRuleCondition
 
     }
 
-    private bool CheckCondition(CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj)
+    private bool CheckCondition(ProductionRuleManager.CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj)
     {
         // Access the state of the environment and check if the condition is satisfied
         // For example, if the condition is "near", check if the subject and object are near each other by checking their positions
@@ -69,19 +69,19 @@ public class ProductionRuleCondition
 
         switch (condition)
         {
-            case CONDITION.NEAR:
+            case ProductionRuleManager.CONDITION.NEAR:
                 return CheckNear(subject, obj);
 
-            case CONDITION.HOLD:
+            case ProductionRuleManager.CONDITION.HOLD:
                 return CheckHold(subject);
 
-            case CONDITION.SEE:
+            case ProductionRuleManager.CONDITION.SEE:
                 return CheckSee(subject);
 
-            case CONDITION.DROP:
-            case CONDITION.PICKUP:
-            case CONDITION.CONTACT:
-            case CONDITION.THROW:
+            case ProductionRuleManager.CONDITION.DROP:
+            case ProductionRuleManager.CONDITION.PICKUP:
+            case ProductionRuleManager.CONDITION.CONTACT:
+            case ProductionRuleManager.CONDITION.THROW:
                 return condition == callbackCondition;
 
             // case CONDITION.USE:
@@ -155,35 +155,39 @@ public class ProductionRuleCondition
         {
             conditionString += " and ";
         }
-        if (condition == CONDITION.NEAR)
+        if (condition == ProductionRuleManager.CONDITION.NEAR)
         {
             conditionString += $"{subjectIdentifier.Encode()} is near {objectIdentifier.Encode()}";
         }
-        else if (condition == CONDITION.CONTACT)
+        else if (condition == ProductionRuleManager.CONDITION.CONTACT)
         {
             conditionString += $"{subjectIdentifier.Encode()} contacts {objectIdentifier.Encode()}";
         }
-        else if (condition == CONDITION.USE)
+        else if (condition == ProductionRuleManager.CONDITION.USE)
         {
             conditionString += $"{subjectIdentifier.Encode()} is used";
         }
-        else if (condition == CONDITION.DROP)
+        else if (condition == ProductionRuleManager.CONDITION.DROP)
         {
             conditionString += $"{subjectIdentifier.Encode()} is dropped";
         }
-        else if (condition == CONDITION.PICKUP)
+        else if (condition == ProductionRuleManager.CONDITION.PICKUP)
         {
             conditionString += $"{subjectIdentifier.Encode()} is picked up";
         }
-        else if (condition == CONDITION.HOLD)
+        else if (condition == ProductionRuleManager.CONDITION.HOLD)
         {
             conditionString += $"{subjectIdentifier.Encode()} is held";
         }
-        else if (condition == CONDITION.USE)
+        else if (condition == ProductionRuleManager.CONDITION.SEE)
         {
             conditionString += $"{subjectIdentifier.Encode()} is seen";
         }
         return conditionString;
+    }
+
+    virtual public void OnTrialOver()
+    {
     }
 
     //     try
