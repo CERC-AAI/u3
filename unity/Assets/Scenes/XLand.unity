@@ -1749,7 +1749,7 @@ MonoBehaviour:
   voxelSize: 1
   connectivityThreshold: 0.5
   saveFile: 
-  loadFile: 
+  loadFile: E:\git\u3_datasets\easy_low\697659.json
   VISUALIZE_GRAPH: 0
   debugArrow: {fileID: 6767979993923170774, guid: 0a87a0185df628240a362c4f57b4dcbf,
     type: 3}

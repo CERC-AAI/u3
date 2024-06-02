@@ -342,9 +342,6 @@ public class MetatileManager : EnvironmentComponent
         
         metatilepool.palette.Initialize();
 
-        InitializeMetatileList(metatilepool);
-        InitializeEnvironment();
-
         if (loadFile != "")
         {
             float startTime = Time.realtimeSinceStartup;
@@ -357,6 +354,9 @@ public class MetatileManager : EnvironmentComponent
         }
         else
         {
+            InitializeMetatileList(metatilepool);
+            InitializeEnvironment();
+
             while (GenerateEnvironment(metatilepool).MoveNext())
             {
             }
@@ -2160,6 +2160,9 @@ public class MetatileManager : EnvironmentComponent
         mLength = (int)jSONObject["l"].i;
 
         voxelSize = jSONObject["v"].n;
+
+        InitializeMetatileList(metatilepool);
+        InitializeEnvironment();
 
         List<JSONObject> placedTiles = jSONObject["d"].list;
 
