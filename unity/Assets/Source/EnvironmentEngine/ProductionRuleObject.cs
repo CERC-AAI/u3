@@ -5,8 +5,7 @@ using UnityEngine;
 using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
-using static UnityEngine.Rendering.ProbeTouchupVolume;
-using System.Drawing;
+using UnityEngine.UIElements;
 
 public class ProductionRuleObject : EnvironmentComponent
 {
@@ -17,6 +16,9 @@ public class ProductionRuleObject : EnvironmentComponent
     GameObject mCurrentDisplayObject;
 
     ProductionRuleManager mManager;
+
+    static Dictionary<Color, MaterialPropertyBlock> mMaterials = new Dictionary<Color, MaterialPropertyBlock>();
+
 
     // public ProductionRuleObject(ProductionRuleIdentifier identifier)
     // {
@@ -58,7 +60,19 @@ public class ProductionRuleObject : EnvironmentComponent
         mCurrentDisplayObject.transform.localPosition = Vector3.zero;
         // Ref the prefab, grab the renderer, set the color
         //Debug.Log("Setting color to: " + ProductionRuleIdentifier.colorDict[color]);
-        mCurrentDisplayObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
+        Renderer renderer = mCurrentDisplayObject.GetComponent<Renderer>();
+        Color colorValue = ProductionRuleIdentifier.colorDict[color];
+        if (!mMaterials.ContainsKey(colorValue))
+        {
+            MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(propertyBlock);
+            propertyBlock.SetColor("_Color", colorValue); // "_Color" is the default property name for the main color
+
+            mMaterials[colorValue] = propertyBlock;
+        }
+
+
+        renderer.SetPropertyBlock(mMaterials[colorValue]);
     }
 
 
@@ -68,6 +82,7 @@ public class ProductionRuleObject : EnvironmentComponent
         base.OnRemoved();
 
     }
+
 
     public override void OnCollision(EnvironmentObject otherObject)
     {

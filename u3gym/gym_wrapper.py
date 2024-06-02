@@ -71,7 +71,7 @@ class U3GymEnv(gym.Env):
         np.random.seed(seed)
         world_id, rule_id = np.random.randint(0, 1000001, size=2)
         json_data = {
-            "env": "xland",
+            "env": 1,
             "msg": "reset",
             "world_load_file": f"{self.world_folder}/{world_id}.json",
             "rule_load_file": f"{self.rule_folder}/{rule_id}.json"

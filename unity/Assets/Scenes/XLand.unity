@@ -454,8 +454,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trialCounter: 0
-  maxTrials: 6
-  trialResetUpdateFrequency: 20
+  maxTrials: 1
+  trialResetUpdateFrequency: 3
   trialDurationCounter: 0
   trialRealTimeCounter: 0
 --- !u!114 &607219979
@@ -1275,7 +1275,7 @@ MonoBehaviour:
         ObjectShape: 
         ObjectColor: 
       action: 3
-      floatValue: 1
+      floatValue: 0
       debugPrintString: Test debug print string :)
   - conditions:
     - condition: 0

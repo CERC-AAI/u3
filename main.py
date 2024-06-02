@@ -5,28 +5,33 @@ import u3gym
 
 
 def time_f(n_envs):
-    env = gym.vector.AsyncVectorEnv([
-        lambda i=i: gym.make(
+    env = gym.make(
             "U3GymEnv-v0",
-            file_name='unity/Builds/LinuxTraining/XLand',
-            worker_id=i + 2,
+            file_name='unity/Builds/WindowsTraining/unitylearning2',
+            worker_id=0,
             disable_env_checker=True,
             camera_width=64,
             camera_height=64
         )
-        for i in range(n_envs)
-    ])
     obs, _ = env.reset(seed=42)
 
     print(obs.shape)
     print(np.all(obs == 0))
 
+    n_steps = 1000000
+
     t1 = time.time()
-    for _ in range(100):
+    for t in range(n_steps):
         obs, _, done, _, _ = env.step(env.action_space.sample())
+
+        print(f"{t}", end = '\r', flush=True)
+
+        if done:
+            print('reset')
+            env.reset()
     
     t2 = time.time()
-    SPS = n_envs * 100 / (t2 - t1)
+    SPS = n_envs * n_steps / (t2 - t1)
     print(f"FPS with n_envs={n_envs}:", SPS)
     env.close()
     return SPS
