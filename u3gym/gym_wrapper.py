@@ -29,7 +29,7 @@ class U3GymEnv(gym.Env):
         camera_width=128,
         camera_height=128,
         trial_count=8,
-        trial_seconds=256,
+        trial_seconds=40,
         frames_per_second=12,
         world_folder='u3-datasets/easy_low',
         rule_folder='u3-datasets/short_few'
@@ -73,11 +73,12 @@ class U3GymEnv(gym.Env):
         json_data = {
             "env": 1,
             "msg": "reset",
-            "world_load_file": f"{self.world_folder}/{world_id}.json",
-            "rule_load_file": f"{self.rule_folder}/{rule_id}.json"
+            "data": {}
         }
         if options is not None and "parameters" in options:
-            json_data["data"] = options["parameters"]
+            json_data["data"] = options["parameters"]            
+        json_data["data"]["world_load_file"] = f"{self.world_folder}/{world_id}.json"
+        json_data["data"]["rule_load_file"] = f"{self.rule_folder}/{rule_id}.json"
         json_data = json.dumps(json_data)
         self.side_channel.send_string(json_data)
         if seed is not None:

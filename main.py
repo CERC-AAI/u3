@@ -7,11 +7,13 @@ import u3gym
 def time_f(n_envs):
     env = gym.make(
             "U3GymEnv-v0",
-            file_name='unity/Builds/WindowsTraining/unitylearning2',
+            file_name=None,#'unity/Builds/WindowsTraining/unitylearning2',
             worker_id=0,
             disable_env_checker=True,
             camera_width=64,
-            camera_height=64
+            camera_height=64,
+            world_folder='../../u3_datasets/easy_low',
+            rule_folder='../../u3_datasets/short_few',
         )
     obs, _ = env.reset(seed=42)
 
