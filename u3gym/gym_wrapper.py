@@ -69,7 +69,7 @@ class U3GymEnv(gym.Env):
     
     def reset(self, seed=None, options=None):
         np.random.seed(seed)
-        world_id, rule_id = np.random.randint(0, 1000001, size=2)
+        world_id, rule_id = np.random.randint(1, 1000001, size=2)
         json_data = {
             "env": 1,
             "msg": "reset",

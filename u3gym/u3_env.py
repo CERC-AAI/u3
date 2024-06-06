@@ -21,7 +21,7 @@ import json
 
 from typing import Dict, Any
 from mlagents_envs.base_env import BaseEnv
-from u3gym.side_channel import U3SideChannel
+from side_channel import U3SideChannel
 from unity_gym_env_pettingzoo_rewrite import UnityToPettingzooWrapper
 
 

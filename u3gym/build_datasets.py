@@ -14,9 +14,9 @@ import u3_env
 
 parser = argparse.ArgumentParser(description='Build a dataset of worlds for the XLand env. Specific a dataset to append to with "--dataset <difficulty>_<height>"')
 parser.add_argument('--worker_id', type=int, help='Worker identifier. Use this to have multiple runs on the same machine', default='0')
-parser.add_argument('--dataset', type=str, help='Name of dataset', default='hard_high')
-parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='windows')
-parser.add_argument('--start_index', type=int, help='Which index to start from?', default=500000)
+parser.add_argument('--dataset', type=str, help='Name of dataset', default='long_many')
+parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='linux')
+parser.add_argument('--start_index', type=int, help='Which index to start from?', default=0)
 parser.add_argument('--end_index', type=int, help='Which index to end at?', default=1000000)
 #parser.add_argument('--dataset', type=str, help='Name of dataset', default='long_many')
 #parser.add_argument('--build_type', type=str, help='Which build are you using? editor, linux, windows', default='windows')
@@ -116,7 +116,7 @@ elif parts[1] == "many":
     if dataset_type != "rule":
         print("Dataset type mismatch. 'easy', 'medium' and 'hard' go with 'low' or 'high'. 'short', 'middle' and 'long' go with 'few' or 'many'")
         sys.exit()
-    rule_distractor = round(rule_chain_length/2)
+    rule_distractor = round(rule_chain_length/2)+1
     rule_distractor_var = rule_chain_length/2
 else:
     print("Dataset name must end with 'low' or 'high' for worlds, 'few' or 'many' for rules")
@@ -139,7 +139,7 @@ elif build_type == "linux":
 elif build_type == "windows":
     env = u3_env.create_environment(file_name=f"{os.path.dirname(os.path.abspath(__file__))}/../unity/Builds/WorldDatasetGeneratorWindows/unitylearning2", worker_id=worker_id, parameters=base_parameters)
 
-root_folder = f"{os.path.dirname(os.path.abspath(__file__))}/../Datasets/"
+root_folder = f"{os.path.dirname(os.path.abspath(__file__))}/../../u3_datasets/"
 save_folder = f"{root_folder}{dataset_name}/"
 
 os.makedirs(save_folder, exist_ok=True)
