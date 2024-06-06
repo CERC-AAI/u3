@@ -35,10 +35,11 @@ class U3GymEnv(gym.Env):
         rule_folder='u3-datasets/short_few'
     ):
         super(U3GymEnv, self).__init__()
-        self.action_space = spaces.Tuple((
-            spaces.Box(-1, 1, shape=(4,)),
-            spaces.MultiDiscrete([1, 1, 1, 1])
-        ))
+        self.action_space = spaces.Discrete(1296)
+        # self.action_space = spaces.Tuple((
+        #     spaces.Box(-1, 1, shape=(4,)),
+        #     spaces.MultiDiscrete([1, 1, 1, 1])
+        # ))
         self.observation_space = spaces.Box(-1, 1, shape=(3, camera_height, camera_width))
         self.world_folder = world_folder
         self.rule_folder = rule_folder
@@ -59,7 +60,7 @@ class U3GymEnv(gym.Env):
             frames_per_second=frames_per_second
         )
         json_data = json.dumps({
-            "env": "xland",
+            "env": 1,
             "msg": "init",
             "data": parameters
         })
@@ -86,6 +87,19 @@ class U3GymEnv(gym.Env):
         return self._env.reset()
 
     def step(self, action):
+        cont_part = action // 16
+        discr_part = action % 16
+
+        cont_action = []
+        for _ in range(4):
+            cont_action.append(cont_part % 3)
+            cont_part //= 3
+        discr_action = []
+        for _ in range(4):
+            discr_action.append(discr_part % 2)
+            discr_part //= 2
+    
+        action = 0.5 * (np.array(cont_action) - 1), np.array(discr_action)
         return self._env.step(action)
 
     def close(self):
@@ -269,7 +283,7 @@ class UnityToGymWrapper(gym.Env):
 
         done = isinstance(info, TerminalSteps)
 
-        return (default_observation, info.reward[0], done, False, {"step": info})
+        return default_observation, info.reward[0], done, False, {"step": info}
 
     def _preprocess_single(self, single_visual_obs: np.ndarray) -> np.ndarray:
         if self.uint8_visual:
