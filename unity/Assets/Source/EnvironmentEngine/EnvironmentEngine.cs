@@ -369,9 +369,10 @@ public class EnvironmentEngine : EnvironmentComponentHolder
                 tempList = new List<EnvironmentObject>(mEnvironmentObjects);
                 for (int i = 0; i < tempList.Count; i++)
                 {
-                    mEnvironmentObjects[i].OnObjectUpdate(deltaTime);
+                    tempList[i].OnObjectUpdate(deltaTime);
                 }
 
+                tempList = new List<EnvironmentObject>(mEnvironmentObjects);
                 for (int i = 0; i < tempList.Count; i++)
                 {
                     if (tempList[i].CheckRemove())
@@ -408,7 +409,7 @@ public class EnvironmentEngine : EnvironmentComponentHolder
         //Debug.Log(JsonUtility.ToJson(this, true));
     }
 
-    void DoRemoveObject(EnvironmentObject removeObject)
+    public void DoRemoveObject(EnvironmentObject removeObject)
     {
         if (removeObject != this)
         {

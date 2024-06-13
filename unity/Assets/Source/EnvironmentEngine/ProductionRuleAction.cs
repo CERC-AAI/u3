@@ -165,6 +165,31 @@ public class ProductionRuleAction
                 Reward(env);
                 break;
 
+            case ProductionRuleManager.ACTION.REWARD_TOGGLE:
+                Debug.Log($"Reward Toggle: {floatValue}");
+                Reward(env);
+
+                ProductionRuleManager manager = env.GetCachedEnvironmentComponent<ProductionRuleManager>();
+                if (manager != null)
+                {
+                    List<ProductionRule> rules = manager.GetAllProdRules();
+                    List<ProductionRule> rewardRules = new List<ProductionRule>();
+                    for (int i = 0; i < rules.Count;  i++)
+                    {
+                        if (rules[i].actions[0] == this)
+                        {
+                            rules[i].ToggleActive(false);
+                        }
+                        else if (rules[i].actions[0].action == ProductionRuleManager.ACTION.REWARD_TOGGLE)
+                        {
+                            rewardRules.Add(rules[i]);
+                        }
+                    }
+                    ShuffleUtility.ShuffleList(rewardRules);
+                    rewardRules[0].ToggleActive(true);
+                }
+                break;
+
             case ProductionRuleManager.ACTION.PRINT:
                 Debug.Log(debugPrintString);
                 break;
@@ -293,6 +318,10 @@ public class ProductionRuleAction
         else if (action == ProductionRuleManager.ACTION.REWARD)
         {
             return $"reward {this.floatValue}";
+        }
+        else if (action == ProductionRuleManager.ACTION.REWARD_TOGGLE)
+        {
+            return $"reward toggle {this.floatValue}";
         }
         else if (action == ProductionRuleManager.ACTION.PRINT)
         {

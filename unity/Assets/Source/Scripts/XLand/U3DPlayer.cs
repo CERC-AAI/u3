@@ -765,4 +765,9 @@ public class U3DPlayer : EnvironmentAgent, ICharacterController
     {
         return new Vector2Int(mOverrideCameraWidth, mOverrideCameraHeight);
     }
+
+    public Vector3 GetPosition()
+    {
+        return Motor.transform.position;
+    }
 }

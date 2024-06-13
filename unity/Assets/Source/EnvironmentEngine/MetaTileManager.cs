@@ -29,6 +29,7 @@ public class MetatileManager : EnvironmentComponent
     public string loadFile = "";
 
     public bool VISUALIZE_GRAPH = false;
+    public bool VISUALIZE_HEIGHT= false;
     public Transform debugArrow;
     public Transform debugNode;
 
@@ -398,6 +399,18 @@ public class MetatileManager : EnvironmentComponent
                         }
                         break;
                         
+                    }
+                }
+
+                if (VISUALIZE_HEIGHT)
+                {
+                    Transform DebugNode = Instantiate<Transform>(debugNode);
+                    debugNode.position = new Vector3(x, heightMap[x, z], z) * voxelSize;
+
+                    Renderer[] renderers = DebugNode.GetComponentsInChildren<Renderer>();
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.material.color = Color.red;
                     }
                 }
                 //Debug.Log($"Height at {x} {z} = {heightMap[x, z]}");

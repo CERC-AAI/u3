@@ -124,7 +124,7 @@ public class EnvironmentComponent : MonoBehaviour
 
     Dictionary<Type, object> mCachedComponents = new Dictionary<Type, object>();
 
-
+    bool mRunStarted = false;
 
     //Dictionary<EnvironmentCallback, EnvironmentCallback> mRegisteredCallbacks = new Dictionary<EnvironmentCallback, EnvironmentCallback>();
 
@@ -208,7 +208,8 @@ public class EnvironmentComponent : MonoBehaviour
         }
         if (mEngine && this is EnvironmentObject)
         {
-            mEngine.RemoveObject((EnvironmentObject)this);
+            //mEngine.RemoveObject((EnvironmentObject)this);
+            mEngine.DoRemoveObject((EnvironmentObject)this);
         }
 
         for (int i = 0; i < mCallbackReferences.Count; i++)
@@ -599,10 +600,12 @@ public class EnvironmentComponent : MonoBehaviour
 
     virtual public void OnRunStarted()
     {
+        mRunStarted = true;
     }
 
     virtual public void OnRunEnded()
     {
+        mRunStarted = false;
     }
 
     virtual public void OnEpisodeStarted()
@@ -629,6 +632,10 @@ public class EnvironmentComponent : MonoBehaviour
 
     virtual public void OnUpdate(float deltaTime)
     {
+        if (!mRunStarted && GetEngine().IsRunning())
+        {
+            OnRunStarted();
+        }
     }
 
     virtual public void OnLateUpdate(float deltaTime)

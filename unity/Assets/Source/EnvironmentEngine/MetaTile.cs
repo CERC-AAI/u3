@@ -283,17 +283,16 @@ public class MetaTile : IMetatileContainer
                     payloads.Add(payloadPart.transform);
                 }
             }
-            else
+
+            while (payloadCopy.childCount > 0)
             {
-                for (int i = 0; i < payloadCopy.childCount; i++)
-                {
-                    Transform child = payloadCopy.GetChild(i);
+                Transform child = payloadCopy.GetChild(0);
 
-                    child.transform.parent = metatileEnvironment.transform;
+                child.transform.parent = metatileEnvironment.transform;
 
-                    payloads.Add(child);
-                }
+                payloads.Add(child);
             }
+
             Destroy(payloadCopy.gameObject);
         }
 

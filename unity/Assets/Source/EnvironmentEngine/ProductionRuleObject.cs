@@ -6,7 +6,6 @@ using System.Reflection;
 using Unity.MLAgents.Sensors;
 using UnityEngine.InputSystem;
 using static UnityEngine.Rendering.ProbeTouchupVolume;
-using System.Drawing;
 
 public class ProductionRuleObject : EnvironmentComponent
 {
@@ -42,7 +41,7 @@ public class ProductionRuleObject : EnvironmentComponent
 
     }
 
-    public void ProductionRuleObjectInitialize(string shape, string color)
+    public void ProductionRuleObjectInitialize(string shape, string color, float alpha = 1.0f)
     {
         identifier = new ProductionRuleIdentifier(shape.ToLower(), color.ToLower());
         if (shape.Trim() == "" || color.Trim() == "")
@@ -58,7 +57,9 @@ public class ProductionRuleObject : EnvironmentComponent
         mCurrentDisplayObject.transform.localPosition = Vector3.zero;
         // Ref the prefab, grab the renderer, set the color
         //Debug.Log("Setting color to: " + ProductionRuleIdentifier.colorDict[color]);
-        mCurrentDisplayObject.GetComponent<Renderer>().material.color = ProductionRuleIdentifier.colorDict[color];
+        Color colorValue = ProductionRuleIdentifier.colorDict[color];
+        colorValue.a = alpha;
+        mCurrentDisplayObject.GetComponent<Renderer>().material.color = colorValue;
     }
 
 

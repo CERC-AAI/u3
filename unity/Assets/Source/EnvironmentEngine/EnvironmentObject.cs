@@ -126,9 +126,9 @@ public class EnvironmentObject : EnvironmentComponentHolder
 
     public override void OnRunStarted()
     {
-        base.OnRunStarted();
-
         ResetDefaultProperties();
+
+        base.OnRunStarted();
     }
 
     public override void ResetDefaultProperties()
