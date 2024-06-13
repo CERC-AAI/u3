@@ -211,13 +211,16 @@ public class ProductionRuleGraph : EnvironmentComponent
 
     public List<ProductionRuleIdentifier> GetRandomInitialState()
     {
-
         List<ProductionRuleIdentifier> initialState = new List<ProductionRuleIdentifier>();
-        int numObjects = GetEngine().GetRandomRange(minInitialObjects, maxInitialObjects + 1);
-        numObjects = Mathf.Max(numObjects, 1);
-        for (int i = 0; i < numObjects; i++)
+
+        if (minInitialObjects > 0 || maxInitialObjects > 0)
         {
-            initialState.Add(GetRandomIdentifier());
+            int numObjects = GetEngine().GetRandomRange(minInitialObjects, maxInitialObjects + 1);
+            numObjects = Mathf.Max(numObjects, 1);
+            for (int i = 0; i < numObjects; i++)
+            {
+                initialState.Add(GetRandomIdentifier());
+            }
         }
 
         return initialState;
@@ -680,6 +683,10 @@ public class ProductionRuleGraph : EnvironmentComponent
             nextState.Add(forwardProductionRule.actions[0].identifier);
         }
         else if (action == ProductionRuleManager.ACTION.REWARD)
+        {
+            // do nothing
+        }
+        else if (action == ProductionRuleManager.ACTION.REWARD_TOGGLE)
         {
             // do nothing
         }

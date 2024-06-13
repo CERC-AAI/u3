@@ -1,0 +1,42 @@
+# Package ######################################################################
+
+[build-system]
+requires = ["setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "u3gym"
+description = "Unity Unified Universe (U3) environments for training Reinfrocement Learning agents."
+readme = "README.md"
+requires-python = ">= 3.8"
+keywords = ["Reinforcement Learning", "RL", "AI", "Unity", "U3"]
+classifiers = [
+    "Development Status :: 4 - Beta",  # change to `5 - Production/Stable` when ready
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    'Intended Audience :: Science/Research',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+]
+dependencies = [
+    "mlagents-envs==1.0.0",
+    "gymnasium",
+    "imageio",
+    "tqdm",
+    "absl-py",
+]
+
+dynamic = ["version"]
+
+[project.urls]
+Repository = "https://github.com/CERC-AAI/u3"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["u3gym", "u3gym.*"]

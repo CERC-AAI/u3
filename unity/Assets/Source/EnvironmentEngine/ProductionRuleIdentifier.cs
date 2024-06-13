@@ -15,7 +15,7 @@ public class ProductionRuleIdentifier
         {"red", new Color(1.0f, 0.0f, 0.0f)},
         {"green", new Color(0.0f, 1.0f, 0.0f)},
         {"blue", new Color(0.0f, 0.0f, 1.0f)},
-        {"purple", new Color(0.0f, 0.0f, 1.0f)},
+        {"purple", new Color(1.0f, 0.0f, 1.0f)},
         {"yellow", new Color(1.0f, 1.0f, 0.0f)},
         {"grey", new Color(0.5f, 0.5f, 0.5f)},
         {"white", new Color(1.0f, 1.0f, 1.0f)},
@@ -67,6 +67,11 @@ public class ProductionRuleIdentifier
 
     public bool CompareTo(ProductionRuleIdentifier other)
     {
+        if (other == null)
+        {
+            return false;
+        }
+
         if (ObjectShape.ToLower().Trim() != other.ObjectShape.ToLower().Trim())
         {
             return false;

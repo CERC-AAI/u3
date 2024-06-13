@@ -45,6 +45,7 @@ public class ProductionRuleManager : EnvironmentComponent
         REMOVE,
         REWARD,
         PRINT,
+        REWARD_TOGGLE,
         NONE
     }
 
@@ -60,6 +61,7 @@ public class ProductionRuleManager : EnvironmentComponent
         UNUSED,
         USE,
         SEE,
+        AGENT_NEAR,
         NONE
     }
 
@@ -361,6 +363,11 @@ public class ProductionRuleManager : EnvironmentComponent
     public List<ProductionRuleObject> GetAllProdRuleObjects()
     {
         return allProdRuleObjects;
+    }
+
+    public List<ProductionRule> GetAllProdRules()
+    {
+        return productionRules;
     }
 }
 

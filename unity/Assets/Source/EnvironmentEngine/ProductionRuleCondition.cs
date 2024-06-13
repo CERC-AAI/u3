@@ -43,6 +43,7 @@ public class ProductionRuleCondition
                 objectIsPermissible = obj != null && objectIdentifier.CompareTo(obj.identifier);
                 break;
 
+            case ProductionRuleManager.CONDITION.AGENT_NEAR:
             case ProductionRuleManager.CONDITION.HOLD:
             case ProductionRuleManager.CONDITION.DROP:
             case ProductionRuleManager.CONDITION.PICKUP:
@@ -71,6 +72,9 @@ public class ProductionRuleCondition
         {
             case ProductionRuleManager.CONDITION.NEAR:
                 return CheckNear(subject, obj);
+
+            case ProductionRuleManager.CONDITION.AGENT_NEAR:
+                return CheckNearAgent(subject);
 
             case ProductionRuleManager.CONDITION.HOLD:
                 return CheckHold(subject);
@@ -110,6 +114,25 @@ public class ProductionRuleCondition
         Vector3 objPosition = obj.transform.position;
         float distance = Vector3.Distance(subjectPosition, objPosition);
         return distance < subject.GetProductionRuleManager().GetNearDistance();
+
+    }
+
+    private bool CheckNearAgent(ProductionRuleObject subject)
+    {
+        if (subject == null)
+        {
+            throw new Exception("CheckNearAgent: Subject is null");
+        }
+        // throw an exception
+        Vector3 subjectPosition = subject.transform.position;
+        U3DPlayer player = subject.GetEngine().GetCachedEnvironmentComponent<U3DPlayer>();
+        if (player == null)
+        {
+            throw new Exception("CheckNearAgent: Agent not found in env");
+        }
+        Vector3 objPosition = player.GetPosition();
+        float distance = Vector3.Distance(subjectPosition, objPosition);
+        return distance < 1;
 
     }
 
@@ -158,6 +181,10 @@ public class ProductionRuleCondition
         if (condition == ProductionRuleManager.CONDITION.NEAR)
         {
             conditionString += $"{subjectIdentifier.Encode()} is near {objectIdentifier.Encode()}";
+        }
+        if (condition == ProductionRuleManager.CONDITION.AGENT_NEAR)
+        {
+            conditionString += $"{subjectIdentifier.Encode()} is near agent";
         }
         else if (condition == ProductionRuleManager.CONDITION.CONTACT)
         {

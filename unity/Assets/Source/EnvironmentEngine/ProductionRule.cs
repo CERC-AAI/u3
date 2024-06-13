@@ -11,7 +11,8 @@ public class ProductionRule
 {
     public List<ProductionRuleCondition> conditions; // may contain multiple CONDITION. These use AND logic.
     public List<ProductionRuleAction> actions;
-
+    [SerializeField]
+    bool mIsActive;
 
     public ProductionRule(ProductionRuleCondition condition, ProductionRuleAction action)
     {
@@ -30,6 +31,11 @@ public class ProductionRule
 
     public bool CheckCallback(ProductionRuleManager.CONDITION callbackCondition, ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
+        if (!mIsActive)
+        {
+            return false;
+        }
+
         foreach (ProductionRuleCondition condition in conditions)
         {
             if (!condition.IsSatisfied(callbackCondition, subject, obj, env))
@@ -42,6 +48,11 @@ public class ProductionRule
     }
     public bool CheckRule(ProductionRuleObject subject, ProductionRuleObject obj, EnvironmentEngine env)
     {
+        if (!mIsActive)
+        {
+            return false;
+        }
+
         foreach (ProductionRuleCondition condition in conditions)
         {
             if (!condition.IsSatisfied(ProductionRuleManager.CONDITION.NONE, subject, obj, env))
@@ -112,4 +123,13 @@ public class ProductionRule
         }
     }
 
+    public void ToggleActive(bool active)
+    {
+        mIsActive = active;
+    }
+
+    public bool isActive()
+    {
+        return mIsActive;
+    }
 }

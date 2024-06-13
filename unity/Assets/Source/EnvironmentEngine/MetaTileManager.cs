@@ -29,6 +29,7 @@ public class MetatileManager : EnvironmentComponent
     public string loadFile = "";
 
     public bool VISUALIZE_GRAPH = false;
+    public bool VISUALIZE_HEIGHT= false;
     public Transform debugArrow;
     public Transform debugNode;
 
@@ -342,9 +343,6 @@ public class MetatileManager : EnvironmentComponent
         
         metatilepool.palette.Initialize();
 
-        InitializeMetatileList(metatilepool);
-        InitializeEnvironment();
-
         if (loadFile != "")
         {
             float startTime = Time.realtimeSinceStartup;
@@ -357,6 +355,9 @@ public class MetatileManager : EnvironmentComponent
         }
         else
         {
+            InitializeMetatileList(metatilepool);
+            InitializeEnvironment();
+
             while (GenerateEnvironment(metatilepool).MoveNext())
             {
             }
@@ -398,6 +399,18 @@ public class MetatileManager : EnvironmentComponent
                         }
                         break;
                         
+                    }
+                }
+
+                if (VISUALIZE_HEIGHT)
+                {
+                    Transform DebugNode = Instantiate<Transform>(debugNode);
+                    debugNode.position = new Vector3(x, heightMap[x, z], z) * voxelSize;
+
+                    Renderer[] renderers = DebugNode.GetComponentsInChildren<Renderer>();
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.material.color = Color.red;
                     }
                 }
                 //Debug.Log($"Height at {x} {z} = {heightMap[x, z]}");
@@ -2160,6 +2173,9 @@ public class MetatileManager : EnvironmentComponent
         mLength = (int)jSONObject["l"].i;
 
         voxelSize = jSONObject["v"].n;
+
+        InitializeMetatileList(metatilepool);
+        InitializeEnvironment();
 
         List<JSONObject> placedTiles = jSONObject["d"].list;
 
