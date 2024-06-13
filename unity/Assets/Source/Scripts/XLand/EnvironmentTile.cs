@@ -16,6 +16,7 @@ public class EnvironmentTile : MonoBehaviour
                 {7, new Color(40 / 256.0f, 40 / 256.0f, 40 / 256.0f) },
                 };
 
+    static Dictionary<Color, MaterialPropertyBlock> mMaterials = new Dictionary<Color, MaterialPropertyBlock>();
 
     public void OnTilePlaced()
     {       
@@ -30,23 +31,19 @@ public class EnvironmentTile : MonoBehaviour
 
             int positionY = Mathf.CeilToInt(transform.position.y);
 
-            renderer.material.color = ColorMap[positionY % ColorMap.Count];
+            Color color = ColorMap[positionY % ColorMap.Count];
+            if (!mMaterials.ContainsKey(color))
+            {
+                MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
+                renderer.GetPropertyBlock(propertyBlock);
+                propertyBlock.SetColor("_Color", color); // "_Color" is the default property name for the main color
+
+                mMaterials[color] = propertyBlock;
+            }
+
+
+            renderer.SetPropertyBlock(mMaterials[color]);
         }
     }
 
-    public void OnDestroy()
-    {
-        Renderer[] renderers = GetComponentsInChildren<Renderer>();
-
-        for (int i = 0; i < renderers.Length; i++)
-        {
-            Renderer renderer = renderers[i];
-
-            //Debug.Log(transform.position);
-            //renderer.material.SetColor("Albedo", Color.blue);
-
-            int positionY = Mathf.CeilToInt(transform.position.y);
-            Destroy(renderer.material);
-        }
-    }
 }

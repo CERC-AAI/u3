@@ -1,17 +1,20 @@
-import imageio
-from python.gym_wrapper import U3GymEnv
 import numpy as np
 import time
 import gymnasium as gym
+import u3gym
+
 
 def time_f(n_envs):
     env = gym.vector.AsyncVectorEnv([
         lambda i=i: gym.make(
             "U3GymEnv-v0",
-            worker_id=i + 2,
+            file_name='unity/Builds/LinuxTraining/XLand',
+            worker_id=i,
             disable_env_checker=True,
-            camera_width=64,
-            camera_height=64
+            camera_width=256,
+            camera_height=256,
+            world_folder='/network/scratch/o/omar.younis/u3-datasets/easy_low',
+            rule_folder='/network/scratch/o/omar.younis/u3-datasets/short_few'
         )
         for i in range(n_envs)
     ])
@@ -32,11 +35,7 @@ def time_f(n_envs):
 
 if __name__ == "__main__":
     ts = []
-    n_envs = [1, 4, 16, 64]
-    while len(ts) < len(n_envs):
-        try:
-            t = time_f(n_envs[len(ts)])
-            ts.append(t)
-            print(ts)
-        except Exception as e:
-            print("Failed for", n_envs[len(ts)], "trying again", e)
+    for n_envs in [1, 4, 16, 64]:
+        t = time_f(n_envs)
+        ts.append(t)
+        print(ts)
